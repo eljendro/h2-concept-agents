@@ -1,0 +1,34 @@
+# Speicherschicht (Entwurf). Als storage.yaml kopieren (nicht in Git). Umgebung über H2_ENV wählen.
+# Logische Wurzeln werden je Umgebung auf ein Backend abgebildet. Code kennt nur logische Pfade.
+
+roots:
+  projekt:  "01 Projekte/{projektname} ({projektnummer})"
+  werkzeug: "02 Dokumente/Planungsunterlagen und Wissen/H2 Konzept Werkzeuge"
+  ablage:   "02 Dokumente"
+  vorlagen: "03 CRM Salesforce/04 Templates Drive Connect /QGIS Template"   # Leerzeichen vor / ist im Original so
+
+environments:
+  local_windows:
+    backend: local
+    drive_root: "${DRIVE_ROOT}"          # z. B. G:/Geteilte Ablagen/ENEO (Drive for Desktop)
+    google_api: oauth_user               # für .gsheet, .gslides und Prüfungen nach Übertragung
+    runs_dir: "${RUNS_DIR}"
+    long_paths: true                     # Windows: Pfade über 260 Zeichen, Run-Ordner kurz halten
+
+  local_mac:
+    backend: local
+    drive_root: "${DRIVE_ROOT}"          # z. B. ~/Library/CloudStorage/GoogleDrive-<konto>/Geteilte Ablagen/ENEO
+    google_api: oauth_user
+    runs_dir: "${RUNS_DIR}"
+
+  server:
+    backend: gdrive_api
+    shared_drive_id: "${GDRIVE_SHARED_DRIVE_ID}"
+    google_api: service_account          # Schlüssel nur aus Umgebung oder Secret-Store
+    runs_dir: "/srv/h2konzept/runs"     # persistenter Speicher
+
+publish:
+  staging: "out/drive_set"               # Spiegel des Zielordners im Run
+  target: "projekt://Projektanalyse*/24h Analyse/H2 Konzept/"
+  archive_pattern: "Archiv {datum}/{name}_vor_{anlass}_{hhmm}"
+  verify: [md5_local, size_via_api, title_via_api]

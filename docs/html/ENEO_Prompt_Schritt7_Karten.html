@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ENEO-Prompt Schritt 7</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:wght@500;600&family=Source+Sans+3:wght@400;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  /* Layout: schmale Memo-Spalte, Abbildungen dürfen breiter laufen. Farben aus dem ENEO-Kartenstil abgeleitet. */
+  --bg:#f4f6f4; --surface:#ffffff; --ink:#1a2420; --muted:#5b6a63; --line:#c7d0cb;
+  --acc:#0F3A30; --accsoft:#e1ebe6; --h2:#1F4E79; --h2soft:#e2eaf3;
+  --warn:#8C2F27; --warnsoft:#f5e2df; --amb:#9a6a12; --ambsoft:#f6ecd6;
+  --pool:#FF1C24; --pot:#004BFF; --potfill:rgba(0,0,255,.16);
+  --f-disp:"Barlow Semi Condensed","Arial Narrow",sans-serif;
+  --f-body:"Source Sans 3","Segoe UI",Helvetica,Arial,sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#111714; --surface:#19211d; --ink:#e3eae6; --muted:#98a69f; --line:#34413b;
+  --acc:#7cc3a9; --accsoft:#1d3830; --h2:#8eb7e2; --h2soft:#1c2d40;
+  --warn:#ec8c80; --warnsoft:#3b221f; --amb:#e2b45c; --ambsoft:#382d1b;
+  --pool:#ff5a60; --pot:#6f9bff; --potfill:rgba(90,130,255,.22); color-scheme:dark;}}
+:root[data-theme="dark"]{
+  --bg:#111714; --surface:#19211d; --ink:#e3eae6; --muted:#98a69f; --line:#34413b;
+  --acc:#7cc3a9; --accsoft:#1d3830; --h2:#8eb7e2; --h2soft:#1c2d40;
+  --warn:#ec8c80; --warnsoft:#3b221f; --amb:#e2b45c; --ambsoft:#382d1b;
+  --pool:#ff5a60; --pot:#6f9bff; --potfill:rgba(90,130,255,.22); color-scheme:dark;}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 var(--f-body)}
+main{max-width:980px;margin:0 auto;padding:40px 20px 80px}
+header{border-bottom:2px solid var(--acc);padding-bottom:18px;margin-bottom:28px}
+.kicker{font:600 13px var(--f-mono);color:var(--acc);letter-spacing:.04em}
+h1{font:600 40px/1.1 var(--f-disp);margin:6px 0 10px;text-wrap:balance}
+h2{font:600 26px/1.2 var(--f-disp);margin:56px 0 6px;text-wrap:balance;display:flex;gap:12px;align-items:baseline}
+h2 .no{font:600 14px var(--f-mono);color:var(--acc);border:1px solid var(--acc);border-radius:4px;padding:1px 6px}
+p{max-width:68ch;margin:6px 0}
+.lead{color:var(--muted);max-width:70ch}
+.meta{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.tag{font:12px var(--f-mono);padding:3px 8px;border-radius:4px;background:var(--accsoft);color:var(--acc)}
+figure{margin:18px 0 0;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:18px;overflow-x:auto}
+figcaption{font-size:14px;color:var(--muted);margin-top:10px;max-width:80ch}
+svg{display:block;width:100%;height:auto;color:var(--ink);font-family:var(--f-body)}
+.duo{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+@media (max-width:760px){.duo{grid-template-columns:1fr}h1{font-size:32px}}
+code,.mono{font-family:var(--f-mono);font-size:.88em}
+/* SVG-Bausteine */
+.bx{fill:var(--surface);stroke:var(--line);stroke-width:1}
+.bx-acc{fill:var(--accsoft);stroke:var(--acc);stroke-width:1}
+.bx-h2{fill:var(--h2soft);stroke:var(--h2);stroke-width:1}
+.bx-warn{fill:var(--warnsoft);stroke:var(--warn);stroke-width:1}
+.bx-amb{fill:var(--ambsoft);stroke:var(--amb);stroke-width:1}
+.bx-dash{fill:none;stroke:var(--muted);stroke-width:1;stroke-dasharray:5 4}
+.ln{stroke:var(--muted);stroke-width:1.4;fill:none}
+.ln-acc{stroke:var(--acc);stroke-width:2;fill:none}
+.ln-dash{stroke:var(--acc);stroke-width:1.4;fill:none;stroke-dasharray:6 4}
+.ln-warn{stroke:var(--warn);stroke-width:1.4;fill:none}
+.tt{font:600 15px var(--f-body);fill:var(--ink)}
+.t{font:13px var(--f-body);fill:var(--ink)}
+.ts{font:12px var(--f-body);fill:var(--muted)}
+.tm{font:13px var(--f-mono);fill:var(--ink)}
+.tmb{font:600 13px var(--f-mono);fill:var(--ink)}
+.ta{font:600 12px var(--f-mono);fill:var(--acc)}
+.tw{font:600 12px var(--f-body);fill:var(--warn)}
+.tamb{font:600 12px var(--f-body);fill:var(--amb)}
+.th2{font:600 12px var(--f-body);fill:var(--h2)}
+.fa{fill:var(--acc)} .fw{fill:var(--warn)} .fm{fill:var(--muted)} .fh{fill:var(--h2)}
+.pool{fill:none;stroke:var(--pool);stroke-width:2}
+.pool-d{fill:none;stroke:var(--pool);stroke-width:2;stroke-dasharray:7 4}
+.pot{fill:var(--potfill);stroke:var(--pot);stroke-width:1.2}
+.hatch{fill:url(#hatch)}
+/* Tabellen und Kacheln */
+table{border-collapse:collapse;width:100%;font-size:14px;min-width:620px}
+th,td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}
+th{font:600 13px var(--f-body);background:var(--bg)}
+td.ab{background:var(--warnsoft);color:var(--warn);font-weight:600}
+td.ve{background:var(--ambsoft);color:var(--amb);font-weight:600}
+td.of{background:var(--accsoft);color:var(--acc)}
+td.c{text-align:center;font-size:18px;color:var(--acc)}
+td.cw{text-align:center;font-size:18px;color:var(--muted)}
+td.ph{color:var(--muted);font-family:var(--f-mono);font-size:12px}
+.chip{display:inline-block;font:600 11px var(--f-body);padding:1px 6px;border-radius:3px;margin-left:6px;vertical-align:middle}
+.chip.ind{background:var(--ambsoft);color:var(--amb)}
+.chip.op{background:var(--warnsoft);color:var(--warn)}
+.src{font-family:var(--f-mono);font-size:12px;color:var(--muted)}
+.tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px}
+.tile{border:1px solid var(--line);border-left:4px solid var(--acc);border-radius:0;padding:10px 12px;background:var(--bg)}
+.tile b{overflow-wrap:anywhere;display:block;font:600 15px var(--f-disp);letter-spacing:.01em}
+.tile span{font-size:13px;color:var(--muted)}
+.issues{display:grid;gap:10px;margin-top:14px}
+.issue{border:1px solid var(--line);border-left:4px solid var(--amb);border-radius:0;background:var(--surface);padding:12px 14px}
+.issue b{font:600 16px var(--f-disp)}
+.issue p{margin:4px 0 0;font-size:15px}
+.legend{display:flex;flex-wrap:wrap;gap:14px;font-size:13px;color:var(--muted);margin-top:10px}
+.legend i{display:inline-block;width:14px;height:10px;margin-right:6px;vertical-align:middle;border-radius:2px}
+footer{margin-top:60px;font-size:13px;color:var(--muted);border-top:1px solid var(--line);padding-top:12px}
+</style>
+</head>
+<body>
+<main>
+
+<header>
+  <div class="kicker">ENEO Wasserstoff-Standortkonzept · Fassung 2026-11-11-Z</div>
+  <h1>Schritt 7: Karten</h1>
+  <p class="lead">Sieben Kartenblätter im ENEO-Hausstil, alle als A3-PDF. Anhang F ist das Rezept und wird vollständig in seiner Reihenfolge abgearbeitet. Kein Blatt gilt als fertig, bevor es nach dem Export als Bild angesehen wurde.</p>
+  <div class="meta"><span class="tag">Anhang C</span><span class="tag">Anhang E</span><span class="tag">Anhang F</span><span class="tag">Anhang G2</span><span class="tag">Anhang H4</span></div>
+</header>
+
+<!-- 01 Blätter -->
+<h2><span class="no">01</span>Die sieben Blätter</h2>
+<figure>
+<svg viewBox="0 0 900 470" role="img" aria-label="Übersicht der Kartenblätter 1 bis 8, Blatt 6 nicht belegt, mit Inhalt, Maßstab, Layout und externer Fassung">
+<g>
+<rect class="bx-acc" x="20" y="20" width="200" height="200" rx="6"/><rect x="32" y="32" width="128" height="88" class="bx"/><rect x="160" y="70" width="48" height="50" class="bx"/>
+<text class="tmb" x="32" y="144">1 Elektrolysestandort</text><text class="ts" x="32" y="164">kurze Wege, beide Varianten,</text><text class="ts" x="32" y="180">BESS-Eignungsflächen</text><text class="ta" x="32" y="206">Layout H2Konzept</text>
+<rect class="bx-acc" x="240" y="20" width="200" height="200" rx="6"/><rect x="252" y="32" width="128" height="88" class="bx"/><rect x="380" y="70" width="48" height="50" class="bx"/>
+<text class="tmb" x="252" y="144">2 Übersicht 15 km</text><text class="ts" x="252" y="164">Parksymbole, Anlagen Dritter,</text><text class="ts" x="252" y="180">Vorranggebiete</text><text class="ta" x="252" y="206">Layout H2Konzept</text>
+<rect class="bx-acc" x="460" y="20" width="200" height="200" rx="6"/><rect x="472" y="32" width="128" height="88" class="bx"/><rect x="600" y="70" width="48" height="50" class="bx"/>
+<text class="tmb" x="472" y="144">3 Parkverbund</text><text class="ts" x="472" y="164">Anlagen einzeln, Flächen,</text><text class="ts" x="472" y="180">Verbund- und Direktleitungen</text><text class="ta" x="472" y="206">Layout H2Konzept</text>
+<rect class="bx-dash" x="680" y="20" width="200" height="200" rx="6"/>
+<text class="tmb" x="692" y="144">6 nicht belegt</text><text class="ts" x="692" y="164">Nummern bleiben fest, damit</text><text class="ts" x="692" y="180">Dateinamen und Skripte über</text><text class="ts" x="692" y="196">alle Projekte gleich bleiben</text>
+<rect class="bx-h2" x="20" y="240" width="200" height="210" rx="6"/><rect x="32" y="252" width="128" height="88" class="bx"/><rect x="160" y="290" width="48" height="50" class="bx"/>
+<text class="tmb" x="32" y="364">4 Eigentümer, nah</text><text class="ts" x="32" y="384">Ausschnitt wie Blatt 1,</text><text class="ts" x="32" y="400">ohne Namen Dritter</text><text class="th2" x="32" y="426">Layout Eigentuemer</text>
+<rect class="bx-h2" x="240" y="240" width="200" height="210" rx="6"/><rect x="252" y="252" width="128" height="88" class="bx"/><rect x="380" y="290" width="48" height="50" class="bx"/>
+<text class="tmb" x="252" y="364">5 Eigentümer, Umfeld</text><text class="ts" x="252" y="384">Ausschnitt wie Blatt 2,</text><text class="ts" x="252" y="400">ohne Namen Dritter</text><text class="th2" x="252" y="426">Layout Eigentuemer</text>
+<rect class="bx-amb" x="460" y="240" width="200" height="210" rx="6"/><rect x="472" y="252" width="128" height="88" class="bx"/><circle cx="526" cy="296" r="36" fill="none" stroke="currentColor" stroke-dasharray="3 3"/><rect x="600" y="290" width="48" height="50" class="bx"/>
+<text class="tmb" x="472" y="364">7 Verbundkarte</text><text class="ts" x="472" y="384">1:80.000, Umkreis 10 km,</text><text class="ts" x="472" y="400">Namen in Randspalten</text><text class="tamb" x="472" y="426">Layout Verbund · + _extern</text>
+<rect class="bx-amb" x="680" y="240" width="200" height="210" rx="6"/><rect x="692" y="252" width="128" height="88" class="bx"/><rect x="820" y="290" width="48" height="50" class="bx"/>
+<text class="tmb" x="692" y="364">8 Nahbereich</text><text class="ts" x="692" y="384">1:40.000, Icons mit Namen,</text><text class="ts" x="692" y="400">ohne Überschneidung</text><text class="tamb" x="692" y="426">Layout Nahbereich · + _extern</text>
+</g>
+</svg>
+<div class="legend"><span><i style="background:var(--accsoft);border:1px solid var(--acc)"></i>Konzeptblätter</span><span><i style="background:var(--h2soft);border:1px solid var(--h2)"></i>für Flächeneigentümer, von Haus aus ohne Namen</span><span><i style="background:var(--ambsoft);border:1px solid var(--amb)"></i>mit Teilnehmernamen, zusätzlich externe Fassung</span></div>
+<figcaption>Dateien heißen <code>&lt;Projekt&gt;_&lt;Nr&gt;_&lt;Name&gt;</code>, etwa <code>_1_Elektrolysestandort</code> oder <code>_7_Verbund_extern</code>. Alle Blätter A3 quer nach Vorgabe von Philipp Rasche vom 06.11.2026.</figcaption>
+</figure>
+
+<!-- 02 Reihenfolge -->
+<h2><span class="no">02</span>Reihenfolge je Blatt</h2>
+<figure>
+<svg viewBox="0 0 900 290" role="img" aria-label="Zehn Arbeitsschritte je Blatt von Layerliste bis Sichtprüfung, mit Rückkehr bei Befund, erst dann das nächste Blatt">
+<defs><marker id="a2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M1 1L9 5L1 9z" class="fm"/></marker></defs>
+<g>
+<rect class="bx" x="20" y="30" width="150" height="50" rx="5"/><text class="ta" x="32" y="52">1</text><text class="t" x="50" y="52">Layerliste,</text><text class="t" x="50" y="68">Stile</text>
+<rect class="bx" x="195" y="30" width="150" height="50" rx="5"/><text class="ta" x="207" y="52">2</text><text class="t" x="225" y="52">Ausschnitt</text><text class="ts" x="225" y="68">F12</text>
+<rect class="bx" x="370" y="30" width="150" height="50" rx="5"/><text class="ta" x="382" y="52">3</text><text class="t" x="400" y="52">Gitter</text><text class="ts" x="400" y="68">F9</text>
+<rect class="bx" x="545" y="30" width="150" height="50" rx="5"/><text class="ta" x="557" y="52">4</text><text class="t" x="575" y="52">Schriftfeld</text><text class="ts" x="575" y="68">F9</text>
+<rect class="bx" x="720" y="30" width="160" height="50" rx="5"/><text class="ta" x="732" y="52">5</text><text class="t" x="750" y="52">Legende bauen</text><text class="ts" x="750" y="68">F11, zuletzt</text>
+<rect class="bx" x="720" y="120" width="160" height="50" rx="5"/><text class="ta" x="732" y="142">6</text><text class="t" x="750" y="142">Legendenfeld</text><text class="ts" x="750" y="158">kompakt ziehen</text>
+<rect class="bx" x="545" y="120" width="150" height="50" rx="5"/><text class="ta" x="557" y="142">7</text><text class="t" x="575" y="142">Nordpfeil</text>
+<rect class="bx-h2" x="370" y="120" width="150" height="50" rx="5"/><text class="ta" x="382" y="142">8</text><text class="t" x="400" y="142">PNG, PDF</text><text class="ts" x="400" y="158">A3, 300 dpi</text>
+<rect class="bx-h2" x="195" y="120" width="150" height="50" rx="5"/><text class="ta" x="207" y="142">9</text><text class="t" x="225" y="142">Vorschau JPG</text><text class="ts" x="225" y="158">1.587 px</text>
+<rect class="bx-warn" x="20" y="120" width="150" height="50" rx="5"/><text class="ta" x="32" y="142">10</text><text class="t" x="56" y="142">Sichtprüfung</text><text class="ts" x="56" y="158">am Bild, G2</text>
+</g>
+<path class="ln" d="M170 55 H191" marker-end="url(#a2)"/><path class="ln" d="M345 55 H366" marker-end="url(#a2)"/><path class="ln" d="M520 55 H541" marker-end="url(#a2)"/><path class="ln" d="M695 55 H716" marker-end="url(#a2)"/>
+<path class="ln" d="M800 80 V116" marker-end="url(#a2)"/>
+<path class="ln" d="M720 145 H699" marker-end="url(#a2)"/><path class="ln" d="M545 145 H524" marker-end="url(#a2)"/><path class="ln" d="M370 145 H349" marker-end="url(#a2)"/><path class="ln" d="M195 145 H174" marker-end="url(#a2)"/>
+<path class="ln-warn" d="M60 170 V200 H440 V174" marker-end="url(#a2)"/><text class="tw" x="160" y="218">Befund: beheben, neu exportieren</text>
+<path class="ln" d="M130 170 V250 H210" marker-end="url(#a2)"/>
+<rect class="bx-acc" x="214" y="232" width="160" height="36" rx="5"/><text class="t" x="294" y="255" text-anchor="middle">nächstes Blatt</text>
+<rect class="bx-amb" x="460" y="226" width="420" height="48" rx="5"/><text class="t" x="472" y="246">Blatt 7 und 8: je Fassung eigener Aufbau,</text><text class="ts" x="472" y="264">extern zuerst, intern zuletzt, damit intern im Projekt steht</text>
+</svg>
+<figcaption>Nach jedem Abschnitt von Anhang F wird einmal aufs Blatt gesehen. Erst wenn alle Blätter geprüft sind, gehen die Vorschaubilder als Kontaktbogen an den Nutzer, vor dem Dokumentenbau.</figcaption>
+</figure>
+
+<!-- 03 A4 zu A3 -->
+<h2><span class="no">03</span>F1 · Aus der A4-Vorlage wird A3</h2>
+<figure>
+<svg viewBox="0 0 900 340" role="img" aria-label="Maßstäbliche Gegenüberstellung: A4-Vorlage mit Kartenelement und Panel, daraus durch Klonen und Verschieben das A3-Blatt">
+<defs><marker id="a3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M1 1L9 5L1 9z" class="fm"/></marker></defs>
+<text class="tt" x="20" y="22">A4 quer, Vorlage</text>
+<rect class="bx" x="20" y="34" width="267" height="189" rx="2"/>
+<rect class="bx-acc" x="26.5" y="40.5" width="254.4" height="176.1"/>
+<rect class="bx" x="228.4" y="140" width="52.4" height="76.6"/>
+<text class="ts" x="120" y="128" text-anchor="middle">282,7 × 195,7</text><text class="ts" x="254.6" y="180" text-anchor="middle">Panel</text>
+<path class="ln" d="M300 130 H360" marker-end="url(#a3)"/><text class="ts" x="304" y="120">klonen</text>
+<text class="tt" x="380" y="22">A3 quer, Ausgabe</text>
+<rect class="bx" x="380" y="34" width="378" height="267.3" rx="2"/>
+<rect class="bx-acc" x="386.5" y="40.5" width="365" height="254.3"/>
+<rect class="bx" x="699.1" y="140" width="52.4" height="154.9"/>
+<text class="ts" x="545" y="170" text-anchor="middle">405,6 × 282,6</text><text class="ts" x="725.3" y="220" text-anchor="middle">Panel</text><text class="ts" x="725.3" y="236" text-anchor="middle">58,2</text>
+<text class="ts" x="569" y="320" text-anchor="middle">420 × 297 mm, Rand 7,2 mm</text>
+<text class="ts" x="776" y="60">Panelelemente</text><text class="ta" x="776" y="80">x &gt; 150 mm:</text><text class="ts" x="776" y="96">+123 mm</text><text class="ta" x="776" y="120">y &gt; 130 mm:</text><text class="ts" x="776" y="136">+87 mm</text><text class="ts" x="776" y="160">Kasten +87 mm</text><text class="ts" x="776" y="176">höher</text>
+<text class="ts" x="776" y="208">Ausschnitt per</text><text class="tm" x="776" y="224">zoomToExtent</text><text class="ts" x="776" y="240">übertragen</text>
+</svg>
+<figcaption>Maßstäblich, 1 mm Papier = 0,9 Einheiten. Alle Maße in Millimetern des Layouts, nie in Kartenmetern. Ein Layout aus der Projektdatei als Vorlage zu nehmen, war eine der Fallen: Kartenelement und Panel blieben A4 (H4).</figcaption>
+</figure>
+
+<!-- 04 Panel -->
+<h2><span class="no">04</span>F1 · Das Panel, nur so hoch wie sein Inhalt</h2>
+<div class="duo">
+<figure>
+<svg viewBox="0 0 420 520" role="img" aria-label="Aufbau des Panels von oben nach unten: Titel, Trennlinie, Legende in zwei Spalten, Übersichtskarte, Logo, Impressum, Projektname, CRS, Maßstabszeile, Maßstabsleiste">
+<rect x="20" y="20" width="230" height="480" fill="var(--accsoft)" stroke="var(--acc)" stroke-dasharray="4 3"/>
+<text class="ta" x="135" y="44" text-anchor="middle">Hauptkarte</text>
+<rect class="bx" x="200" y="100" width="190" height="400"/>
+<text class="tmb" x="210" y="122">Wasserstoff-Standort-</text><text class="tmb" x="210" y="138">konzept (P-XXXX)</text>
+<line x1="210" y1="148" x2="380" y2="148" stroke="var(--acc)" stroke-width="1.2"/>
+<rect x="210" y="156" width="82" height="150" fill="none" stroke="var(--line)"/><rect x="298" y="156" width="82" height="150" fill="none" stroke="var(--line)"/><text class="ts" x="251" y="234" text-anchor="middle">Spalte 1</text><text class="ts" x="339" y="234" text-anchor="middle">Spalte 2</text>
+<text class="tw" x="295" y="320" text-anchor="middle">3 mm</text>
+<rect x="210" y="326" width="170" height="76" class="bx-h2"/><text class="ts" x="295" y="368" text-anchor="middle">Übersicht 1:1.200.000</text>
+<rect x="210" y="408" width="100" height="32" class="bx-acc"/><text class="ts" x="260" y="429" text-anchor="middle">Logo</text>
+<text class="ts" x="210" y="456">Impressum · Projekt</text><text class="ts" x="210" y="472">CRS · Maßstab | bearb.</text>
+<rect x="210" y="482" width="40" height="6" fill="currentColor"/><rect x="250" y="482" width="40" height="6" fill="none" stroke="currentColor"/>
+<line x1="395" y1="100" x2="395" y2="500" class="ln"/><text class="ts" x="400" y="300">wächst</text>
+</svg>
+<figcaption>Schema. Unten bündig fest: Übersichtskarte 57,7 × 26 mm, Logo 34 × 11,4 mm, Impressum, Zeilen und Maßstabsleiste. Titel, Trennlinie und Legende rücken nach unten, bis die Legende 3 mm über der Übersicht endet.</figcaption>
+</figure>
+<figure>
+<svg viewBox="0 0 420 520" role="img" aria-label="Fehler und Ausweg: Panel in voller Höhe mit leerem Feld ist falsch. Reicht der Platz nicht, wird der Kasten bis zum oberen Kartenrand gezogen und danach wieder kompakt gesetzt">
+<rect class="bx-warn" x="20" y="20" width="180" height="300" rx="4"/><text class="tw" x="110" y="44" text-anchor="middle">falsch</text>
+<rect x="40" y="60" width="140" height="160" fill="var(--surface)" stroke="var(--warn)" stroke-dasharray="4 3"/><text class="tw" x="110" y="144" text-anchor="middle">leeres Feld</text>
+<rect x="40" y="226" width="140" height="80" class="bx"/><text class="ts" x="110" y="270" text-anchor="middle">Legende</text>
+<rect class="bx-acc" x="220" y="20" width="180" height="300" rx="4"/><text class="ta" x="310" y="44" text-anchor="middle">richtig</text>
+<rect x="240" y="170" width="140" height="136" class="bx"/><text class="ts" x="310" y="242" text-anchor="middle">Legende</text><text class="ts" x="310" y="160" text-anchor="middle">Kasten beginnt am Titel</text>
+<rect class="bx-amb" x="20" y="340" width="380" height="160" rx="6"/><text class="tt" x="34" y="364">Zu wenig Platz</text>
+<text class="ts" x="34" y="390">1 Kasten bis zum oberen Kartenrand ziehen,</text><text class="ts" x="34" y="406">Legende ab Kartenrand + 9,6 mm</text>
+<text class="ts" x="34" y="430">2 Zeilenhöhen auf 5,7 / 4,0 / 4,2 mm,</text><text class="ts" x="34" y="446">Abstand 2,5 mm</text>
+<text class="ts" x="34" y="470">3 danach wieder kompakt setzen</text><text class="tw" x="34" y="490">nie die Schrift verkleinern</text>
+</svg>
+<figcaption>„Ein leeres weißes Feld im Panel ist ein Fehler.“ Die Legende ist zugleich Beschriftungssperre für die Hauptkarte, mit 2 mm Abstand.</figcaption>
+</figure>
+</div>
+
+<!-- 05 Farben -->
+<h2><span class="no">05</span>F5 · Themenfarben und Flächenstile</h2>
+<figure>
+<svg viewBox="0 0 900 400" role="img" aria-label="Neun Themenfarben des ENEO-Hausstils mit Hexwert und Verwendung, dazu sieben Flächenstile">
+<g>
+<rect x="20" y="20" width="40" height="28" fill="#1F4E79"/><text class="tmb" x="70" y="32">#1F4E79</text><text class="ts" x="70" y="46">Wasserstoff, Elektrolyse, Kernnetz</text>
+<rect x="20" y="58" width="40" height="28" fill="#6B4A2E"/><text class="tmb" x="70" y="70">#6B4A2E</text><text class="ts" x="70" y="84">Biogas, CO2, Methanolweg</text>
+<rect x="20" y="96" width="40" height="28" fill="#B8860B"/><text class="tmb" x="70" y="108">#B8860B</text><text class="ts" x="70" y="122">Solar</text>
+<rect x="20" y="134" width="40" height="28" fill="#8C2F27"/><text class="tmb" x="70" y="146">#8C2F27</text><text class="ts" x="70" y="160">Netz, Gasnetz, Leitungen (Alpha 190)</text>
+<rect x="20" y="172" width="40" height="28" fill="#1A1A1A"/><text class="tmb" x="70" y="184">#1A1A1A</text><text class="ts" x="70" y="198">Wärme, Industrie, Versatzlinien</text>
+<rect x="20" y="210" width="40" height="28" fill="#0F3A30"/><text class="tmb" x="70" y="222">#0F3A30</text><text class="ts" x="70" y="236">Wind, Parkverbund, Nordpfeil, Kopfzeilen</text>
+<rect x="20" y="248" width="40" height="28" fill="#4A78C8"/><text class="tmb" x="70" y="260">#4A78C8</text><text class="ts" x="70" y="274">Anlagen Dritter in Planung</text>
+<rect x="20" y="286" width="40" height="28" fill="#E58A2E"/><text class="tmb" x="70" y="298">orange</text><text class="ts" x="70" y="312">WEA Dritter in Betrieb (pb.C['aktiv'])</text>
+<rect x="20" y="324" width="40" height="28" fill="#5A5266"/><text class="tmb" x="70" y="336">#5A5266</text><text class="ts" x="70" y="350">Speicher, BESS-Eignung</text>
+</g>
+<g>
+<text class="tt" x="480" y="28">Flächen</text>
+<rect x="480" y="44" width="70" height="34" fill="none" stroke="rgb(255,28,36)" stroke-width="2"/><text class="t" x="566" y="58">Poolfläche</text><text class="ts" x="566" y="72">keine Füllung, 0,30 mm</text>
+<rect x="480" y="88" width="70" height="34" fill="rgba(0,0,255,.21)" stroke="rgb(0,75,255)" stroke-width="1.3"/><text class="t" x="566" y="102">Potenzialfläche</text><text class="ts" x="566" y="116">Füllung Alpha 54, 0,20 mm</text>
+<rect x="480" y="132" width="70" height="34" fill="none" stroke="rgb(255,28,36)" stroke-width="2" stroke-dasharray="7 4"/><text class="t" x="566" y="146">Nachrichtliche ENEO-Fläche</text><text class="ts" x="566" y="160">gestrichelt, 0,30 mm</text>
+<rect x="480" y="176" width="70" height="34" fill="none" stroke="#7a4fb0" stroke-width="2.4" stroke-dasharray="8 4"/><text class="t" x="566" y="190">RROP-Vorranggebiet</text><text class="ts" x="566" y="204">violett gestrichelt, 0,50 mm</text>
+<rect x="480" y="220" width="70" height="34" fill="rgba(90,82,102,.24)" stroke="#5A5266" stroke-width="2.4"/><text class="t" x="566" y="234">BESS-Eignungsfläche</text><text class="ts" x="566" y="248">„BESS 3 2,1 ha“, 0,55 mm</text>
+<rect x="480" y="264" width="70" height="34" fill="none" stroke="currentColor" stroke-width="1.2" stroke-dasharray="6 4"/><text class="t" x="566" y="278">Analysegebiet 15 km</text><text class="ts" x="566" y="292">schwarz gestrichelt, 0,25 mm</text>
+<rect x="480" y="308" width="70" height="34" fill="none" stroke="currentColor" stroke-width="1.5" stroke-dasharray="6 4"/><text class="t" x="566" y="322">Umkreis 10 km, Blatt 7</text><text class="ts" x="566" y="336">schwarz gestrichelt, 0,30 mm</text>
+</g>
+</svg>
+<figcaption>Hexwerte aus F5, die Farbtöne für „orange“ und RROP-Violett sind Näherungen, weil der Prompt dafür auf <code>pb.C</code> im Skript verweist. Eigene Flächen stehen im ENEO-Originalstil der Projektdateien, nicht in der Windfarbe (Entscheidung des Nutzers vom 06.11.2026).</figcaption>
+</figure>
+
+<!-- 06 Symbole -->
+<h2><span class="no">06</span>F6 · Symbole und ihre Größe</h2>
+<div class="duo">
+<figure>
+<table style="min-width:0;font-size:13px">
+<thead><tr><th>Datei</th><th>für</th></tr></thead>
+<tbody>
+<tr><td class="src">eneo_windenergie</td><td>WEA ENEO, Parksymbol</td></tr>
+<tr><td class="src">eneo_wind_bestand</td><td>Anlagen Dritter</td></tr>
+<tr><td class="src">eneo_elektrolyse</td><td>Varianten A und B</td></tr>
+<tr><td class="src">eneo_h2_erzeugung</td><td>Erzeugungspartner, Tankstellen</td></tr>
+<tr><td class="src">eneo_h2_kernnetz</td><td>Einspeisepunkt, Kernnetz, überregional</td></tr>
+<tr><td class="src">eneo_umspannwerk</td><td>Umspannwerke</td></tr>
+<tr><td class="src">eneo_verknuepfungspunkt_380kv</td><td>Verknüpfungspunkte</td></tr>
+<tr><td class="src">eneo_energieversorger</td><td>Energie, Infrastruktur</td></tr>
+<tr><td class="src">eneo_biogas</td><td>braun: CO2-Quelle, schwarz: Teilnehmer</td></tr>
+<tr><td class="src">eneo_pv · eneo_speicher</td><td>Photovoltaik, Speicher</td></tr>
+<tr><td class="src">eneo_waermenetz · eneo_industrie</td><td>Wärmesenken, Industrie</td></tr>
+<tr><td class="src">eneo_ankerabnehmer(_ohne_kreis)</td><td>ohne Kreis auf Blatt 7 und 8</td></tr>
+<tr><td class="src">eneo_logistik · eneo_hafen</td><td>Logistik, Häfen</td></tr>
+<tr><td class="src">eneo_entsorgung · eneo_kommunal</td><td>Abfall, Kläranlagen, Kommunen</td></tr>
+<tr><td class="src">eneo_forschung</td><td>Forschung und Bildung</td></tr>
+<tr><td class="src">eneo_projektgebiet</td><td>Übersicht Blatt 4 und 5</td></tr>
+<tr><td class="src">nordpfeil.svg</td><td>#0F3A30 und #2F6F57</td></tr>
+</tbody>
+</table>
+<figcaption>H2-Symbolsatz mit 20 SVG im Werkzeugordner unter <code>ENEO_QGIS_Icons/</code>. Füllung und Kontur in derselben Farbe, Konturstärke 7,5 % der Symbolgröße.</figcaption>
+</figure>
+<figure>
+<svg viewBox="0 0 420 420" role="img" aria-label="Symbolgröße auf Blatt 1 bis 5 hängt am Maßstab: 8 mm bis 1:40.000, linear fallend auf 4 mm bei 1:200.000. Auf Blatt 7 und 8 fest 5,5 mm">
+<line x1="60" y1="300" x2="400" y2="300" class="ln"/><line x1="60" y1="300" x2="60" y2="40" class="ln"/>
+<text class="ts" x="52" y="304" text-anchor="end">2</text><text class="ts" x="52" y="244" text-anchor="end">4</text><text class="ts" x="52" y="184" text-anchor="end">6</text><text class="ts" x="52" y="124" text-anchor="end">8</text><text class="ts" x="52" y="64" text-anchor="end">10</text>
+<line x1="60" y1="240" x2="400" y2="240" stroke="var(--line)" stroke-dasharray="2 3"/><line x1="60" y1="180" x2="400" y2="180" stroke="var(--line)" stroke-dasharray="2 3"/><line x1="60" y1="120" x2="400" y2="120" stroke="var(--line)" stroke-dasharray="2 3"/>
+<text class="ts" x="74" y="320" text-anchor="middle">20k</text><text class="ts" x="108" y="320" text-anchor="middle">40k</text><text class="ts" x="210" y="320" text-anchor="middle">100k</text><text class="ts" x="295" y="320" text-anchor="middle">150k</text><text class="ts" x="380" y="320" text-anchor="middle">200k</text>
+<polyline points="60,120 108,120 380,240 400,240" fill="none" stroke="var(--acc)" stroke-width="2.4"/>
+<line x1="60" y1="165" x2="400" y2="165" stroke="var(--amb)" stroke-width="1.6" stroke-dasharray="6 4"/><text class="tamb" x="396" y="158" text-anchor="end">Blatt 7, 8: 5,5 mm</text>
+<circle cx="76" cy="120" r="5" class="fh"/><text class="th2" x="82" y="108">1</text>
+<circle cx="98" cy="120" r="5" class="fh"/><text class="th2" x="96" y="108">3</text>
+<circle cx="311" cy="210" r="5" class="fh"/><text class="th2" x="250" y="232">2 (5,0 mm)</text>
+<text class="ts" x="230" y="344" text-anchor="middle">Maßstabszahl</text><text class="ts" x="20" y="30">Größe in mm</text>
+<text class="tm" x="20" y="380">scale_linear(@map_scale,</text><text class="tm" x="20" y="398"> 40000, 200000, 8, 4)</text>
+</svg>
+<figcaption>Punkte: A4-Maßstäbe aus der Blatttabelle des Referenzlaufs. In A3 sinken die Maßstabszahlen um etwa den Faktor 1,43, die Symbole werden dadurch eher größer. Die Elektrolyse ist auf Blatt 7 und 8 6,0 mm groß.</figcaption>
+</figure>
+</div>
+
+<!-- 07 Versatz -->
+<h2><span class="no">07</span>F7 · Icons versetzen ohne Überschneidung</h2>
+<figure>
+<svg viewBox="0 0 900 380" role="img" aria-label="Versatzalgorithmus: feste Symbole zuerst, jedes Icon prüft gegen gesetzte Icons, Punkte und Beschriftungen, Versatz in acht Richtungen bis 36 mm, kleinster freier Versatz gewinnt, Standortpunkt und Versatzlinie">
+<rect class="bx" x="20" y="20" width="420" height="340" rx="6"/>
+<g stroke="var(--line)" stroke-dasharray="3 3">
+<line x1="230" y1="190" x2="230" y2="50"/><line x1="230" y1="190" x2="230" y2="330"/><line x1="230" y1="190" x2="90" y2="190"/><line x1="230" y1="190" x2="370" y2="190"/>
+<line x1="230" y1="190" x2="131" y2="91"/><line x1="230" y1="190" x2="329" y2="91"/><line x1="230" y1="190" x2="131" y2="289"/><line x1="230" y1="190" x2="329" y2="289"/>
+</g>
+<circle cx="230" cy="190" r="140" fill="none" stroke="var(--line)"/><text class="ts" x="372" y="80">36 mm</text>
+<rect x="191" y="151" width="22" height="22" class="fh" transform="rotate(45 202 162)"/><text class="th2" x="168" y="144">fest</text>
+<rect x="216" y="176" width="28" height="28" rx="4" fill="var(--warnsoft)" stroke="var(--warn)"/><text class="tw" x="250" y="216">Konflikt</text>
+<line x1="230" y1="190" x2="300" y2="190" stroke="#1A1A1A" stroke-width="1.4"/>
+<circle cx="230" cy="190" r="4" fill="#1A1A1A"/>
+<rect x="300" y="176" width="28" height="28" rx="4" class="bx-acc"/>
+<text class="t" x="334" y="186">Kiesel GmbH</text><text class="ts" x="334" y="202">rechts, fett, Halo</text>
+<text class="tt" x="470" y="40">Ablauf in nah.py</text>
+<text class="t" x="470" y="70">1 feste Symbole setzen, die nicht weichen</text><text class="ts" x="486" y="88">Elektrolyse. Auf Blatt 7 sind Teilnehmer 2,2-mm-Punkte</text><text class="ts" x="486" y="104">und zugleich Hindernisse, auf Blatt 8 Icons.</text>
+<text class="t" x="470" y="134">2 jedes Icon im Layoutmaß prüfen</text><text class="ts" x="486" y="152">gegen Icons, Punkte, Beschriftungskästen</text><text class="ts" x="486" y="168">(Umbruch bei 24 Zeichen, 6,5 pt fett)</text>
+<text class="t" x="470" y="198">3 acht Richtungen bis 36 mm,</text><text class="t" x="486" y="216">kleinster freier Versatz gewinnt</text>
+<text class="t" x="470" y="246">4 Standortpunkt 1,8 mm, Versatzlinie 0,25 mm</text><text class="ts" x="486" y="264">Legende: „Icon versetzt, Punkt am Standort“</text>
+<text class="t" x="470" y="294">5 Ergebnis &lt;blatt&gt;_symbole.gpkg</text><text class="ts" x="486" y="312">Layer Symbole, Standort, Versatz</text>
+<text class="t" x="470" y="342">6 verworfene Beschriftungen mit Namen melden</text>
+</svg>
+<figcaption>Schema mit erfundenem Namen. Gilt für Blatt 7 und 8. Auf Blatt 1 bis 5 gibt es feste Versatzplätze aus <code>slots3.json</code>, Doppelerfassungen werden für die Darstellung auf eine Quelle gefiltert.</figcaption>
+</figure>
+
+<!-- 08 Blatt 7 -->
+<h2><span class="no">08</span>F7 und F12 · Blatt 7, Verbundkarte mit Randspalten</h2>
+<figure>
+<svg viewBox="0 0 900 470" role="img" aria-label="Aufbau von Blatt 7: Umkreis 10 km in der Mitte des sichtbaren Kartenteils, Teilnehmer als Punkte, Namen mit Icon in zwei Randspalten mit Linie zum Punkt, Ziele außerhalb mit Pfeil zum Rand">
+<defs><marker id="a8" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M1 1L9 5L1 9z" style="fill:currentColor"/></marker></defs>
+<rect x="20" y="20" width="860" height="430" fill="var(--bg)" stroke="var(--line)"/>
+<rect x="720" y="230" width="150" height="210" class="bx"/><text class="ts" x="795" y="340" text-anchor="middle">Panel</text>
+<circle cx="370" cy="235" r="190" fill="none" stroke="currentColor" stroke-width="1.2" stroke-dasharray="6 4"/><text class="ts" x="370" y="62" text-anchor="middle">Umkreis 10 km</text>
+<text class="tmb" x="34" y="46">N</text><text class="ts" x="34" y="64">Nordpfeil</text>
+<polygon class="pot" points="330,200 400,192 410,250 340,258"/><polygon class="pool" points="340,206 394,200 402,244 348,250"/>
+<rect x="430" y="215" width="14" height="14" class="fh" transform="rotate(45 437 222)"/>
+<g style="fill:currentColor"><circle cx="250" cy="150" r="4"/><circle cx="270" cy="320" r="4"/><circle cx="470" cy="140" r="4"/><circle cx="500" cy="300" r="4"/><circle cx="300" cy="380" r="4"/></g>
+<g stroke="currentColor" stroke-width="0.7" fill="none"><path d="M140 120 L250 150"/><path d="M140 160 L270 320"/><path d="M140 200 L300 380"/><path d="M640 120 L470 140"/><path d="M640 160 L500 300"/></g>
+<g><rect x="36" y="110" width="104" height="20" fill="var(--surface)"/><text class="ts" x="40" y="124">■ Stadtwerke …</text>
+<rect x="36" y="150" width="104" height="20" fill="var(--surface)"/><text class="ts" x="40" y="164">■ Kläranlage …</text>
+<rect x="36" y="190" width="104" height="20" fill="var(--surface)"/><text class="ts" x="40" y="204">■ Biogas, anonym.</text>
+<rect x="640" y="110" width="76" height="20" fill="var(--surface)"/><text class="ts" x="712" y="124" text-anchor="end">Ziegelei … ■</text>
+<rect x="640" y="150" width="76" height="20" fill="var(--surface)"/><text class="ts" x="712" y="164" text-anchor="end">Spedition … ■</text></g>
+<text class="ts" x="40" y="96">ab 24 mm unter Nordpfeil</text>
+<line x1="560" y1="380" x2="700" y2="430" stroke="currentColor" stroke-width="0.7" marker-end="url(#a8)"/><text class="ts" x="560" y="418">Ziel außerhalb, Pfeil zum Rand,</text><text class="ts" x="560" y="434">„außerhalb des Ausschnitts, … km“</text>
+<text class="ts" x="40" y="440">Ringmitte mittig im sichtbaren Kartenteil, 1:80.000</text>
+</svg>
+<figcaption>Schema mit gekürzten Namen. Randspalten werden nach der Lage des Punktes verteilt, gestapelt ohne Überlappung, je Zeile eine Linie von 0,15 mm. Keine Wind-Icons: Die Parks erscheinen als Pool- und Potenzialfläche mit Namen. Die externe Fassung zeigt nur die Punkte, ohne Randspalten.</figcaption>
+</figure>
+
+<!-- 09 Layerlisten und Sichtbarkeit -->
+<h2><span class="no">09</span>F3 und F8 · Was auf welchem Blatt erscheint</h2>
+<figure>
+<table>
+<thead><tr><th>Layer</th><th>Blatt 1</th><th>2</th><th>3</th><th>7</th><th>8</th><th>Regel</th></tr></thead>
+<tbody>
+<tr><td>Elektrolysestandort</td><td class="c">●</td><td class="c">●</td><td class="c">●</td><td class="c">●</td><td class="c">●</td><td></td></tr>
+<tr><td>WEA-Standorte einzeln</td><td class="c">●</td><td class="cw">○</td><td class="c">●</td><td></td><td></td><td class="ph">Übersicht: Parksymbol</td></tr>
+<tr><td>Pool- und Potenzialflächen</td><td class="c">●</td><td class="c">●</td><td class="c">●</td><td class="c">●</td><td class="c">●</td><td class="ph">auf jedem Blatt</td></tr>
+<tr><td>Parkverbund, Direktleitungen</td><td class="c">●</td><td class="c">●</td><td class="c">●</td><td class="c">●</td><td class="c">●</td><td class="ph">Beschriftung bis 1:100.000</td></tr>
+<tr><td>Akteure nach Kategorie</td><td class="c">●</td><td class="c">●</td><td class="c">●</td><td class="cw">○</td><td class="cw">○</td><td class="ph">7, 8: Symbollayer des Blattes</td></tr>
+<tr><td>Vorhaben Dritter, PV, Biogas</td><td class="c">●</td><td class="c">●</td><td class="c">●</td><td></td><td></td><td></td></tr>
+<tr><td>Netz, Gasnetz, Kernnetz-Trasse</td><td class="c">●</td><td class="c">●</td><td class="c">●</td><td class="c">●</td><td class="c">●</td><td></td></tr>
+<tr><td>Wasserstoffwege</td><td class="c">●</td><td class="c">●</td><td class="c">●</td><td class="c">●</td><td class="c">●</td><td></td></tr>
+<tr><td>RROP-Vorranggebiete, BESS-Eignung</td><td class="c">●</td><td></td><td class="c">●</td><td></td><td></td><td class="ph">nur Nahkarten</td></tr>
+<tr><td>Analysegebiet 15 km</td><td></td><td class="c">●</td><td></td><td></td><td></td><td class="ph">nur Übersicht</td></tr>
+<tr><td>Umkreis 10 km</td><td></td><td></td><td></td><td class="c">●</td><td></td><td></td></tr>
+<tr><td>OSM Standard</td><td class="c">●</td><td class="c">●</td><td class="c">●</td><td class="c">●</td><td class="c">●</td><td class="ph">ATKIS, Satellit aus</td></tr>
+</tbody>
+</table>
+<div class="legend"><span>● im Blatt</span><span>○ anders dargestellt</span></div>
+<figcaption>Verdichtet aus F3 und F8, Blatt 4 und 5 folgen Blatt 1 und 2 ohne Namen Dritter. Nicht in der Karte: Layer 00, 02 als Rohdaten, 04, 23, 70, 96, 97. Die Sichtbarkeitsschwellen werden aus dem gröbsten Blattmaßstab gerechnet, rund zehn Prozent darüber. Jedes Kartenelement bekommt seine Layerliste einzeln gesetzt und ausgegeben.</figcaption>
+</figure>
+
+<!-- 10 Gitter -->
+<h2><span class="no">10</span>F9 · Gitter, Nordpfeil, Schriftfeld, Maßstabsleiste</h2>
+<div class="duo">
+<figure>
+<svg viewBox="0 0 420 400" role="img" aria-label="Kartenecke mit Metergitter: Beschriftung außerhalb des Rahmens mit Tausenderpunkt, oben und unten waagerecht, links aufsteigend gedreht, rechts absteigend, Nordpfeil oben links">
+<rect x="70" y="60" width="300" height="270" fill="var(--accsoft)" stroke="currentColor" stroke-width="1.2"/>
+<g stroke="currentColor" stroke-width="0.6" opacity=".35"><line x1="170" y1="60" x2="170" y2="330"/><line x1="270" y1="60" x2="270" y2="330"/><line x1="70" y1="150" x2="370" y2="150"/><line x1="70" y1="240" x2="370" y2="240"/></g>
+<g stroke="currentColor" stroke-width="1"><line x1="170" y1="60" x2="170" y2="50"/><line x1="270" y1="60" x2="270" y2="50"/><line x1="170" y1="330" x2="170" y2="340"/><line x1="270" y1="330" x2="270" y2="340"/><line x1="70" y1="150" x2="60" y2="150"/><line x1="70" y1="240" x2="60" y2="240"/><line x1="370" y1="150" x2="380" y2="150"/><line x1="370" y1="240" x2="380" y2="240"/></g>
+<text class="tm" x="170" y="42" text-anchor="middle">512.000</text><text class="tm" x="270" y="42" text-anchor="middle">513.000</text>
+<text class="tm" x="170" y="356" text-anchor="middle">512.000</text><text class="tm" x="270" y="356" text-anchor="middle">513.000</text>
+<text class="tm" x="52" y="150" text-anchor="middle" transform="rotate(-90 52 150)">5.893.000</text><text class="tm" x="388" y="150" text-anchor="middle" transform="rotate(90 388 150)">5.893.000</text>
+<polygon points="86,86 92,70 98,86" style="fill:#0F3A30"/><polygon points="92,70 98,86 92,82" style="fill:#2F6F57"/>
+<text x="90" y="104" style="font:600 13px var(--f-body);fill:#0F3A30">N</text>
+<text class="ts" x="110" y="84">3 mm vom Rand, 7 × 12 mm</text>
+<text class="ts" x="70" y="384">ETRS89 / UTM 32N, Arial 6,5 pt, Striche 1,0 mm</text>
+</svg>
+<figcaption>Beispielkoordinaten. Hier waagerecht und gedreht nur angedeutet. Die Übersichtskarte bekommt kein Gitter.</figcaption>
+</figure>
+<figure>
+<table style="min-width:0;font-size:13px">
+<thead><tr><th>Blatt</th><th>Gitter</th><th>Maßstab</th><th>Segment ≤</th><th>gewählt</th></tr></thead>
+<tbody>
+<tr><td>1, 3, 4</td><td>1 km</td><td class="ph">aus Ausschnitt</td><td class="ph">20 mm × M</td><td></td></tr>
+<tr><td>2, 5</td><td>10 km</td><td class="ph">aus Ausschnitt</td><td class="ph">20 mm × M</td><td></td></tr>
+<tr><td>7</td><td>5 km</td><td>1:80.000</td><td>1.600 m</td><td class="c">1.500 m</td></tr>
+<tr><td>8</td><td>2 km</td><td>1:40.000</td><td>800 m</td><td class="c">500 m</td></tr>
+</tbody>
+</table>
+<p style="font-size:13px;color:var(--muted);margin-top:10px">Segmente zur Wahl: 100, 200, 250, 500, 1.000, 1.500, 2.000, 2.500, 3.000, 4.000, 5.000, 10.000 m. Zwei Segmente dürfen zusammen höchstens 40 mm breit sein.</p>
+<div style="border:1px solid var(--line);border-radius:6px;padding:10px 12px;font:12px var(--f-mono);line-height:1.8;background:var(--bg)">
+Narthauen-Süd (P-3241), Blatt 7, …<br>CRS: ETRS89 / UTM 32N (EPSG:25832), Meter<br>1:80.000 | bearb. | XY | 06.11.2026<br><span style="color:var(--muted)">ENEO Gruppe GmbH<br>Datenstand 10/2026 (Nefino …, MaStR …), Überprüfung empfohlen ab 04/2027</span>
+</div>
+<figcaption>Schriftfeld und Impressum mit Beispielwerten. Die Prüfung empfiehlt sich sechs Monate nach dem Datenstand. Eine Beschriftung, die aus dem Panel läuft, ist ein Fehler.</figcaption>
+</figure>
+</div>
+
+<!-- 11 Linien -->
+<h2><span class="no">11</span>F10 · Linien und Beschriftungen</h2>
+<figure>
+<svg viewBox="0 0 900 420" role="img" aria-label="Linienstile in ihren Stärken: Parkverbund, Direktleitung, Stromleitungen 110, 220 und 380 kV, Gasnetz, Kernnetz-Trasse, Wasserstoff- und Stoffwege, Versatzlinie, Randspaltenlinie">
+<g>
+<line x1="20" y1="30" x2="180" y2="30" stroke="#0F3A30" stroke-width="3.6"/><text class="t" x="200" y="34">Parkverbund · 0,60 mm</text><text class="ts" x="460" y="34">abstand_km, eine Dezimale, 7,5 pt fett grün, entlang der Linie</text>
+<line x1="20" y1="64" x2="180" y2="64" stroke="#0F3A30" stroke-width="2.1" stroke-dasharray="8 5"/><text class="t" x="200" y="68">Direktleitung Strom · 0,35 mm</text><text class="ts" x="460" y="68">laenge_km, zwei Dezimalen, 6,5 pt, Overlap erlaubt, Priorität 8</text>
+<line x1="20" y1="98" x2="180" y2="98" stroke="rgba(140,47,39,.75)" stroke-width="1.1"/><text class="t" x="200" y="102">110-kV-Leitung · 0,18 mm</text>
+<line x1="20" y1="132" x2="180" y2="132" stroke="rgba(140,47,39,.75)" stroke-width="1.8"/><text class="t" x="200" y="136">220-kV-Leitung · 0,30 mm</text><text class="ts" x="460" y="120">kategorisiert nach spannung_kv,</text><text class="ts" x="460" y="136">drei Legendenzeilen auf allen Blättern</text>
+<line x1="20" y1="166" x2="180" y2="166" stroke="rgba(140,47,39,.75)" stroke-width="2.7"/><text class="t" x="200" y="170">380-kV-Leitung · 0,45 mm</text>
+<line x1="20" y1="200" x2="180" y2="200" stroke="#8C2F27" stroke-width="1"/><text class="t" x="200" y="204">Gasnetz (Kacheln) · 0,12–0,30 mm</text><text class="ts" x="460" y="204">je Blatt, Legendenstrich 0,15 mm</text>
+<line x1="20" y1="234" x2="180" y2="234" stroke="#1F4E79" stroke-width="2.1"/><text class="t" x="200" y="238">H2-Kernnetz Trasse · 0,35 mm</text><text class="ts" x="460" y="238">Mittellinie aus den Kacheln, siehe unten</text>
+<line x1="20" y1="268" x2="180" y2="268" stroke="#1F4E79" stroke-width="2.9"/><line x1="20" y1="280" x2="180" y2="280" stroke="#6B4A2E" stroke-width="2.9"/><text class="t" x="200" y="278">Stoffwege · 0,45–0,50 mm</text><text class="ts" x="460" y="272">H2-Weg Kernnetz blau, CO2 braun,</text><text class="ts" x="460" y="288">Beimischung Netzfarbe, Direktlieferung schwarz</text>
+<line x1="20" y1="314" x2="180" y2="314" stroke="currentColor" stroke-width="1.5"/><text class="t" x="200" y="318">Versatzlinie · 0,25 mm</text>
+<line x1="20" y1="348" x2="180" y2="348" stroke="currentColor" stroke-width="0.9"/><text class="t" x="200" y="352">Randspaltenlinie Blatt 7 · 0,15 mm</text><text class="ts" x="460" y="352">außerhalb mit Pfeilspitze 1,6 mm</text>
+</g>
+<text class="ts" x="20" y="396">Stärken maßstäblich im Verhältnis, 1 mm Linienstärke = 6 Einheiten.</text>
+</svg>
+<figcaption>Schrift: Arial. Parknamen 9 pt fett grün außerhalb der Fläche, „Variante A/B“ 8 pt fett blau, Teilnehmernamen auf Blatt 8 6,5 pt fett mit weißem Halo. Mit „PreventOverlap“ fielen im Referenzlauf zwei von sechs Längen aus (H4).</figcaption>
+</figure>
+<figure>
+<svg viewBox="0 0 900 200" role="img" aria-label="Herleitung der Kernnetz-Mittellinie aus den Nefino-Kacheln: Nachbarschaftsgraph, längster Pfad je Komponente, gleitendes Mittel über 5, zweimal Chaikin">
+<defs><marker id="a11" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M1 1L9 5L1 9z" class="fm"/></marker></defs>
+<g style="fill:var(--h2soft);stroke:var(--h2)"><rect x="20" y="70" width="22" height="22"/><rect x="42" y="80" width="22" height="22"/><rect x="64" y="70" width="22" height="22"/><rect x="86" y="58" width="22" height="22"/><rect x="108" y="64" width="22" height="22"/><rect x="130" y="76" width="22" height="22"/></g>
+<text class="ts" x="20" y="130">Kacheln rund 150 m</text>
+<path class="ln" d="M160 84 H196" marker-end="url(#a11)"/>
+<g class="fh"><circle cx="214" cy="81" r="4"/><circle cx="236" cy="91" r="4"/><circle cx="258" cy="81" r="4"/><circle cx="280" cy="69" r="4"/><circle cx="302" cy="75" r="4"/><circle cx="324" cy="87" r="4"/></g>
+<polyline points="214,81 236,91 258,81 280,69 302,75 324,87" fill="none" stroke="var(--h2)"/>
+<text class="ts" x="214" y="130">Graph, längster Pfad</text>
+<path class="ln" d="M340 84 H376" marker-end="url(#a11)"/>
+<path d="M390 84 C420 92 440 78 470 72 C490 70 500 80 520 86" fill="none" stroke="#1F4E79" stroke-width="2.1"/>
+<text class="ts" x="390" y="130">Mittel über 5, zweimal Chaikin</text>
+<rect class="bx-warn" x="580" y="40" width="300" height="110" rx="6"/><text class="tw" x="594" y="64">nicht über Hauptachse oder Rasterung</text><text class="ts" x="594" y="88">mittlerer Fehler 889 m</text><text class="ts" x="594" y="112">Ergebnis: kernnetz_trasse_linie.gpkg,</text><text class="ts" x="594" y="128">dazu je Variante der nächste Trassenpunkt</text>
+</svg>
+<figcaption>Verfahren je Zusammenhangskomponente der Kacheln. Fehlerwert aus der Fallentabelle H4.</figcaption>
+</figure>
+
+<!-- 12 Legende -->
+<h2><span class="no">12</span>F11 · Die Legende wird gebaut, nicht konfiguriert</h2>
+<div class="duo">
+<figure>
+<svg viewBox="0 0 420 420" role="img" aria-label="Legendenmaße vierfach vergrößert: zwei Spalten zu 28,4 mm, Text ab 6,8 mm, Textbreite 21,2 mm, Zeilenhöhen 6,4 mm für Punkte und 4,4 mm für Linien und Flächen, Kopfzeile 4,6 mm">
+<rect x="20" y="40" width="227" height="360" fill="none" stroke="var(--line)" stroke-dasharray="4 3"/>
+<line x1="20" y1="28" x2="247" y2="28" class="ln"/><text class="ts" x="133" y="22" text-anchor="middle">Spalte 28,4 mm</text>
+<line x1="74" y1="410" x2="247" y2="410" class="ln"/><text class="ts" x="160" y="404" text-anchor="middle">Text 21,2 mm</text>
+<line x1="20" y1="416" x2="74" y2="416" stroke="var(--amb)"/><text class="tamb" x="20" y="404">6,8</text>
+<rect x="20" y="50" width="227" height="37" fill="var(--accsoft)"/><text x="26" y="74" style="font:600 13px var(--f-body);fill:#0F3A30">Eigenes Vorhaben</text><text class="ts" x="252" y="74">4,6 mm Kopf</text>
+<rect x="26" y="98" width="44" height="44" fill="none" stroke="var(--line)"/><rect x="36" y="108" width="24" height="24" class="fh" transform="rotate(45 48 120)"/><text class="t" x="80" y="125">Elektrolysestandort</text><text class="ts" x="252" y="125">6,4 mm Punkt</text>
+<line x1="26" y1="170" x2="70" y2="170" stroke="var(--line)"/><rect x="26" y="160" width="44" height="20" fill="none" stroke="rgb(255,28,36)" stroke-width="2"/><text class="t" x="80" y="175">Poolfläche</text><text class="ts" x="252" y="175">4,4 mm Fläche</text>
+<line x1="26" y1="212" x2="70" y2="212" stroke="#0F3A30" stroke-width="3.6"/><text class="t" x="80" y="216">Parkverbund (Abstand)</text><text class="ts" x="252" y="216">4,4 mm Linie</text>
+<rect x="26" y="240" width="44" height="44" fill="none" stroke="var(--line)"/><text class="t" x="80" y="258">Ankerabnehmer</text><text class="t" x="80" y="276">(Kandidat)</text><text class="ts" x="252" y="258">Umbruch:</text><text class="ts" x="252" y="274">Höhe aus Zeilenzahl</text>
+<text class="tw" x="26" y="330">nicht „Ankerabnehmer-Kandidat“:</text><text class="tw" x="26" y="348">länger als 21,2 mm</text>
+</svg>
+<figcaption>Vierfach vergrößert, Arial 6,8 pt. Symbole: Linien als 5,5-mm-Strich, Flächen 5,5 × 3,5 mm, Icons 5,5 × 5,5 mm, ohne Versatz. Spalten gleich hoch gefüllt, keine Kopfzeile als letzte Zeile einer Spalte.</figcaption>
+</figure>
+<figure>
+<svg viewBox="0 0 420 420" role="img" aria-label="Sieben Kopfzeilen der Legende in fester Reihenfolge auf allen Blättern">
+<g>
+<rect class="bx-acc" x="20" y="20" width="380" height="44" rx="4"/><text class="ta" x="32" y="40">1</text><text class="t" x="52" y="40">Eigenes Vorhaben</text><text class="ts" x="52" y="56">Elektrolyse, WEA, Flächen, Verbund, Direktleitung</text>
+<rect class="bx" x="20" y="72" width="380" height="44" rx="4"/><text class="ta" x="32" y="92">2</text><text class="t" x="52" y="92">Abnehmer und Partner</text><text class="ts" x="52" y="108">Teilnehmer, sieben Kategorien, Speicher-Partner</text>
+<rect class="bx" x="20" y="124" width="380" height="44" rx="4"/><text class="ta" x="32" y="144">3</text><text class="t" x="52" y="144">Erzeugung Dritter</text><text class="ts" x="52" y="160">WEA in Betrieb und Planung, BESS, PV, Biogas</text>
+<rect class="bx" x="20" y="176" width="380" height="44" rx="4"/><text class="ta" x="32" y="196">4</text><text class="t" x="52" y="196">Netz</text><text class="ts" x="52" y="212">UW, 110/220/380 kV, Gasnetz, Kernnetz</text>
+<rect class="bx" x="20" y="228" width="380" height="44" rx="4"/><text class="ta" x="32" y="248">5</text><text class="t" x="52" y="248">Wasserstoff- und Stoffwege</text><text class="ts" x="52" y="264">Kernnetz, CO2, Beimischung, Direktlieferung</text>
+<rect class="bx" x="20" y="280" width="380" height="44" rx="4"/><text class="ta" x="32" y="300">6</text><text class="t" x="52" y="300">Wärme und Planung</text><text class="ts" x="52" y="316">Wärmesenke, Vorranggebiet, Analysegebiet, Versatz</text>
+<rect class="bx-amb" x="20" y="332" width="380" height="44" rx="4"/><text class="ta" x="32" y="352">7</text><text class="t" x="52" y="352">Außerhalb des Blattes (nur Blatt 8)</text><text class="ts" x="52" y="368">Icon, Name, Entfernung, Richtung</text>
+</g>
+<text class="ts" x="20" y="402">Einträge ohne Objekt im Blattausschnitt entfallen.</text>
+</svg>
+<figcaption>Wortlaut und Reihenfolge gleich auf allen Blättern, ohne Nummern. Geprüft wird gegen Blattausschnitt und Maßstabsstufe, nicht gegen den Layer. Prüfung: Zahl der Einträge, Spaltenhöhe gegen die Kappe, Liste <code>ueber</code> leer, Bild betrachtet.</figcaption>
+</figure>
+</div>
+
+<!-- 13 Ausschnitt Export -->
+<h2><span class="no">13</span>F12 · Ausschnitt und Export</h2>
+<figure>
+<table>
+<thead><tr><th>Blatt</th><th>Ausschnitt</th><th>Rand</th></tr></thead>
+<tbody>
+<tr><td>1, 4</td><td>um beide Elektrolysevarianten</td><td>1.500 m</td></tr>
+<tr><td>2, 5</td><td>Analysegebiet 15 km</td><td>600 m</td></tr>
+<tr><td>3</td><td>alle WEA des Verbunds, Poolflächen, beide Varianten, um 9 % der Breite verschoben, damit der Inhalt links vom Panel liegt</td><td>450 m</td></tr>
+<tr><td>7</td><td>Ringmitte mittig im sichtbaren Kartenteil, 1:80.000</td><td>–</td></tr>
+<tr><td>8</td><td>alle Parks, beide Varianten, Teilnehmer des Nahbereichs, 1:40.000, obere linke Ecke fest im Skript</td><td>–</td></tr>
+</tbody>
+</table>
+<div class="tiles" style="margin-top:14px">
+<div class="tile"><b>PNG</b><span>300 dpi, A3: 4.960 × 3.508 Pixel</span></div>
+<div class="tile"><b>PDF</b><span>300 dpi, Vektor (rasterizeWholeImage = False), A3</span></div>
+<div class="tile"><b>Vorschau JPG</b><span>1.587 Pixel breit, Karten/Vorschau/&lt;Datei&gt;_Ansicht_&lt;MMTT&gt;.jpg</span></div>
+</div>
+<figcaption>Linien zu Zielen außerhalb bestimmen den Ausschnitt nicht. Vor jedem Export werden alle CRS in einer Zeile ausgegeben. Für Slack und Präsentationen geht das PDF raus, die Vorschau dient nur der Sichtprüfung.</figcaption>
+</figure>
+
+<!-- 14 Sichtprüfung -->
+<h2><span class="no">14</span>G2 · Sichtprüfung am exportierten Blatt</h2>
+<figure>
+<svg viewBox="0 0 900 200" role="img" aria-label="Ablauf der Sichtprüfung: PNG nach tmp, Weltdatei, Rasterlayer, rendern bis 440 mal 330 Pixel in drei Zoomstufen">
+<defs><marker id="a14" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M1 1L9 5L1 9z" class="fm"/></marker></defs>
+<rect class="bx" x="20" y="30" width="150" height="60" rx="5"/><text class="t" x="34" y="54">PNG nach /tmp</text><text class="ts" x="34" y="72">.pgw daneben</text>
+<rect class="bx" x="200" y="30" width="170" height="60" rx="5"/><text class="t" x="214" y="54">Rasterlayer laden</text><text class="ts" x="214" y="72">CRS 25832, Rest aus</text>
+<rect class="bx" x="400" y="30" width="170" height="60" rx="5"/><text class="t" x="414" y="54">rendern</text><text class="ts" x="414" y="72">höchstens 440 × 330 px</text>
+<rect class="bx-acc" x="600" y="30" width="280" height="60" rx="5"/><text class="t" x="614" y="54">drei Zoomstufen</text><text class="ts" x="614" y="72">weit, Blattmaßstab, nah</text>
+<path class="ln" d="M170 60 H196" marker-end="url(#a14)"/><path class="ln" d="M370 60 H396" marker-end="url(#a14)"/><path class="ln" d="M570 60 H596" marker-end="url(#a14)"/>
+<rect class="bx-amb" x="20" y="116" width="860" height="60" rx="5"/><text class="t" x="34" y="140">Ein Ansichtsfehler ist kein Befund: vor der Meldung eng heranzoomen.</text><text class="ts" x="34" y="160">Bilder mit QImage skalieren und schneiden (PIL fehlt), Ausschnitte mit Faktor 2 vergrößern, große Bilder als Kontaktbogen.</text>
+</svg>
+<figcaption>Technik aus G2 und Anhang E. Geprüft wird auch das Kartenfenster des Projekts.</figcaption>
+</figure>
+<figure>
+<div class="tiles">
+<div class="tile"><b>Blatt und Gitter</b><span>1 Gitterwerte plausibel (Ost 300.000–700.000, Nord 5,7–6,1 Mio.) · 13 A3 quer, Karte 405,6 × 282,6 mm · 14 Gitter vier Seiten, Nordpfeil</span></div>
+<div class="tile"><b>Inhalt</b><span>2 alle Ziele im Kartenfeld · 3 jedes Pflichtthema mit sichtbarem Objekt · 4 Karte farbig (Farbstichprobe)</span></div>
+<div class="tile"><b>Symbole und Linien</b><span>5 nichts übereinander · 6 Symbol auf der Anlage oder mit Linie · 11 Themenfarbe und Stärke · 12 jede Linie endet an einem Objekt</span></div>
+<div class="tile"><b>Legende</b><span>7 Symbol und Eintrag gegenseitig · 8 gefüllt, Tinte über 5 % · 15 endet 3 mm über Übersicht, Reihenfolge nach F11</span></div>
+<div class="tile"><b>Panel</b><span>9 keine Überlappung · 10 Logo, Titel, Maßstabsleiste im Kasten, CRS-Zeile lesbar</span></div>
+<div class="tile"><b>Stil</b><span>16 Flächen im Originalstil, Leitungen in drei Stärken, Längen an Verbund- und Direktleitungen</span></div>
+<div class="tile"><b>Blatt 7 und 8</b><span>17 jeder Teilnehmer mit Name und Linie, kein Icon verdeckt ein anderes</span></div>
+<div class="tile" style="border-left-color:var(--warn)"><b>Externe Fassungen</b><span>18 ohne Namen, geprüft über die Namensliste aus Layer 50</span></div>
+</div>
+<figcaption>Die 18 Prüfungen aus G2, thematisch gruppiert. Die Nummern entsprechen der Prüfliste im Prompt.</figcaption>
+</figure>
+
+<!-- 15 Extern -->
+<h2><span class="no">15</span>Interne und externe Fassung von Blatt 7 und 8</h2>
+<figure>
+<svg viewBox="0 0 900 230" role="img" aria-label="Unterschiede zwischen interner und externer Fassung: Blatt 7 extern ohne Randspalten, Blatt 8 extern Icons ohne Beschriftung und Legendenblock nur mit der Zahl">
+<rect class="bx" x="20" y="20" width="200" height="190" rx="6"/><text class="tt" x="34" y="44">Blatt 7 intern</text><circle cx="120" cy="120" r="50" fill="none" stroke="currentColor" stroke-dasharray="4 3"/><g style="fill:currentColor"><circle cx="100" cy="100" r="3"/><circle cx="140" cy="130" r="3"/></g><text class="ts" x="34" y="190">■ Name</text><line x1="70" y1="186" x2="100" y2="100" stroke="currentColor" stroke-width="0.6"/>
+<rect class="bx-acc" x="240" y="20" width="200" height="190" rx="6"/><text class="tt" x="254" y="44">Blatt 7 extern</text><circle cx="340" cy="120" r="50" fill="none" stroke="currentColor" stroke-dasharray="4 3"/><g style="fill:currentColor"><circle cx="320" cy="100" r="3"/><circle cx="360" cy="130" r="3"/></g><text class="ta" x="254" y="190">nur Punkte</text>
+<rect class="bx" x="460" y="20" width="200" height="190" rx="6"/><text class="tt" x="474" y="44">Blatt 8 intern</text><rect x="500" y="90" width="18" height="18" class="fh"/><text class="ts" x="524" y="104">Kiesel GmbH</text><text class="ts" x="474" y="190">außerhalb: Name, km, Richtung</text>
+<rect class="bx-acc" x="680" y="20" width="200" height="190" rx="6"/><text class="tt" x="694" y="44">Blatt 8 extern</text><rect x="720" y="90" width="18" height="18" class="fh"/><text class="ta" x="694" y="190">außerhalb: nur die Zahl</text>
+</svg>
+<figcaption>Schema mit erfundenem Namen. Blatt 4 und 5 sind von Haus aus ohne Namen Dritter. Aufbau je Fassung: extern zuerst, intern zuletzt.</figcaption>
+</figure>
+
+<!-- 16 Ausgabe -->
+<h2><span class="no">16</span>Ausgabe von Schritt 7</h2>
+<div class="tiles" style="margin-top:14px">
+<div class="tile"><b>je Blatt</b><span>PNG, PDF A3, Vorschau-JPG, Maßstab</span></div>
+<div class="tile"><b>Symbollayer</b><span>Objektzahl, Zahl versetzter Icons</span></div>
+<div class="tile"><b>Legende</b><span>Einträge je Spalte</span></div>
+<div class="tile"><b>Sichtprüfung</b><span>Ergebnis je Blatt</span></div>
+<div class="tile" style="border-left-color:var(--amb)"><b>Kontaktbogen</b><span>alle Vorschaubilder an den Nutzer, vor dem Dokumentenbau</span></div>
+</div>
+
+<!-- 17 Unstimmigkeiten -->
+<h2><span class="no">17</span>Unstimmigkeiten im Prompt</h2>
+<div class="issues">
+<div class="issue"><b>Verlorene Platzhalter</b><p>An mehreren Stellen fehlt Text zwischen Leerzeichen und Komma, etwa „Fläche , nicht im Verbund“, „km “ in der Randspalte, „(P-XXXX), Blatt N, “ im Schriftfeld und „BESS 3 2,1 ha“. Vermutlich sind beim Export aus Markdown Platzhalter in spitzen Klammern verschwunden. Dasselbe erklärt <code>H2 Konzept//Quelle/</code> in Schritt 1.8.</p></div>
+<div class="issue"><b>Maßstäbe aus der A4-Zeit</b><p>Die Blatttabelle nennt Maßstäbe des Referenzlaufs in A4 (1:21.303, 1:159.428, 1:34.461). Alle Blätter sind jetzt A3, die Maßstabszahlen werden kleiner. F8 rechnet die Sichtbarkeitsschwellen aus dem gröbsten Blattmaßstab, und die Symbolgröße hängt am Maßstab.</p></div>
+<div class="issue"><b>Blatt 4 und 5 ohne Layerliste</b><p>F3 legt Layerlisten nur für Blatt 1 bis 3 und 7, 8 fest. Für die Eigentümerblätter gibt es nur „wie Blatt 1/2, ohne Namen Dritter“ und den Verweis auf die Skripte eig.py, fest.py und final.py.</p></div>
+<div class="issue"><b>Querverweise und Dateien</b><p>G2 Nr. 11 prüft Linienstärken „nach F12“, die Stärken stehen aber in F10. <code>slots3.json</code> aus F7 fehlt in der Liste der Arbeitsdateien in Anhang C.</p></div>
+</div>
+
+<footer>Quelle: ENEO_Konzept_Prompt, Fassung 2026-11-11-Z, Schritt 7 sowie Anhang C, E, F, G2 und H4. Koordinaten, Namen und das Schriftfeld in 07, 08, 10 und 15 sind Beispiele.</footer>
+</main>
+</body>
+</html>

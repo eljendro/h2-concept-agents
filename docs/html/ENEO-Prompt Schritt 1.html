@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ENEO-Prompt Schritt 1</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:wght@500;600&family=Source+Sans+3:wght@400;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  /* Layout: schmale Memo-Spalte, Abbildungen dürfen breiter laufen. Farben aus dem ENEO-Kartenstil abgeleitet. */
+  --bg:#f4f6f4; --surface:#ffffff; --ink:#1a2420; --muted:#5b6a63; --line:#c7d0cb;
+  --acc:#0F3A30; --accsoft:#e1ebe6; --h2:#1F4E79; --h2soft:#e2eaf3;
+  --warn:#8C2F27; --warnsoft:#f5e2df; --amb:#9a6a12; --ambsoft:#f6ecd6;
+  --pool:#FF1C24; --pot:#004BFF; --potfill:rgba(0,0,255,.16);
+  --f-disp:"Barlow Semi Condensed","Arial Narrow",sans-serif;
+  --f-body:"Source Sans 3","Segoe UI",Helvetica,Arial,sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#111714; --surface:#19211d; --ink:#e3eae6; --muted:#98a69f; --line:#34413b;
+  --acc:#7cc3a9; --accsoft:#1d3830; --h2:#8eb7e2; --h2soft:#1c2d40;
+  --warn:#ec8c80; --warnsoft:#3b221f; --amb:#e2b45c; --ambsoft:#382d1b;
+  --pool:#ff5a60; --pot:#6f9bff; --potfill:rgba(90,130,255,.22); color-scheme:dark;}}
+:root[data-theme="dark"]{
+  --bg:#111714; --surface:#19211d; --ink:#e3eae6; --muted:#98a69f; --line:#34413b;
+  --acc:#7cc3a9; --accsoft:#1d3830; --h2:#8eb7e2; --h2soft:#1c2d40;
+  --warn:#ec8c80; --warnsoft:#3b221f; --amb:#e2b45c; --ambsoft:#382d1b;
+  --pool:#ff5a60; --pot:#6f9bff; --potfill:rgba(90,130,255,.22); color-scheme:dark;}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 var(--f-body)}
+main{max-width:980px;margin:0 auto;padding:40px 20px 80px}
+header{border-bottom:2px solid var(--acc);padding-bottom:18px;margin-bottom:28px}
+.kicker{font:600 13px var(--f-mono);color:var(--acc);letter-spacing:.04em}
+h1{font:600 40px/1.1 var(--f-disp);margin:6px 0 10px;text-wrap:balance}
+h2{font:600 26px/1.2 var(--f-disp);margin:56px 0 6px;text-wrap:balance;display:flex;gap:12px;align-items:baseline}
+h2 .no{font:600 14px var(--f-mono);color:var(--acc);border:1px solid var(--acc);border-radius:4px;padding:1px 6px}
+p{max-width:68ch;margin:6px 0}
+.lead{color:var(--muted);max-width:70ch}
+.meta{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.tag{font:12px var(--f-mono);padding:3px 8px;border-radius:4px;background:var(--accsoft);color:var(--acc)}
+figure{margin:18px 0 0;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:18px;overflow-x:auto}
+figcaption{font-size:14px;color:var(--muted);margin-top:10px;max-width:80ch}
+svg{display:block;width:100%;height:auto;color:var(--ink);font-family:var(--f-body)}
+.duo{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+@media (max-width:760px){.duo{grid-template-columns:1fr}h1{font-size:32px}}
+code,.mono{font-family:var(--f-mono);font-size:.88em}
+/* SVG-Bausteine */
+.bx{fill:var(--surface);stroke:var(--line);stroke-width:1}
+.bx-acc{fill:var(--accsoft);stroke:var(--acc);stroke-width:1}
+.bx-h2{fill:var(--h2soft);stroke:var(--h2);stroke-width:1}
+.bx-warn{fill:var(--warnsoft);stroke:var(--warn);stroke-width:1}
+.bx-amb{fill:var(--ambsoft);stroke:var(--amb);stroke-width:1}
+.bx-dash{fill:none;stroke:var(--muted);stroke-width:1;stroke-dasharray:5 4}
+.ln{stroke:var(--muted);stroke-width:1.4;fill:none}
+.ln-acc{stroke:var(--acc);stroke-width:2;fill:none}
+.ln-dash{stroke:var(--acc);stroke-width:1.4;fill:none;stroke-dasharray:6 4}
+.ln-warn{stroke:var(--warn);stroke-width:1.4;fill:none}
+.tt{font:600 15px var(--f-body);fill:var(--ink)}
+.t{font:13px var(--f-body);fill:var(--ink)}
+.ts{font:12px var(--f-body);fill:var(--muted)}
+.tm{font:13px var(--f-mono);fill:var(--ink)}
+.tmb{font:600 13px var(--f-mono);fill:var(--ink)}
+.ta{font:600 12px var(--f-mono);fill:var(--acc)}
+.tw{font:600 12px var(--f-body);fill:var(--warn)}
+.tamb{font:600 12px var(--f-body);fill:var(--amb)}
+.th2{font:600 12px var(--f-body);fill:var(--h2)}
+.fa{fill:var(--acc)} .fw{fill:var(--warn)} .fm{fill:var(--muted)} .fh{fill:var(--h2)}
+.pool{fill:none;stroke:var(--pool);stroke-width:2}
+.pool-d{fill:none;stroke:var(--pool);stroke-width:2;stroke-dasharray:7 4}
+.pot{fill:var(--potfill);stroke:var(--pot);stroke-width:1.2}
+.hatch{fill:url(#hatch)}
+/* Tabellen und Kacheln */
+table{border-collapse:collapse;width:100%;font-size:14px;min-width:620px}
+th,td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}
+th{font:600 13px var(--f-body);background:var(--bg)}
+td.ab{background:var(--warnsoft);color:var(--warn);font-weight:600}
+td.ve{background:var(--ambsoft);color:var(--amb);font-weight:600}
+td.of{background:var(--accsoft);color:var(--acc)}
+.src{font-family:var(--f-mono);font-size:12px;color:var(--muted)}
+.tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px}
+.tile{border:1px solid var(--line);border-left:4px solid var(--acc);border-radius:0;padding:10px 12px;background:var(--bg)}
+.tile b{display:block;font:600 15px var(--f-disp);letter-spacing:.01em}
+.tile span{font-size:13px;color:var(--muted)}
+.issues{display:grid;gap:10px;margin-top:14px}
+.issue{border:1px solid var(--line);border-left:4px solid var(--amb);border-radius:0;background:var(--surface);padding:12px 14px}
+.issue b{font:600 16px var(--f-disp)}
+.issue p{margin:4px 0 0;font-size:15px}
+.legend{display:flex;flex-wrap:wrap;gap:14px;font-size:13px;color:var(--muted);margin-top:10px}
+.legend i{display:inline-block;width:14px;height:10px;margin-right:6px;vertical-align:middle;border-radius:2px}
+footer{margin-top:60px;font-size:13px;color:var(--muted);border-top:1px solid var(--line);padding-top:12px}
+</style>
+</head>
+<body>
+<main>
+
+<header>
+  <div class="kicker">ENEO Wasserstoff-Standortkonzept · Fassung 2026-11-11-Z</div>
+  <h1>Schritt 1: Projekt, Daten, Ausgangslage</h1>
+  <p class="lead">Aus dem Projektnamen werden der Projektordner, die Arbeitskopie, der Nefino-Export, der Projektstand und der Parkverbund bestimmt. Bevor teure Arbeit beginnt, wird geprüft, ob die Pflichtangaben vorliegen.</p>
+  <div class="meta"><span class="tag">Anhang A</span><span class="tag">Anhang B</span><span class="tag">Anhang C</span><span class="tag">Anhang D</span><span class="tag">Anhang E</span><span class="tag">Anhang F</span><span class="tag">Anhang H</span></div>
+</header>
+
+<!-- ============ 1 Überblick ============ -->
+<h2><span class="no">01</span>Die neun Teilschritte</h2>
+<figure>
+<svg viewBox="0 0 900 410" role="img" aria-label="Teilschritte 1.1 bis 1.9 in Reihenfolge, mit dem Eingangsvertrag als Haltepunkt nach 1.6">
+<defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M1 1L9 5L1 9z" class="fm"/></marker></defs>
+<!-- Reihe 1 -->
+<g><rect class="bx" x="20" y="20" width="260" height="96" rx="6"/><text class="ta" x="36" y="44">1.1</text><text class="tt" x="70" y="44">Projektordner auflösen</text><text class="ts" x="36" y="68">über Projektregister.csv</text><text class="ts" x="36" y="86">im Werkzeugordner</text><text class="ta" x="264" y="106" text-anchor="end">Anhang C</text></g>
+<g><rect class="bx-acc" x="320" y="20" width="260" height="96" rx="6"/><text class="ta" x="336" y="44">1.2</text><text class="tt" x="370" y="44">H2-Ordner anlegen</text><text class="ts" x="336" y="68">Projektanalyse/24h Analyse/</text><text class="ts" x="336" y="86">H2 Konzept/</text><text class="ta" x="564" y="106" text-anchor="end">Anhang A</text></g>
+<g><rect class="bx-acc" x="620" y="20" width="260" height="96" rx="6"/><text class="ta" x="636" y="44">1.3</text><text class="tt" x="670" y="44">Arbeitskopie .qgz</text><text class="ts" x="636" y="68">per XML wählen, nicht öffnen,</text><text class="ts" x="636" y="86">dann kopieren</text><text class="ta" x="864" y="106" text-anchor="end">Anhang A, E</text></g>
+<line class="ln" x1="280" y1="68" x2="316" y2="68" marker-end="url(#ar)"/>
+<line class="ln" x1="580" y1="68" x2="616" y2="68" marker-end="url(#ar)"/>
+<line class="ln" x1="750" y1="116" x2="750" y2="146" marker-end="url(#ar)"/>
+<!-- Reihe 2, rechts nach links -->
+<g><rect class="bx" x="620" y="150" width="260" height="96" rx="6"/><text class="ta" x="636" y="174">1.4</text><text class="tt" x="670" y="174">Nefino-Export finden</text><text class="ts" x="636" y="198">Schwelle, dann größte</text><text class="ts" x="636" y="216">Ausdehnung</text><text class="ta" x="864" y="236" text-anchor="end">Anhang B, E</text></g>
+<g><rect class="bx" x="320" y="150" width="260" height="96" rx="6"/><text class="ta" x="336" y="174">1.5</text><text class="tt" x="370" y="174">Projektstand</text><text class="ts" x="336" y="198">Stufe 1 bis 5, höchste</text><text class="ts" x="336" y="216">erreichte gilt, mit Beleg</text><text class="ta" x="564" y="236" text-anchor="end">Anhang A</text></g>
+<g><rect class="bx-warn" x="20" y="150" width="260" height="96" rx="6"/><text class="ta" x="36" y="174">1.6</text><text class="tt" x="70" y="174">Eingangsvertrag</text><text class="ts" x="36" y="198">Pflichtangaben je Stand</text><text class="tw" x="36" y="218">fehlt etwas: melden, anhalten</text><text class="ta" x="264" y="236" text-anchor="end">Anhang A</text></g>
+<line class="ln" x1="620" y1="198" x2="584" y2="198" marker-end="url(#ar)"/>
+<line class="ln" x1="320" y1="198" x2="284" y2="198" marker-end="url(#ar)"/>
+<line class="ln" x1="150" y1="246" x2="150" y2="276" marker-end="url(#ar)"/>
+<!-- Reihe 3 -->
+<g><rect class="bx" x="20" y="280" width="260" height="96" rx="6"/><text class="ta" x="36" y="304">1.7</text><text class="tt" x="70" y="304">Parkverbund</text><text class="ts" x="36" y="328">ENEO-Projekte bis 5 km,</text><text class="ts" x="36" y="346">je Park Ordner und Layer</text><text class="ta" x="264" y="366" text-anchor="end">Anhang D</text></g>
+<g><rect class="bx" x="320" y="280" width="260" height="96" rx="6"/><text class="ta" x="336" y="304">1.8</text><text class="tt" x="370" y="304">Nachrichtliche Flächen</text><text class="ts" x="336" y="328">ENEO-Flächen ohne</text><text class="ts" x="336" y="346">Projektordner, nur zur Info</text><text class="ta" x="564" y="366" text-anchor="end">Anhang F</text></g>
+<g><rect class="bx-h2" x="620" y="280" width="260" height="96" rx="6"/><text class="ta" x="636" y="304">1.9</text><text class="tt" x="670" y="304">Arbeitsordner auf dem Mac</text><text class="ts" x="636" y="328">Referenzlauf kopieren und</text><text class="ts" x="636" y="346">parametrieren</text><text class="ta" x="864" y="366" text-anchor="end">Anhang C, E, H</text></g>
+<line class="ln" x1="280" y1="328" x2="316" y2="328" marker-end="url(#ar)"/>
+<line class="ln" x1="580" y1="328" x2="616" y2="328" marker-end="url(#ar)"/>
+</svg>
+<div class="legend"><span><i style="background:var(--accsoft);border:1px solid var(--acc)"></i>schreibt in den Drive-Ordner</span><span><i style="background:var(--h2soft);border:1px solid var(--h2)"></i>schreibt auf den Mac</span><span><i style="background:var(--warnsoft);border:1px solid var(--warn)"></i>Haltepunkt</span><span><i style="background:var(--surface);border:1px solid var(--line)"></i>liest nur</span></div>
+<figcaption>Schritt 1 läuft vollständig ohne externe Recherche. Bricht der Eingangsvertrag ab, ist nur billige Arbeit verloren.</figcaption>
+</figure>
+
+<!-- ============ 2 Ordnerbild ============ -->
+<h2><span class="no">02</span>Wo Schritt 1 liest und schreibt</h2>
+<p>Ordnerbild aus Anhang A. Der Bestand bleibt unberührt, geschrieben wird nur in den grün markierten Ordner.</p>
+<figure>
+<svg viewBox="0 0 900 500" role="img" aria-label="Ordnerstruktur eines ENEO-Projekts mit den Stellen, die Schritt 1 liest, und dem einzigen Ordner, in den geschrieben wird">
+<g>
+<text class="tmb" x="20" y="34">01 Projekte/&lt;Name&gt; (P-XXXX)/</text><rect class="bx" x="470" y="20" width="62" height="20" rx="3"/><text class="ts" x="501" y="34" text-anchor="middle">1.1</text><text class="ts" x="548" y="34">über Projektregister aufgelöst</text>
+<path class="ln" d="M32 42 V458" stroke-width="1"/>
+<path class="ln" d="M32 60 H48 M32 88 H48 M32 116 H48 M32 144 H48 M32 172 H48 M32 400 H48 M32 428 H48 M32 456 H48" stroke-width="1"/>
+<text class="tm" x="54" y="64">DCF &lt;Name&gt;.gsheet</text><rect class="bx" x="470" y="50" width="62" height="20" rx="3"/><text class="ts" x="501" y="64" text-anchor="middle">liest</text><text class="ts" x="548" y="64">Netto-Stromertrag P50</text>
+<text class="tm" x="54" y="92">Angebot &lt;Name&gt; (&lt;Datum&gt;).gslides</text><rect class="bx" x="470" y="78" width="62" height="20" rx="3"/><text class="ts" x="501" y="92" text-anchor="middle">liest</text><text class="ts" x="548" y="92">Anlagenzahl, Typ, Leistung</text>
+<text class="tm" x="54" y="120">Vertrieb: Projekt &lt;Name&gt;.gsheet</text><text class="ts" x="548" y="120">Eigentümer, Sprechergruppe</text>
+<text class="tm" x="54" y="148">H2 Konzept/</text><rect class="bx-warn" x="470" y="134" width="62" height="20" rx="3"/><text class="tw" x="501" y="148" text-anchor="middle">nur lesen</text><text class="ts" x="548" y="148">mögliche Vorarbeit, vorab gegenlesen</text>
+<text class="tm" x="54" y="176">Projektanalyse/</text><rect class="bx" x="470" y="162" width="62" height="20" rx="3"/><text class="ts" x="501" y="176" text-anchor="middle">1.5</text><text class="ts" x="548" y="176">Stand 5: BImSchG-Unterlagen</text>
+<path class="ln" d="M66 184 V372" stroke-width="1"/>
+<path class="ln" d="M66 204 H82 M66 232 H82 M66 260 H82" stroke-width="1"/>
+<text class="tm" x="88" y="208">Ertragsprognose/</text><rect class="bx" x="470" y="194" width="62" height="20" rx="3"/><text class="ts" x="501" y="208" text-anchor="middle">liest</text><text class="ts" x="548" y="208">je Auslegungsvariante eine PDF</text>
+<text class="tm" x="88" y="236">Geodaten/</text><rect class="bx" x="470" y="222" width="62" height="20" rx="3"/><text class="ts" x="501" y="236" text-anchor="middle">liest</text><text class="ts" x="548" y="236">Flurstücke, Poolflächen</text>
+<text class="tm" x="88" y="264">24h Analyse/</text>
+<path class="ln" d="M100 272 V372" stroke-width="1"/>
+<path class="ln" d="M100 292 H116 M100 320 H116 M100 372 H116" stroke-width="1"/>
+<text class="tmb" x="122" y="296">&lt;Projekt&gt;.qgz</text><rect class="bx" x="470" y="282" width="62" height="20" rx="3"/><text class="ts" x="501" y="296" text-anchor="middle">1.3</text><text class="ts" x="548" y="296">maßgebliche Projektdatei, nur über XML</text>
+<text class="tm" x="122" y="324">Planung/</text><rect class="bx" x="470" y="310" width="62" height="20" rx="3"/><text class="ts" x="501" y="324" text-anchor="middle">liest</text><text class="ts" x="548" y="324">WEA-Layouts als GPKG und CSV</text>
+<rect class="bx-acc" x="114" y="344" width="760" height="44" rx="5"/>
+<text class="tmb" x="122" y="370" style="fill:var(--acc)">H2 Konzept/</text><rect x="470" y="356" width="62" height="20" rx="3" class="fa"/><text class="ts" x="501" y="370" text-anchor="middle" style="fill:var(--surface);font-weight:600">schreibt</text><text class="ts" x="548" y="364">1.2 Arbeitsordner, 1.3 Arbeitskopie,</text><text class="ts" x="548" y="380">1.4 hier liegt meist der Nefino-Export</text>
+<text class="tm" x="54" y="404">MVA Anfrage &lt;Gutachter&gt;/</text><rect class="bx" x="470" y="390" width="62" height="20" rx="3"/><text class="ts" x="501" y="404" text-anchor="middle">liest</text><text class="ts" x="548" y="404">Luftfahrt, Höhe. Name wechselt, Präfix prüfen</text>
+<text class="tm" x="54" y="432">Eigentuemer/</text><rect class="bx" x="470" y="418" width="62" height="20" rx="3"/><text class="ts" x="501" y="432" text-anchor="middle">1.5</text><text class="ts" x="548" y="432">Stand 2 und 3: Pacht, Verträge</text>
+<text class="tm" x="54" y="460">Projektentwicklung/</text><rect class="bx" x="470" y="446" width="62" height="20" rx="3"/><text class="ts" x="501" y="460" text-anchor="middle">1.5</text><text class="ts" x="548" y="460">Stand 4: Netzanfragen</text>
+</g>
+</svg>
+<figcaption>Im PDF ist die Einrückung des Ordnerbilds verloren. Die Hierarchie ist aus den Pfadangaben in 1.2, 1.3 und 2.6 rekonstruiert. Unsicher ist vor allem, wo <code>Planung/</code> liegt.</figcaption>
+</figure>
+
+<!-- ============ 3 Arbeitskopie ============ -->
+<h2><span class="no">03</span>1.3 · Welche Projektdatei gilt</h2>
+<figure>
+<svg viewBox="0 0 900 270" role="img" aria-label="Auswahlkette für die maßgebliche qgz-Datei: Hausformblatt, Ablageort, meiste Drucklayouts, dann Kopie">
+<defs><marker id="ar3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M1 1L9 5L1 9z" class="fm"/></marker></defs>
+<rect class="bx-dash" x="8" y="10" width="702" height="122" rx="6"/>
+<text class="ts" x="20" y="28">gelesen über die XML in der .qgz (ZIP mit .qgs als Text), nie in QGIS geöffnet · Anhang E</text>
+<rect class="bx" x="20" y="44" width="150" height="76" rx="6"/><text class="tt" x="95" y="74" text-anchor="middle">alle .qgz</text><text class="ts" x="95" y="94" text-anchor="middle">im Projektordner</text>
+<rect class="bx" x="200" y="44" width="150" height="76" rx="6"/><text class="tt" x="275" y="68" text-anchor="middle">Hausformblatt?</text><text class="ts" x="275" y="88" text-anchor="middle">Kartenelement</text><text class="ts" x="275" y="104" text-anchor="middle">282,7 × 195,7 mm</text>
+<rect class="bx" x="380" y="44" width="150" height="76" rx="6"/><text class="tt" x="455" y="68" text-anchor="middle">Ablageort?</text><text class="ts" x="455" y="88" text-anchor="middle">direkt unter</text><text class="ts" x="455" y="104" text-anchor="middle">24h Analyse/</text>
+<rect class="bx" x="560" y="44" width="140" height="76" rx="6"/><text class="tt" x="630" y="68" text-anchor="middle">mehrere?</text><text class="ts" x="630" y="88" text-anchor="middle">meiste</text><text class="ts" x="630" y="104" text-anchor="middle">Drucklayouts</text>
+<rect class="bx-acc" x="740" y="44" width="150" height="76" rx="6"/><text class="tt" x="815" y="68" text-anchor="middle">Kopie</text><text class="ts" x="815" y="88" text-anchor="middle">&lt;Projekt&gt; H2</text><text class="ts" x="815" y="104" text-anchor="middle">Konzept.qgz</text>
+<line class="ln" x1="170" y1="82" x2="196" y2="82" marker-end="url(#ar3)"/>
+<line class="ln" x1="350" y1="82" x2="376" y2="82" marker-end="url(#ar3)"/>
+<line class="ln" x1="530" y1="82" x2="556" y2="82" marker-end="url(#ar3)"/>
+<line class="ln" x1="700" y1="82" x2="736" y2="82" marker-end="url(#ar3)"/>
+<line class="ln-warn" x1="275" y1="120" x2="275" y2="166" marker-end="url(#ar3)"/>
+<line class="ln-warn" x1="455" y1="120" x2="455" y2="166" marker-end="url(#ar3)"/>
+<rect class="bx-warn" x="200" y="170" width="150" height="50" rx="6"/><text class="tw" x="275" y="191" text-anchor="middle">nein: keine</text><text class="tw" x="275" y="208" text-anchor="middle">ENEO-Projektdatei</text>
+<rect class="bx-warn" x="380" y="170" width="150" height="50" rx="6"/><text class="tw" x="455" y="191" text-anchor="middle">Nebenordner:</text><text class="tw" x="455" y="208" text-anchor="middle">Sonderstand</text>
+<rect class="bx-acc" x="740" y="150" width="150" height="104" rx="6"/><text class="ta" x="752" y="170">Begründung</text><text class="ts" x="752" y="190">Ablageort</text><text class="ts" x="752" y="207">Layerzahl</text><text class="ts" x="752" y="224">Layoutnamen</text><text class="ts" x="752" y="241">saveUserFull</text>
+<line class="ln" x1="815" y1="120" x2="815" y2="146" marker-end="url(#ar3)"/>
+<text class="ts" x="560" y="152">Dateinamen zählen nicht.</text><text class="ts" x="560" y="170">Auch mehr Layer machen einen</text><text class="ts" x="560" y="188">Nebenordner nicht maßgeblich.</text>
+</svg>
+<figcaption>Verweist die Projektdatei auf Dateien neben sich, werden diese mitkopiert oder die Pfade absolut gesetzt.</figcaption>
+</figure>
+
+<div class="duo">
+<figure>
+<svg viewBox="0 0 420 320" role="img" aria-label="Das Hausformblatt: A4 quer 297 mal 210 mm mit Kartenelement 282,7 mal 195,7 mm und Panel rechts">
+<rect class="bx" x="30" y="30" width="356" height="252" rx="2"/>
+<rect class="bx-acc" x="38.6" y="38.6" width="339.2" height="234.8"/>
+<rect class="bx" x="307.9" y="160" width="69.9" height="113.4"/>
+<text class="ts" x="342.8" y="210" text-anchor="middle">Panel</text><text class="ts" x="342.8" y="226" text-anchor="middle">58,2 mm</text>
+<text class="tt" x="170" y="150" text-anchor="middle">Kartenelement</text>
+<text class="tmb" x="170" y="172" text-anchor="middle" style="fill:var(--acc)">282,7 × 195,7 mm</text>
+<text class="ts" x="170" y="192" text-anchor="middle">bei 7,2 / 7,2 mm</text>
+<line class="ln" x1="30" y1="300" x2="386" y2="300"/><text class="ts" x="208" y="314" text-anchor="middle">297 mm, A4 quer</text>
+<line class="ln" x1="14" y1="30" x2="14" y2="282"/><text class="ts" x="20" y="22">210 mm</text>
+</svg>
+<figcaption>Erkennungsmerkmal einer ENEO-Projektdatei. Das Maß wird in der XML gesucht.</figcaption>
+</figure>
+<figure>
+<svg viewBox="0 0 420 320" role="img" aria-label="Datenweg der Projektdatei: Auslesen der XML in tmp, Kopie in den H2-Ordner">
+<defs><marker id="ar3b" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M1 1L9 5L1 9z" class="fm"/></marker></defs>
+<rect class="bx" x="20" y="30" width="170" height="70" rx="6"/><text class="tm" x="105" y="60" text-anchor="middle">&lt;Projekt&gt;.qgz</text><text class="ts" x="105" y="80" text-anchor="middle">Bestand, unberührt</text>
+<rect class="bx-h2" x="230" y="30" width="170" height="70" rx="6"/><text class="tm" x="315" y="60" text-anchor="middle">/tmp/…/.qgs</text><text class="ts" x="315" y="80" text-anchor="middle">entpackt, gezählt</text>
+<line class="ln" x1="190" y1="65" x2="226" y2="65" marker-end="url(#ar3b)"/>
+<rect class="bx-acc" x="20" y="200" width="380" height="70" rx="6"/><text class="tm" x="210" y="230" text-anchor="middle">H2 Konzept/&lt;Projekt&gt; H2 Konzept.qgz</text><text class="ts" x="210" y="250" text-anchor="middle">Arbeitskopie, ab hier wird gearbeitet</text>
+<path class="ln" d="M105 100 V196" marker-end="url(#ar3b)"/><text class="ts" x="115" y="150">Datei kopieren</text>
+<path class="ln-warn" d="M315 100 V140"/><text class="tw" x="230" y="160">XML: zuerst zählen,</text><text class="tw" x="230" y="176">dann Muster bauen</text>
+</svg>
+<figcaption>QGIS schreibt Attribute in wechselnder Reihenfolge. Null Treffer gelten erst als Befund, wenn auch das Schlüsselwort fehlt.</figcaption>
+</figure>
+</div>
+
+<!-- ============ 4 Nefino ============ -->
+<h2><span class="no">04</span>1.4 · Welcher Nefino-Export gilt</h2>
+<div class="duo">
+<figure>
+<svg viewBox="0 0 420 380" role="img" aria-label="Filterkette für Nefino-Exporte: erkennen, entpacken, vier Schwellen, größte Ausdehnung">
+<polygon class="bx" points="20,20 400,20 380,74 40,74"/><text class="tt" x="210" y="44" text-anchor="middle">alle Kandidaten</text><text class="ts" x="210" y="62" text-anchor="middle">erkannt an analysis_area/analysis_area.gpkg</text>
+<polygon class="bx-h2" points="40,82 380,82 362,128 58,128"/><text class="tt" x="210" y="102" text-anchor="middle">ZIP außerhalb von QGIS entpacken</text><text class="ts" x="210" y="119" text-anchor="middle">nie am Ordnernamen erkennen</text>
+<polygon class="bx-warn" points="58,136 362,136 334,286 86,286"/>
+<text class="tw" x="210" y="158" text-anchor="middle">Schwelle, alle vier erfüllt</text>
+<text class="tmb" x="110" y="186">≥ 25</text><text class="t" x="170" y="186">Themengruppen</text>
+<text class="tmb" x="110" y="212">≥ 150</text><text class="t" x="170" y="212">GeoPackages</text>
+<text class="tmb" x="110" y="238">25832</text><text class="t" x="170" y="238">EPSG gesetzt</text>
+<text class="tmb" x="110" y="264">19,5²</text><text class="t" x="170" y="264">km Ausdehnung</text>
+<polygon class="bx-acc" points="86,294 334,294 300,350 120,350"/><text class="tt" x="210" y="318" text-anchor="middle">größte Ausdehnung</text><text class="ts" x="210" y="336" text-anchor="middle">unter den übrigen</text>
+</svg>
+<figcaption>Erst gegen die Schwelle halten, dann die größte Ausdehnung wählen. Mehr Themen sind kein Mangel. Ohne gesetztes CRS scheidet ein Export aus.</figcaption>
+</figure>
+<figure>
+<svg viewBox="0 0 420 380" role="img" aria-label="Abdeckung: Nefino-Daten enden bei 10 km, das Analysegebiet reicht bis 15 km plus 2 km weichen Rand, der Ring dazwischen wird nach Anhang B ergänzt">
+<defs><pattern id="hatch" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="7" stroke="var(--amb)" stroke-width="1.6"/></pattern></defs>
+<circle cx="210" cy="190" r="170" class="bx-dash"/>
+<path class="hatch" fill-rule="evenodd" d="M210 40 a150 150 0 1 0 0.01 0 Z M210 90 a100 100 0 1 1 -0.01 0 Z"/>
+<circle cx="210" cy="190" r="150" fill="none" stroke="currentColor" stroke-width="1.4" stroke-dasharray="6 4"/>
+<circle cx="210" cy="190" r="100" class="bx-h2" fill-opacity=".85"/>
+<rect x="128.75" y="108.75" width="162.5" height="162.5" fill="none" stroke="var(--warn)" stroke-width="1.4"/>
+<circle cx="210" cy="190" r="4" class="fa"/>
+<text class="th2" x="210" y="176" text-anchor="middle">Nefino-Layer</text><text class="th2" x="210" y="214" text-anchor="middle">bis 10 km</text>
+<text class="tw" x="296" y="122">min. 19,5 km</text>
+<rect x="276" y="28" width="132" height="22" rx="3" fill="var(--surface)"/><text class="tamb" x="342" y="44" text-anchor="middle">Ring 10 bis 15 km</text>
+<text class="ts" x="210" y="376" text-anchor="middle">weicher Rand bis 17 km</text>
+<text class="ts" x="8" y="16">Maßstab: 1 km ≈ 10 Einheiten</text>
+</svg>
+<figcaption>Die Schwelle sichert nur den Nahbereich. Der schraffierte Ring wird in Schritt 3 aus MaStR, OSM, LGLN und weiteren Quellen ergänzt (Anhang B).</figcaption>
+</figure>
+</div>
+
+<!-- ============ 5 Projektstand ============ -->
+<h2><span class="no">05</span>1.5 · Projektstand ablesen</h2>
+<figure>
+<svg viewBox="0 0 900 260" role="img" aria-label="Fünf Stufen des Projektstands, jeweils am Ordnerinhalt erkennbar">
+<g>
+<rect class="bx" x="20" y="180" width="164" height="60" rx="4"/><text class="tt" x="32" y="202">1 Akquise</text><text class="ts" x="32" y="220">nur Ertragsprognose</text><text class="ts" x="32" y="234">und Angebot</text>
+<rect class="bx" x="194" y="140" width="164" height="100" rx="4"/><text class="tt" x="206" y="164">2 Sicherung läuft</text><text class="ts" x="206" y="184">Eigentuemer/ mit Pacht-</text><text class="ts" x="206" y="200">berechnung, Anschreiben</text>
+<rect class="bx" x="368" y="100" width="164" height="140" rx="4"/><text class="tt" x="380" y="124">3 Verträge</text><text class="ts" x="380" y="144">unterschriebene</text><text class="ts" x="380" y="160">Nutzungs- oder Reser-</text><text class="ts" x="380" y="176">vierungsverträge</text>
+<rect class="bx" x="542" y="60" width="164" height="180" rx="4"/><text class="tt" x="554" y="84">4 Netzanschluss</text><text class="ts" x="554" y="104">Projektentwicklung/</text><text class="ts" x="554" y="120">mit Netzanfrage</text>
+<rect class="bx-acc" x="716" y="20" width="164" height="220" rx="4"/><text class="tt" x="728" y="44">5 Genehmigung</text><text class="ts" x="728" y="64">BImSchG-Unterlagen,</text><text class="ts" x="728" y="80">Fachgutachten,</text><text class="ts" x="728" y="96">Vorbescheid</text>
+<line class="ln-warn" x1="20" y1="252" x2="358" y2="252"/><text class="tw" x="189" y="250" text-anchor="middle" dy="-4"> </text>
+<line x1="368" y1="252" x2="880" y2="252" stroke="var(--acc)" stroke-width="3"/>
+</g>
+</svg>
+<div class="legend"><span><i style="background:var(--warn)"></i>Stand 1 und 2: weichere Regeln im Eingangsvertrag</span><span><i style="background:var(--acc)"></i>ab Stand 3: strengere Regeln</span></div>
+<figcaption>Es gilt der höchste erreichte Stand, mit Beleg. Er steht später in Kapitel 1 der Konzeptbegründung und steuert den Eingangsvertrag.</figcaption>
+</figure>
+
+<!-- ============ 6 Eingangsvertrag ============ -->
+<h2><span class="no">06</span>1.6 · Eingangsvertrag</h2>
+<figure>
+<table>
+<thead><tr><th>Pflichtangabe</th><th>Quelle</th><th>Stand 1 bis 2</th><th>ab Stand 3</th></tr></thead>
+<tbody>
+<tr><td>WEA-Koordinaten UTM 32N</td><td class="src">Ertragsprognose, Planung/</td><td class="ab">Abbruch</td><td class="ab">Abbruch</td></tr>
+<tr><td>Anlagenzahl, Typ, Leistung, Nabenhöhe</td><td class="src">Ertragsprognose, Angebot</td><td class="ab">Abbruch</td><td class="ab">Abbruch</td></tr>
+<tr><td>Netto-Stromertrag P50</td><td class="src">DCF</td><td class="ab">Abbruch</td><td class="ab">Abbruch</td></tr>
+<tr><td>Höhenbeschränkung</td><td class="src">Luftfahrtbewertung</td><td class="ab">Abbruch</td><td class="ab">Abbruch</td></tr>
+<tr><td>Potenzial- und Poolfläche</td><td class="src">Planung/, Geodaten/</td><td class="ve">Vermerk</td><td class="ab">Abbruch</td></tr>
+<tr><td>Flächensicherungsstand</td><td class="src">Eigentümer/</td><td class="of">erwartungsgemäß offen</td><td class="ve">Vermerk</td></tr>
+<tr><td>Netzanschlussstand</td><td class="src">Projektentwicklung/</td><td class="of">erwartungsgemäß offen</td><td class="ve">Vermerk</td></tr>
+<tr><td>Verfahrensstand BImSchG</td><td class="src">Projektanalyse/</td><td class="of">erwartungsgemäß offen</td><td class="ve">Vermerk ab Stand 4</td></tr>
+</tbody>
+</table>
+<div class="legend"><span><i style="background:var(--warnsoft);border:1px solid var(--warn)"></i>Abbruch: melden und anhalten</span><span><i style="background:var(--ambsoft);border:1px solid var(--amb)"></i>Vermerk: als offenen Punkt führen</span><span><i style="background:var(--accsoft);border:1px solid var(--acc)"></i>offen ist normal</span></div>
+<figcaption>Die ersten vier Zeilen brechen immer ab. Für Fläche, Sicherung, Netz und Verfahren hängt die Regel am Projektstand aus 1.5.</figcaption>
+</figure>
+
+<!-- ============ 7 Parkverbund ============ -->
+<h2><span class="no">07</span>1.7 und 1.8 · Parkverbund und nachrichtliche Flächen</h2>
+<figure>
+<svg viewBox="0 0 900 430" role="img" aria-label="Schema: Hauptpark mit zwei Verbundparks innerhalb von 5 km, Verbundlinien mit Abstand, Direktleitungen zur Elektrolyse und eine nachrichtliche Fläche außerhalb des Verbunds">
+<defs><marker id="ar7" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M1 1L9 5L1 9z" class="fm"/></marker></defs>
+<rect class="bx" x="10" y="10" width="560" height="410" rx="6"/>
+<circle cx="250" cy="215" r="170" class="bx-dash"/>
+<text class="ts" x="250" y="36" text-anchor="middle">5 km um die Zelle</text>
+<!-- Hauptpark -->
+<polygon class="pot" points="200,180 290,170 310,240 220,260"/>
+<polygon class="pool" points="215,190 280,184 295,232 228,248"/>
+<g class="fa"><circle cx="240" cy="205" r="4"/><circle cx="268" cy="200" r="4"/><circle cx="252" cy="230" r="4"/><circle cx="278" cy="222" r="4"/></g>
+<text x="255" y="285" text-anchor="middle" class="ta">Hauptprojekt</text>
+<!-- Verbundpark A -->
+<polygon class="pot" points="110,90 170,82 182,130 120,140"/>
+<polygon class="pool" points="122,98 165,93 172,126 130,132"/>
+<g class="fa"><circle cx="140" cy="108" r="4"/><circle cx="158" cy="118" r="4"/></g>
+<text class="ta" x="146" y="74" text-anchor="middle">Verbundpark A</text>
+<!-- Verbundpark B -->
+<polygon class="pot" points="330,300 400,292 410,350 340,356"/>
+<polygon class="pool" points="342,308 394,302 400,342 350,348"/>
+<g class="fa"><circle cx="362" cy="322" r="4"/><circle cx="384" cy="330" r="4"/></g>
+<text class="ta" x="372" y="378" text-anchor="middle">Verbundpark B</text>
+<!-- Verbundlinien -->
+<line class="ln-acc" x1="150" y1="114" x2="255" y2="215"/>
+<line class="ln-acc" x1="255" y1="215" x2="372" y2="326"/>
+<rect x="160" y="150" width="54" height="18" rx="3" fill="var(--surface)"/><text class="ta" x="187" y="164" text-anchor="middle">3,1 km</text>
+<rect x="290" y="258" width="54" height="18" rx="3" fill="var(--surface)"/><text class="ta" x="317" y="272" text-anchor="middle">2,6 km</text>
+<!-- Elektrolyse (Schritt 4) -->
+<rect x="420" y="160" width="18" height="18" class="fh" transform="rotate(45 429 169)"/>
+<text class="th2" x="448" y="160">Elektrolyse</text><text class="ts" x="448" y="176">Variante A, Schritt 4</text>
+<path class="ln-dash" d="M255 215 L420 172"/><path class="ln-dash" d="M150 114 L418 166"/><path class="ln-dash" d="M372 326 L425 182"/>
+<rect x="330" y="128" width="58" height="18" rx="3" fill="var(--surface)"/><text class="ta" x="359" y="142" text-anchor="middle">5,42 km</text>
+<!-- Nachrichtliche Fläche -->
+<polygon class="pool-d" points="450,300 530,290 548,370 462,382"/>
+<text class="tw" x="498" y="336" text-anchor="middle">(VRG 70)</text>
+<text class="ts" x="498" y="400" text-anchor="middle">Flächenauswahl, nicht im Verbund</text>
+<!-- Rechte Spalte: was je Verbundpark entsteht -->
+<text class="tt" x="600" y="40">Je Verbundpark entsteht</text>
+<rect class="bx-h2" x="600" y="56" width="280" height="80" rx="5"/><text class="tmb" x="612" y="78">&lt;Parkname&gt;/</text><text class="ts" x="612" y="98">Poolfläche.gpkg</text><text class="ts" x="612" y="114">Potenzialfläche.gpkg</text><text class="ts" x="612" y="130">WEA-Layout.gpkg, aus dessen Projektordner</text>
+<rect class="bx" x="600" y="146" width="280" height="40" rx="5"/><text class="t" x="612" y="171">Layergruppe &lt;Parkname&gt; (P-XXXX)</text>
+<rect class="bx" x="600" y="196" width="280" height="40" rx="5"/><text class="t" x="612" y="221">Stammdaten nach Schritt 2.7</text>
+<rect class="bx-acc" x="600" y="246" width="280" height="40" rx="5"/><text class="t" x="612" y="264">Layer 64 Parkverbund</text><text class="ts" x="612" y="279">abstand_km, eine Dezimale</text>
+<rect class="bx-acc" x="600" y="296" width="280" height="40" rx="5"/><text class="t" x="612" y="314">Layer 61 Direktleitung je Variante</text><text class="ts" x="612" y="329">laenge_km, zwei Dezimalen</text>
+<rect class="bx" x="600" y="346" width="280" height="40" rx="5"/><text class="t" x="612" y="364">Mengenmodell auf Parksumme</text><text class="ts" x="612" y="379">mit Anteil je Park</text>
+</svg>
+<div class="legend"><span><i style="border:2px solid var(--pool)"></i>Poolfläche</span><span><i style="background:var(--potfill);border:1px solid var(--pot)"></i>Potenzialfläche</span><span><i style="border:2px dashed var(--pool)"></i>nachrichtliche ENEO-Fläche</span><span><i style="background:var(--acc)"></i>Verbundlinie</span><span><i style="border-top:2px dashed var(--acc);height:0"></i>Direktleitung (konstruiert)</span></div>
+<figcaption>Schema mit Beispielwerten. Im Referenzlauf Narthauen-Süd waren das Otterstedt-Nord (P-3239) und Otterstedt-Süd (P-3240) mit zusammen 72,0 MW, nachrichtlich dazu „Nördlich von Reeßum“ (VRG 70). Verbundparks gelten nicht als Vorhaben Dritter.</figcaption>
+</figure>
+
+<!-- ============ 8 Arbeitsordner ============ -->
+<h2><span class="no">08</span>1.9 · Arbeitsordner auf dem Mac</h2>
+<figure>
+<svg viewBox="0 0 900 400" role="img" aria-label="Arbeitsordner auf dem Mac mit Unterordnern, gespeist aus dem Referenzlauf, gebaut in tmp, Drive nur als Ablage über drive_set">
+<defs><marker id="ar8" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M1 1L9 5L1 9z" class="fm"/></marker></defs>
+<!-- Drive -->
+<rect class="bx" x="10" y="20" width="230" height="360" rx="6"/>
+<text class="tt" x="24" y="46">Google Drive</text><text class="ts" x="24" y="64">Ablage, nicht Werkbank</text>
+<rect class="bx" x="24" y="84" width="202" height="84" rx="5"/><text class="t" x="36" y="106">Referenzlauf Narthauen-Süd</text><text class="ts" x="36" y="124">Kartendarstellung Arbeits-</text><text class="ts" x="36" y="140">dateien/: pb.py, stil.py, nah.py,</text><text class="ts" x="36" y="156">karte.py, drive.py, Symbole …</text>
+<rect class="bx" x="24" y="182" width="202" height="60" rx="5"/><text class="t" x="36" y="204">Werkzeugordner</text><text class="ts" x="36" y="222">Module erst nach /tmp</text><text class="ts" x="36" y="236">kopieren, dann importieren</text>
+<rect class="bx-acc" x="24" y="296" width="202" height="60" rx="5"/><text class="t" x="36" y="318">H2 Konzept/ des Projekts</text><text class="ts" x="36" y="336">erst nach Änderungsliste</text><text class="ts" x="36" y="350">und Go (Anhang H)</text>
+<!-- Mac -->
+<rect class="bx-h2" x="300" y="20" width="330" height="360" rx="6"/>
+<text class="tmb" x="314" y="46">~/h2_arbeit_&lt;projekt&gt;/</text>
+<path class="ln" d="M322 56 V328" stroke-width="1"/>
+<path class="ln" d="M322 76 H338 M322 200 H338 M322 248 H338 M322 288 H338 M322 328 H338" stroke-width="1"/>
+<text class="tm" x="344" y="80">out/</text><text class="ts" x="420" y="80">Arbeits-GeoPackage, qgz</text>
+<path class="ln" d="M356 88 V168" stroke-width="1"/><path class="ln" d="M356 112 H370 M356 160 H370" stroke-width="1"/>
+<text class="tm" x="376" y="116">drive_set/</text><text class="ts" x="376" y="134">Staging, Spiegel des Drive</text>
+<text class="tm" x="376" y="164">Kartendarstellung</text><text class="tm" x="376" y="182">Arbeitsdateien/</text>
+<text class="tm" x="344" y="204">karten/</text>
+<text class="tm" x="344" y="252">vorschau/</text>
+<text class="tm" x="344" y="292">doku/</text>
+<text class="ts" x="344" y="332">alles hier parametriert:</text><text class="ts" x="344" y="348">Pfade, Projektname, Blattausschnitte,</text><text class="ts" x="344" y="364">Layernamen</text>
+<!-- tmp -->
+<rect class="bx" x="690" y="120" width="200" height="120" rx="6"/>
+<text class="tmb" x="704" y="146">/tmp</text><text class="ts" x="704" y="168">Werkbank: GeoPackage,</text><text class="ts" x="704" y="184">Projektdatei, Exporte</text><text class="ts" x="704" y="200">werden hier gebaut</text><text class="ts" x="704" y="222">am Ende einmal copy2</text>
+<!-- Pfeile -->
+<path class="ln" d="M226 126 H296" marker-end="url(#ar8)"/><text class="ts" x="236" y="118">kopieren</text>
+<path class="ln" d="M630 160 H686" marker-end="url(#ar8)" transform="translate(0,0)"/>
+<path class="ln" d="M690 200 H634" marker-end="url(#ar8)"/><text class="ts" x="642" y="218">copy2</text>
+<path class="ln" d="M370 120 H330" stroke-width="0"/>
+<path class="ln-dash" d="M300 326 H230" marker-end="url(#ar8)"/><text class="ts" x="246" y="300">später,</text><text class="ts" x="246" y="314">Schritt 8</text>
+<path class="ln-warn" d="M226 212 L296 212"/><text class="tw" x="240" y="204">import</text>
+<line x1="254" y1="202" x2="272" y2="222" stroke="var(--warn)" stroke-width="2.4"/><line x1="272" y1="202" x2="254" y2="222" stroke="var(--warn)" stroke-width="2.4"/>
+</svg>
+<figcaption>Importiert wird nur aus dem Arbeitsordner, nie aus einem Drive-Pfad, denn das blockiert QGIS. Auf das Drive gelangt erst in Schritt 8 etwas, über <code>out/drive_set/</code>.</figcaption>
+</figure>
+
+<!-- ============ 9 Ausgabe ============ -->
+<h2><span class="no">09</span>Ausgabe von Schritt 1</h2>
+<div class="tiles" style="margin-top:14px">
+<div class="tile"><b>Projektordner</b><span>aufgelöst über das Register</span></div>
+<div class="tile"><b>Beide H2-Pfade</b><span>Arbeitsordner und Vorarbeit (nur lesen)</span></div>
+<div class="tile"><b>Arbeitskopie</b><span>mit Layerzahl und Begründung der Wahl</span></div>
+<div class="tile"><b>Nefino-Export</b><span>Pfad und Ausdehnung</span></div>
+<div class="tile"><b>Projektstand</b><span>Stufe mit Beleg</span></div>
+<div class="tile"><b>Eingangsvertrag</b><span>weiter, Vermerke oder Abbruch</span></div>
+<div class="tile"><b>Parkverbund</b><span>Parks mit Parkleistungen</span></div>
+<div class="tile"><b>Nachrichtliche Flächen</b><span>mit VRG-Nummer</span></div>
+<div class="tile"><b>Arbeitsordner</b><span>Pfad auf dem Mac</span></div>
+</div>
+
+<!-- ============ 10 Unstimmigkeiten ============ -->
+<h2><span class="no">10</span>Unstimmigkeiten im Prompt</h2>
+<div class="issues">
+<div class="issue"><b>Schreiben auf das Drive vor der Änderungsliste</b><p>1.2 legt den H2-Ordner an und 1.3 kopiert die Arbeitskopie dorthin, beides auf dem Drive. Laut Vorspann und Anhang H steht vor jeder Änderung im Drive-Ordner die Änderungsliste, und auf das Drive wird nie direkt geschrieben. 1.9 legt die Projektdatei zudem unter <code>out/</code> auf dem Mac ab.</p></div>
+<div class="issue"><b>Direktleitungen vor der Standortwahl</b><p>1.7 verlangt je Park und Standortvariante eine Direktleitung mit Länge. Die Varianten entstehen aber erst in 4.1, und 4.6 beschreibt dieselbe Rechnung noch einmal.</p></div>
+<div class="issue"><b>Leerer Pfadteil in 1.8</b><p>Die Ablage lautet <code>H2 Konzept//Quelle/</code>. Zwischen den Schrägstrichen fehlt vermutlich ein Name, etwa der Flächen- oder Parkname.</p></div>
+<div class="issue"><b>Ordnerbild ohne Einrückung</b><p>Die Hierarchie in Anhang A ist im PDF flach. Die Lage von <code>Planung/</code>, <code>Ertragsprognose/</code> und <code>Geodaten/</code> lässt sich nur aus anderen Pfadangaben erschließen.</p></div>
+</div>
+
+<footer>Quelle: ENEO_Konzept_Prompt, Fassung 2026-11-11-Z, Schritt 1 sowie Anhang A, B, C, D, E, F und H. Zahlen in den Schemata 07 sind Beispielwerte.</footer>
+</main>
+</body>
+</html>

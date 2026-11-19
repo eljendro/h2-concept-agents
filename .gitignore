@@ -1,0 +1,48 @@
+# Zugangsdaten
+.env
+*.env
+!.env.example
+secrets/
+
+# Projektdaten und Laufergebnisse: nie ins Repository
+data/**
+!data/**/
+!data/**/.gitkeep
+!data/README.md
+runs/**
+!runs/.gitkeep
+
+# Vertrauliche Ergebnisse des Referenzlaufs (Namen von Abnehmern, Eigentümern, Wettbewerbern)
+docs/docx/
+docs/md/Datenquellen_*-*.md
+
+# Geodaten und QGIS-Artefakte außerhalb von templates/ und tests/fixtures/
+*.gpkg
+*.gpkg-wal
+*.gpkg-shm
+*.qgz
+*.qgs~
+!tests/fixtures/**/*.gpkg
+*.aux.xml
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.ruff_cache/
+*.egg-info/
+build/
+dist/
+
+# Betriebssystem, Editoren
+.DS_Store
+Thumbs.db
+desktop.ini
+.idea/
+.vscode/
+~$*.docx
+
+# Lokale Speicherkonfiguration
+config/storage.yaml

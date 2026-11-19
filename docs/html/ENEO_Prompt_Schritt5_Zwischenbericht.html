@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ENEO-Prompt Schritt 5</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:wght@500;600&family=Source+Sans+3:wght@400;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  /* Layout: schmale Memo-Spalte, Abbildungen dürfen breiter laufen. Farben aus dem ENEO-Kartenstil abgeleitet. */
+  --bg:#f4f6f4; --surface:#ffffff; --ink:#1a2420; --muted:#5b6a63; --line:#c7d0cb;
+  --acc:#0F3A30; --accsoft:#e1ebe6; --h2:#1F4E79; --h2soft:#e2eaf3;
+  --warn:#8C2F27; --warnsoft:#f5e2df; --amb:#9a6a12; --ambsoft:#f6ecd6;
+  --pool:#FF1C24; --pot:#004BFF; --potfill:rgba(0,0,255,.16);
+  --f-disp:"Barlow Semi Condensed","Arial Narrow",sans-serif;
+  --f-body:"Source Sans 3","Segoe UI",Helvetica,Arial,sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#111714; --surface:#19211d; --ink:#e3eae6; --muted:#98a69f; --line:#34413b;
+  --acc:#7cc3a9; --accsoft:#1d3830; --h2:#8eb7e2; --h2soft:#1c2d40;
+  --warn:#ec8c80; --warnsoft:#3b221f; --amb:#e2b45c; --ambsoft:#382d1b;
+  --pool:#ff5a60; --pot:#6f9bff; --potfill:rgba(90,130,255,.22); color-scheme:dark;}}
+:root[data-theme="dark"]{
+  --bg:#111714; --surface:#19211d; --ink:#e3eae6; --muted:#98a69f; --line:#34413b;
+  --acc:#7cc3a9; --accsoft:#1d3830; --h2:#8eb7e2; --h2soft:#1c2d40;
+  --warn:#ec8c80; --warnsoft:#3b221f; --amb:#e2b45c; --ambsoft:#382d1b;
+  --pool:#ff5a60; --pot:#6f9bff; --potfill:rgba(90,130,255,.22); color-scheme:dark;}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 var(--f-body)}
+main{max-width:980px;margin:0 auto;padding:40px 20px 80px}
+header{border-bottom:2px solid var(--acc);padding-bottom:18px;margin-bottom:28px}
+.kicker{font:600 13px var(--f-mono);color:var(--acc);letter-spacing:.04em}
+h1{font:600 40px/1.1 var(--f-disp);margin:6px 0 10px;text-wrap:balance}
+h2{font:600 26px/1.2 var(--f-disp);margin:56px 0 6px;text-wrap:balance;display:flex;gap:12px;align-items:baseline}
+h2 .no{font:600 14px var(--f-mono);color:var(--acc);border:1px solid var(--acc);border-radius:4px;padding:1px 6px}
+p{max-width:68ch;margin:6px 0}
+.lead{color:var(--muted);max-width:70ch}
+.meta{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.tag{font:12px var(--f-mono);padding:3px 8px;border-radius:4px;background:var(--accsoft);color:var(--acc)}
+figure{margin:18px 0 0;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:18px;overflow-x:auto}
+figcaption{font-size:14px;color:var(--muted);margin-top:10px;max-width:80ch}
+svg{display:block;width:100%;height:auto;color:var(--ink);font-family:var(--f-body)}
+.duo{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+@media (max-width:760px){.duo{grid-template-columns:1fr}h1{font-size:32px}}
+code,.mono{font-family:var(--f-mono);font-size:.88em}
+/* SVG-Bausteine */
+.bx{fill:var(--surface);stroke:var(--line);stroke-width:1}
+.bx-acc{fill:var(--accsoft);stroke:var(--acc);stroke-width:1}
+.bx-h2{fill:var(--h2soft);stroke:var(--h2);stroke-width:1}
+.bx-warn{fill:var(--warnsoft);stroke:var(--warn);stroke-width:1}
+.bx-amb{fill:var(--ambsoft);stroke:var(--amb);stroke-width:1}
+.bx-dash{fill:none;stroke:var(--muted);stroke-width:1;stroke-dasharray:5 4}
+.ln{stroke:var(--muted);stroke-width:1.4;fill:none}
+.ln-acc{stroke:var(--acc);stroke-width:2;fill:none}
+.ln-dash{stroke:var(--acc);stroke-width:1.4;fill:none;stroke-dasharray:6 4}
+.ln-warn{stroke:var(--warn);stroke-width:1.4;fill:none}
+.tt{font:600 15px var(--f-body);fill:var(--ink)}
+.t{font:13px var(--f-body);fill:var(--ink)}
+.ts{font:12px var(--f-body);fill:var(--muted)}
+.tm{font:13px var(--f-mono);fill:var(--ink)}
+.tmb{font:600 13px var(--f-mono);fill:var(--ink)}
+.ta{font:600 12px var(--f-mono);fill:var(--acc)}
+.tw{font:600 12px var(--f-body);fill:var(--warn)}
+.tamb{font:600 12px var(--f-body);fill:var(--amb)}
+.th2{font:600 12px var(--f-body);fill:var(--h2)}
+.fa{fill:var(--acc)} .fw{fill:var(--warn)} .fm{fill:var(--muted)} .fh{fill:var(--h2)}
+.pool{fill:none;stroke:var(--pool);stroke-width:2}
+.pool-d{fill:none;stroke:var(--pool);stroke-width:2;stroke-dasharray:7 4}
+.pot{fill:var(--potfill);stroke:var(--pot);stroke-width:1.2}
+.hatch{fill:url(#hatch)}
+/* Tabellen und Kacheln */
+table{border-collapse:collapse;width:100%;font-size:14px;min-width:620px}
+th,td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}
+th{font:600 13px var(--f-body);background:var(--bg)}
+td.ab{background:var(--warnsoft);color:var(--warn);font-weight:600}
+td.ve{background:var(--ambsoft);color:var(--amb);font-weight:600}
+td.of{background:var(--accsoft);color:var(--acc)}
+td.c{text-align:center;font-size:18px;color:var(--acc)}
+td.cw{text-align:center;font-size:18px;color:var(--muted)}
+td.ph{color:var(--muted);font-family:var(--f-mono);font-size:12px}
+.chip{display:inline-block;font:600 11px var(--f-body);padding:1px 6px;border-radius:3px;margin-left:6px;vertical-align:middle}
+.chip.ind{background:var(--ambsoft);color:var(--amb)}
+.chip.op{background:var(--warnsoft);color:var(--warn)}
+.src{font-family:var(--f-mono);font-size:12px;color:var(--muted)}
+.tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px}
+.tile{border:1px solid var(--line);border-left:4px solid var(--acc);border-radius:0;padding:10px 12px;background:var(--bg)}
+.tile b{overflow-wrap:anywhere;display:block;font:600 15px var(--f-disp);letter-spacing:.01em}
+.tile span{font-size:13px;color:var(--muted)}
+.issues{display:grid;gap:10px;margin-top:14px}
+.issue{border:1px solid var(--line);border-left:4px solid var(--amb);border-radius:0;background:var(--surface);padding:12px 14px}
+.issue b{font:600 16px var(--f-disp)}
+.issue p{margin:4px 0 0;font-size:15px}
+.legend{display:flex;flex-wrap:wrap;gap:14px;font-size:13px;color:var(--muted);margin-top:10px}
+.legend i{display:inline-block;width:14px;height:10px;margin-right:6px;vertical-align:middle;border-radius:2px}
+footer{margin-top:60px;font-size:13px;color:var(--muted);border-top:1px solid var(--line);padding-top:12px}
+</style>
+</head>
+<body>
+<main>
+
+<header>
+  <div class="kicker">ENEO Wasserstoff-Standortkonzept · Fassung 2026-11-11-Z</div>
+  <h1>Schritt 5: Zwischenbericht</h1>
+  <p class="lead">Der Zwischenbericht ist die Nahtstelle zwischen Analyse und Produktion. Er fasst Schritt 1 bis 4 im Chat in Tabellen zusammen, stellt die offenen Punkte als Fragen mit Auswahl und hält an. Ist die Freigabe vorab erteilt, läuft der Lauf ohne Unterbrechung weiter.</p>
+  <div class="meta"><span class="tag">Startnachricht</span><span class="tag">Grundsätze</span><span class="tag">Anhang A</span><span class="tag">Anhang D</span><span class="tag">Anhang H</span></div>
+</header>
+
+<!-- 01 Position -->
+<h2><span class="no">01</span>Wo der Zwischenbericht steht</h2>
+<figure>
+<svg viewBox="0 0 900 300" role="img" aria-label="Schritt 1 bis 4 liefern den Bericht, danach entscheidet die Freigabe: vorab erteilt heißt weiter mit Schritt 6, sonst anhalten und auf Antwort warten">
+<defs><marker id="a1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M1 1L9 5L1 9z" class="fm"/></marker></defs>
+<rect class="bx" x="20" y="40" width="80" height="60" rx="6"/><text class="tt" x="60" y="75" text-anchor="middle">1</text>
+<rect class="bx" x="110" y="40" width="80" height="60" rx="6"/><text class="tt" x="150" y="75" text-anchor="middle">2</text>
+<rect class="bx" x="200" y="40" width="80" height="60" rx="6"/><text class="tt" x="240" y="75" text-anchor="middle">3</text>
+<rect class="bx" x="290" y="40" width="80" height="60" rx="6"/><text class="tt" x="330" y="75" text-anchor="middle">4</text>
+<path class="ln" d="M370 70 H406" marker-end="url(#a1)"/>
+<rect class="bx-acc" x="410" y="30" width="180" height="80" rx="6"/><text class="tt" x="500" y="58" text-anchor="middle">5 Zwischenbericht</text><text class="ts" x="500" y="78" text-anchor="middle">im Chat, nicht als Datei</text><text class="ts" x="500" y="94" text-anchor="middle">Tabellen, keine Erzählung</text>
+<path class="ln" d="M590 70 H626" marker-end="url(#a1)"/>
+<rect class="bx-amb" x="630" y="40" width="130" height="60" rx="6"/><text class="tt" x="695" y="66" text-anchor="middle">Freigabe</text><text class="ts" x="695" y="84" text-anchor="middle">vorab erteilt?</text>
+<path class="ln" d="M760 60 H820 V40 H836" marker-end="url(#a1)"/><text class="ts" x="770" y="52">ja</text>
+<path class="ln" d="M695 100 V150" marker-end="url(#a1)"/><text class="ts" x="705" y="130">nein</text>
+<rect class="bx-acc" x="840" y="20" width="50" height="40" rx="6"/><text class="tt" x="865" y="45" text-anchor="middle">6</text>
+<rect class="bx-warn" x="600" y="154" width="190" height="56" rx="6"/><text class="tw" x="695" y="178" text-anchor="middle">anhalten</text><text class="ts" x="695" y="196" text-anchor="middle">auf Antwort warten</text>
+<rect x="20" y="236" width="350" height="22" class="bx-acc"/><text class="ts" x="30" y="252">nur Projektordner und Export, billig</text>
+<rect x="410" y="236" width="480" height="22" class="bx-amb"/><text class="ts" x="420" y="252">teure Arbeit: externe Einzelrecherche, Karten, Dokumente</text>
+<text class="ts" x="20" y="284">Grundsatz: Bricht der Eingangsvertrag in Schritt 1 ab, ist von der teuren Arbeit nichts verloren.</text>
+</svg>
+<figcaption>Die Startnachricht des Referenzlaufs erteilt die Freigabe für Schritt 6 bis 9 vorab. Der Bericht kommt dann trotzdem in den Chat, der Lauf hält aber nicht an.</figcaption>
+</figure>
+
+<!-- 02 Inhalt -->
+<h2><span class="no">02</span>Was in den Bericht gehört und woher es kommt</h2>
+<figure>
+<svg viewBox="0 0 900 470" role="img" aria-label="Zehn Bausteine des Zwischenberichts mit dem Teilschritt, aus dem sie stammen">
+<defs><marker id="a2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M1 1L9 5L1 9z" class="fm"/></marker></defs>
+<g>
+<rect class="bx" x="20" y="20" width="140" height="40" rx="5"/><text class="t" x="90" y="45" text-anchor="middle">Schritt 1</text>
+<rect class="bx" x="20" y="72" width="140" height="40" rx="5"/><text class="t" x="90" y="97" text-anchor="middle">Schritt 2</text>
+<rect class="bx" x="20" y="124" width="140" height="40" rx="5"/><text class="t" x="90" y="149" text-anchor="middle">Schritt 3</text>
+<rect class="bx" x="20" y="176" width="140" height="40" rx="5"/><text class="t" x="90" y="201" text-anchor="middle">4.1</text>
+<rect class="bx" x="20" y="228" width="140" height="40" rx="5"/><text class="t" x="90" y="253" text-anchor="middle">4.3</text>
+<rect class="bx" x="20" y="280" width="140" height="40" rx="5"/><text class="t" x="90" y="305" text-anchor="middle">4.4</text>
+<rect class="bx" x="20" y="332" width="140" height="40" rx="5"/><text class="t" x="90" y="357" text-anchor="middle">4.5</text>
+<rect class="bx-dash" x="20" y="384" width="140" height="68" rx="5"/><text class="t" x="90" y="414" text-anchor="middle">alle Schritte</text><text class="ts" x="90" y="432" text-anchor="middle">Layer 97, Vermerke</text>
+</g>
+<g>
+<path class="ln" d="M160 40 H316" marker-end="url(#a2)"/>
+<path class="ln" d="M160 92 H316" marker-end="url(#a2)"/>
+<path class="ln" d="M160 144 H316" marker-end="url(#a2)"/>
+<path class="ln" d="M160 196 H316" marker-end="url(#a2)"/>
+<path class="ln" d="M160 248 H316" marker-end="url(#a2)"/>
+<path class="ln" d="M160 300 H316" marker-end="url(#a2)"/>
+<path class="ln" d="M160 346 H316" marker-end="url(#a2)"/><path class="ln" d="M160 358 C230 358 250 380 316 380" marker-end="url(#a2)"/>
+<path class="ln" d="M160 408 C230 408 250 410 316 414" marker-end="url(#a2)"/><path class="ln" d="M160 428 C230 428 250 444 316 448" marker-end="url(#a2)"/>
+</g>
+<g>
+<rect class="bx-acc" x="320" y="20" width="560" height="40" rx="5"/><text class="t" x="332" y="45">Projektordner und Arbeitskopie</text><text class="ts" x="868" y="45" text-anchor="end">Pfade, Layerzahl</text>
+<rect class="bx-acc" x="320" y="72" width="560" height="40" rx="5"/><text class="t" x="332" y="97">Stammdaten mit Versionsauflösung</text><text class="ts" x="868" y="97" text-anchor="end">je Park, Summe, Fundstelle</text>
+<rect class="bx-acc" x="320" y="124" width="560" height="40" rx="5"/><text class="t" x="332" y="149">Umfeld nach Themen</text><text class="ts" x="868" y="149" text-anchor="end">Objektzahl, Quelle, Ausdehnung</text>
+<rect class="bx-acc" x="320" y="176" width="560" height="40" rx="5"/><text class="t" x="332" y="201">Kandidatentabelle mit Auswahl</text><text class="ts" x="868" y="201" text-anchor="end">mit Begründung</text>
+<rect class="bx-acc" x="320" y="228" width="560" height="40" rx="5"/><text class="t" x="332" y="253">Akteure</text><text class="ts" x="868" y="253" text-anchor="end">Kategorie, Status, Zweitprüfung, Funktionszeile</text>
+<rect class="bx-acc" x="320" y="280" width="560" height="40" rx="5"/><text class="t" x="332" y="305">Mengenmodell</text><text class="ts" x="868" y="305" text-anchor="end">drei Fälle je Park und Verbund</text>
+<rect class="bx-acc" x="320" y="332" width="275" height="28" rx="5"/><text class="t" x="332" y="351">Methanolanalyse</text>
+<rect class="bx-acc" x="320" y="366" width="275" height="28" rx="5"/><text class="t" x="332" y="385">Speicherprüfung</text>
+<rect class="bx-acc" x="320" y="400" width="275" height="28" rx="5"/><text class="t" x="332" y="419">Quellenliste</text>
+<rect class="bx-amb" x="320" y="434" width="275" height="28" rx="5"/><text class="t" x="332" y="453">offene Punkte als Fragen</text>
+</g>
+</svg>
+<figcaption>Zehn Bausteine, in der Reihenfolge des Prompts. Die Zuordnung zu den Teilschritten ist abgeleitet, der Prompt nennt nur die Bausteine.</figcaption>
+</figure>
+
+<!-- 03 Lücken -->
+<h2><span class="no">03</span>Was aus Schritt 1 bis 4 nicht im Bericht steht</h2>
+<figure>
+<table>
+<thead><tr><th>Ergebnis</th><th>aus</th><th>im Bericht</th></tr></thead>
+<tbody>
+<tr><td>Projektordner, Arbeitskopie</td><td class="src">1.1 bis 1.3</td><td class="of">ja</td></tr>
+<tr><td>Nefino-Export mit Ausdehnung</td><td class="src">1.4</td><td class="ve">nur indirekt, über Umfeld</td></tr>
+<tr><td>Projektstand, Ergebnis des Eingangsvertrags</td><td class="src">1.5, 1.6</td><td class="ab">nicht genannt</td></tr>
+<tr><td>Parkverbund, nachrichtliche Flächen</td><td class="src">1.7, 1.8</td><td class="ve">nur indirekt, über Stammdaten je Park</td></tr>
+<tr><td>Stammdaten mit Versionsauflösung</td><td class="src">2</td><td class="of">ja</td></tr>
+<tr><td>Umfeld je Thema</td><td class="src">3</td><td class="of">ja</td></tr>
+<tr><td>Kandidaten, Planungsrecht</td><td class="src">4.1</td><td class="of">ja, Planungsrecht nicht eigens genannt</td></tr>
+<tr><td>Akteure mit Zweitprüfung</td><td class="src">4.3</td><td class="of">ja</td></tr>
+<tr><td>Mengenmodell</td><td class="src">4.4</td><td class="of">ja</td></tr>
+<tr><td>Methanolanalyse, Speicherprüfung</td><td class="src">4.5</td><td class="of">ja</td></tr>
+<tr><td>Direktleitungen mit Längen</td><td class="src">4.6</td><td class="ab">nicht genannt</td></tr>
+<tr><td>Kostenseite</td><td class="src">Anhang D</td><td class="ab">nicht genannt</td></tr>
+<tr><td>Wasserstoffwege</td><td class="src">Anhang D</td><td class="ab">nicht genannt</td></tr>
+</tbody>
+</table>
+<div class="legend"><span><i style="background:var(--accsoft);border:1px solid var(--acc)"></i>Baustein des Berichts</span><span><i style="background:var(--ambsoft);border:1px solid var(--amb)"></i>nur mittelbar enthalten</span><span><i style="background:var(--warnsoft);border:1px solid var(--warn)"></i>fehlt in der Liste</span></div>
+<figcaption>Abgleich der Ausgaben von Schritt 1 bis 4 mit der Inhaltsliste von Schritt 5. Was fehlt, sieht der Nutzer vor der Produktion nicht.</figcaption>
+</figure>
+
+<!-- 04 Mockup -->
+<h2><span class="no">04</span>So kann der Bericht im Chat aussehen</h2>
+<figure>
+<div style="max-width:720px;border:1px solid var(--line);border-radius:12px;background:var(--bg);padding:16px 18px;font-size:14px">
+<div style="font:600 12px var(--f-mono);color:var(--muted);margin-bottom:8px">Claude · Zwischenbericht nach Schritt 5 · Beispiel</div>
+<div style="font-weight:600;margin:4px 0">Stammdaten</div>
+<table style="min-width:0;font-size:13px"><thead><tr><th>Park</th><th>WEA</th><th>MW</th><th>P50 MWh/a</th><th>h</th><th>Fundstelle</th></tr></thead>
+<tbody><tr><td>Hauptpark</td><td>8</td><td>50,0</td><td>150.000</td><td>3.000</td><td class="src">DCF, Prognose v2_final</td></tr>
+<tr><td>Verbundpark A</td><td>4</td><td>22,0</td><td>63.800</td><td>2.900</td><td class="src">DCF A</td></tr>
+<tr><td>Summe</td><td>12</td><td>72,0</td><td>213.800</td><td></td><td></td></tr></tbody></table>
+<div style="font-weight:600;margin:12px 0 4px">Mengenmodell, Verbund</div>
+<table style="min-width:0;font-size:13px"><thead><tr><th>Fall</th><th>MW</th><th>H2 t/a</th><th>CO2 Leitung t/a</th><th>Lkw/a</th></tr></thead>
+<tbody><tr><td>A</td><td>28,8</td><td>2.480</td><td>2.700</td><td>…</td></tr><tr><td>B</td><td>36,0</td><td>2.840</td><td>2.700</td><td>…</td></tr><tr><td>C</td><td>…</td><td>…</td><td>2.700</td><td>0</td></tr></tbody></table>
+<div style="font-weight:600;margin:12px 0 4px">Offene Punkte</div>
+<div style="display:grid;gap:8px">
+<div style="border:1px solid var(--amb);border-radius:8px;padding:8px 10px;background:var(--surface)">1. Poolfläche aus Geometrie 52,4 ha, DCF 48,0 ha. Womit rechnen? <span class="chip ind">Geometrie</span><span class="chip ind">DCF</span></div>
+<div style="border:1px solid var(--amb);border-radius:8px;padding:8px 10px;background:var(--surface)">2. Fall C nur 21 % von Fall A. CO2-Leitung über 3 km prüfen? <span class="chip ind">ja</span><span class="chip ind">nein</span></div>
+<div style="border:1px solid var(--amb);border-radius:8px;padding:8px 10px;background:var(--surface)">3. Zwei WEA außerhalb der RROP-Entwurfskulisse. An Projektentwicklung geben? <span class="chip ind">ja</span><span class="chip ind">schon bekannt</span></div>
+</div>
+</div>
+<figcaption>Gestaltetes Beispiel mit erfundenen Werten. Der Prompt legt nur die Bausteine und die Form fest: kurz, Tabellen, offene Punkte mit einem Wort beantwortbar.</figcaption>
+</figure>
+
+<!-- 05 Offene Punkte -->
+<h2><span class="no">05</span>Offene Punkte: Frage statt Erzählung</h2>
+<div class="duo">
+<figure>
+<svg viewBox="0 0 420 340" role="img" aria-label="Ein offener Punkt als Erzählung im Vergleich zur Frage mit Auswahl, die sich mit einem Wort beantworten lässt">
+<rect class="bx-warn" x="20" y="20" width="380" height="120" rx="6"/><text class="tw" x="34" y="44">so nicht</text>
+<text class="ts" x="34" y="68">Die Poolfläche weicht von der DCF ab, was</text><text class="ts" x="34" y="84">verschiedene Ursachen haben kann, etwa</text><text class="ts" x="34" y="100">einen älteren Planstand. Das sollte bei</text><text class="ts" x="34" y="116">Gelegenheit geklärt werden.</text>
+<rect class="bx-acc" x="20" y="160" width="380" height="160" rx="6"/><text class="ta" x="34" y="184">so</text>
+<text class="t" x="34" y="210">Poolfläche: Geometrie 52,4 ha, DCF 48,0 ha</text><text class="t" x="34" y="230">(Δ 4,4 ha, 9,2 %). Womit rechnen?</text>
+<rect class="bx" x="34" y="248" width="96" height="28" rx="14"/><text class="t" x="82" y="267" text-anchor="middle">Geometrie</text>
+<rect class="bx" x="140" y="248" width="70" height="28" rx="14"/><text class="t" x="175" y="267" text-anchor="middle">DCF</text>
+<rect class="bx" x="220" y="248" width="120" height="28" rx="14"/><text class="t" x="280" y="267" text-anchor="middle">offen lassen</text>
+<text class="ts" x="34" y="302">Fundstellen: Planung/, DCF Blatt Fläche</text>
+</svg>
+<figcaption>Beispiel. Grundlage ist die Regel „Erst fragen, dann annehmen“: Bei Mehrdeutigkeit wird mit Auswahlmöglichkeiten nachgefragt.</figcaption>
+</figure>
+<figure>
+<svg viewBox="0 0 420 340" role="img" aria-label="Woher offene Punkte im Lauf typischerweise stammen">
+<text class="tt" x="20" y="26">Typische Herkunft</text>
+<g>
+<rect class="bx" x="20" y="40" width="380" height="30" rx="4"/><text class="ts" x="30" y="60">Vermerke aus dem Eingangsvertrag</text><text class="ta" x="390" y="60" text-anchor="end">1.6</text>
+<rect class="bx" x="20" y="76" width="380" height="30" rx="4"/><text class="ts" x="30" y="96">Verlustansatz, Poolfläche, Verbundparks</text><text class="ta" x="390" y="96" text-anchor="end">2.5–2.7</text>
+<rect class="bx" x="20" y="112" width="380" height="30" rx="4"/><text class="ts" x="30" y="132">Exportlücke mit Himmelsrichtung</text><text class="ta" x="390" y="132" text-anchor="end">3.1</text>
+<rect class="bx" x="20" y="148" width="380" height="30" rx="4"/><text class="ts" x="30" y="168">Widersprüche zwischen Planungsebenen</text><text class="ta" x="390" y="168" text-anchor="end">4.1</text>
+<rect class="bx" x="20" y="184" width="380" height="30" rx="4"/><text class="ts" x="30" y="204">Anlagen außerhalb der Windkulisse</text><text class="ta" x="390" y="204" text-anchor="end">Anhang D</text>
+<rect class="bx" x="20" y="220" width="380" height="30" rx="4"/><text class="ts" x="30" y="240">Teilnehmer ohne Zweitprüfung</text><text class="ta" x="390" y="240" text-anchor="end">4.3</text>
+<rect class="bx" x="20" y="256" width="380" height="30" rx="4"/><text class="ts" x="30" y="276">Fall C nicht tragfähig, Trassenfrage</text><text class="ta" x="390" y="276" text-anchor="end">4.4, 4.5</text>
+<rect class="bx" x="20" y="292" width="380" height="30" rx="4"/><text class="ts" x="30" y="312">Kostenzeile ohne Quelle</text><text class="ta" x="390" y="312" text-anchor="end">Anhang D</text>
+</g>
+</svg>
+<figcaption>Aus den Regeln der Schritte 1 bis 4 zusammengestellt. Jeder Punkt nennt die geprüfte Quelle, sonst ist ein „zu erheben“ nicht zulässig.</figcaption>
+</figure>
+</div>
+
+<!-- 06 Konfidenz und Form -->
+<h2><span class="no">06</span>Wie Werte und Sätze im Bericht aussehen</h2>
+<div class="duo">
+<figure>
+<svg viewBox="0 0 420 300" role="img" aria-label="Drei Konfidenzstufen aus Layer 97 und wie sie im Bericht erscheinen">
+<rect class="bx-acc" x="20" y="20" width="380" height="70" rx="6"/><text class="tmb" x="34" y="46">belegt</text><text class="ts" x="34" y="68">Wert mit benannter Quelle und Abrufdatum</text>
+<rect class="bx-amb" x="20" y="104" width="380" height="80" rx="6"/><text class="tmb" x="34" y="130">indikativ</text><text class="ts" x="34" y="152">als solcher gekennzeichnet, z. B. Energieanteil,</text><text class="ts" x="34" y="168">Windatlas, geschätzte Vorlauftemperatur</text>
+<rect class="bx-warn" x="20" y="198" width="380" height="80" rx="6"/><text class="tmb" x="34" y="224">zu erheben</text><text class="ts" x="34" y="246">nur mit Angabe, welche Quelle geprüft wurde.</text><text class="ts" x="34" y="262">Keine Zahl erfinden, um eine Lücke zu schließen.</text>
+</svg>
+<figcaption>Konfidenzstufen aus Anhang D, Layer 97. Herkunft und Prüfquelle bleiben getrennt.</figcaption>
+</figure>
+<figure>
+<svg viewBox="0 0 420 300" role="img" aria-label="Formregeln für den Chat: kurz, Tabellen, Preise in Euro, keine Gedankenstriche, keine Semikolons">
+<g>
+<rect class="bx-acc" x="20" y="20" width="380" height="36" rx="4"/><text class="t" x="34" y="43">Tabellen, keine Erzählung</text><text class="ta" x="388" y="43" text-anchor="end">✓</text>
+<rect class="bx-acc" x="20" y="64" width="380" height="36" rx="4"/><text class="t" x="34" y="87">Preise in Euro</text><text class="ta" x="388" y="87" text-anchor="end">✓</text>
+<rect class="bx-acc" x="20" y="108" width="380" height="36" rx="4"/><text class="t" x="34" y="131">Fragen mit einem Wort beantwortbar</text><text class="ta" x="388" y="131" text-anchor="end">✓</text>
+<rect class="bx-warn" x="20" y="152" width="380" height="36" rx="4"/><text class="t" x="34" y="175">Gedankenstriche</text><text class="tw" x="388" y="175" text-anchor="end">✗</text>
+<rect class="bx-warn" x="20" y="196" width="380" height="36" rx="4"/><text class="t" x="34" y="219">Semikolons</text><text class="tw" x="388" y="219" text-anchor="end">✗</text>
+<rect class="bx-warn" x="20" y="240" width="380" height="36" rx="4"/><text class="t" x="34" y="263">Bericht als Datei</text><text class="tw" x="388" y="263" text-anchor="end">✗</text>
+</g>
+</svg>
+<figcaption>Aus Startnachricht und Grundsätzen. Die Regeln gelten für Chat, Dokumente, Legenden und Beschriftungen gleichermaßen.</figcaption>
+</figure>
+</div>
+
+<!-- 07 Unstimmigkeiten -->
+<h2><span class="no">07</span>Unstimmigkeiten im Prompt</h2>
+<div class="issues">
+<div class="issue"><b>Fragen ohne Pause</b><p>Die offenen Punkte stehen als Fragen mit Auswahl. Bei vorab erteilter Freigabe läuft der Lauf aber ohne Unterbrechung weiter. Unklar ist, welche Annahme bis zur Antwort gilt und wie eine spätere Antwort in Karten und Dokumente zurückfließt. Das widerspricht dem Grundsatz „Erst fragen, dann annehmen“.</p></div>
+<div class="issue"><b>Freigabe ohne Wirkung</b><p>Der Grundsatz „Teure Arbeit erst nach der Freigabe“ setzt die Kostenschwelle an Schritt 5. Die Startnachricht erteilt die Freigabe vorab, und Schritt 3 und 4 recherchieren bereits extern. Damit schützt der Haltepunkt im Regelfall nichts mehr.</p></div>
+<div class="issue"><b>Lücken in der Inhaltsliste</b><p>Projektstand, Ergebnis des Eingangsvertrags, Direktleitungen, Kostenseite und Wasserstoffwege fehlen im Bericht (siehe 03). Gerade Kosten und Direktleitungen prägen später die Fassungen für Investoren und Kommunen.</p></div>
+<div class="issue"><b>Bericht ohne Ablage</b><p>Der Bericht steht nur im Chat. Antworten auf die offenen Punkte haben keinen festgelegten Ort. Der Übergabebericht nach Anhang H5 führt zwar Entscheidungen und offene Punkte, erwähnt den Zwischenbericht aber nicht.</p></div>
+</div>
+
+<footer>Quelle: ENEO_Konzept_Prompt, Fassung 2026-11-11-Z, Schritt 5 sowie Startnachricht, Grundsätze und Anhang A, D und H. Alle Werte in 04 und 05 sind erfundene Beispiele.</footer>
+</main>
+</body>
+</html>

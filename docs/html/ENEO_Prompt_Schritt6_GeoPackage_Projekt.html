@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ENEO-Prompt Schritt 6</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:wght@500;600&family=Source+Sans+3:wght@400;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  /* Layout: schmale Memo-Spalte, Abbildungen dürfen breiter laufen. Farben aus dem ENEO-Kartenstil abgeleitet. */
+  --bg:#f4f6f4; --surface:#ffffff; --ink:#1a2420; --muted:#5b6a63; --line:#c7d0cb;
+  --acc:#0F3A30; --accsoft:#e1ebe6; --h2:#1F4E79; --h2soft:#e2eaf3;
+  --warn:#8C2F27; --warnsoft:#f5e2df; --amb:#9a6a12; --ambsoft:#f6ecd6;
+  --pool:#FF1C24; --pot:#004BFF; --potfill:rgba(0,0,255,.16);
+  --f-disp:"Barlow Semi Condensed","Arial Narrow",sans-serif;
+  --f-body:"Source Sans 3","Segoe UI",Helvetica,Arial,sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#111714; --surface:#19211d; --ink:#e3eae6; --muted:#98a69f; --line:#34413b;
+  --acc:#7cc3a9; --accsoft:#1d3830; --h2:#8eb7e2; --h2soft:#1c2d40;
+  --warn:#ec8c80; --warnsoft:#3b221f; --amb:#e2b45c; --ambsoft:#382d1b;
+  --pool:#ff5a60; --pot:#6f9bff; --potfill:rgba(90,130,255,.22); color-scheme:dark;}}
+:root[data-theme="dark"]{
+  --bg:#111714; --surface:#19211d; --ink:#e3eae6; --muted:#98a69f; --line:#34413b;
+  --acc:#7cc3a9; --accsoft:#1d3830; --h2:#8eb7e2; --h2soft:#1c2d40;
+  --warn:#ec8c80; --warnsoft:#3b221f; --amb:#e2b45c; --ambsoft:#382d1b;
+  --pool:#ff5a60; --pot:#6f9bff; --potfill:rgba(90,130,255,.22); color-scheme:dark;}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 var(--f-body)}
+main{max-width:980px;margin:0 auto;padding:40px 20px 80px}
+header{border-bottom:2px solid var(--acc);padding-bottom:18px;margin-bottom:28px}
+.kicker{font:600 13px var(--f-mono);color:var(--acc);letter-spacing:.04em}
+h1{font:600 40px/1.1 var(--f-disp);margin:6px 0 10px;text-wrap:balance}
+h2{font:600 26px/1.2 var(--f-disp);margin:56px 0 6px;text-wrap:balance;display:flex;gap:12px;align-items:baseline}
+h2 .no{font:600 14px var(--f-mono);color:var(--acc);border:1px solid var(--acc);border-radius:4px;padding:1px 6px}
+p{max-width:68ch;margin:6px 0}
+.lead{color:var(--muted);max-width:70ch}
+.meta{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.tag{font:12px var(--f-mono);padding:3px 8px;border-radius:4px;background:var(--accsoft);color:var(--acc)}
+figure{margin:18px 0 0;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:18px;overflow-x:auto}
+figcaption{font-size:14px;color:var(--muted);margin-top:10px;max-width:80ch}
+svg{display:block;width:100%;height:auto;color:var(--ink);font-family:var(--f-body)}
+.duo{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+@media (max-width:760px){.duo{grid-template-columns:1fr}h1{font-size:32px}}
+code,.mono{font-family:var(--f-mono);font-size:.88em}
+/* SVG-Bausteine */
+.bx{fill:var(--surface);stroke:var(--line);stroke-width:1}
+.bx-acc{fill:var(--accsoft);stroke:var(--acc);stroke-width:1}
+.bx-h2{fill:var(--h2soft);stroke:var(--h2);stroke-width:1}
+.bx-warn{fill:var(--warnsoft);stroke:var(--warn);stroke-width:1}
+.bx-amb{fill:var(--ambsoft);stroke:var(--amb);stroke-width:1}
+.bx-dash{fill:none;stroke:var(--muted);stroke-width:1;stroke-dasharray:5 4}
+.ln{stroke:var(--muted);stroke-width:1.4;fill:none}
+.ln-acc{stroke:var(--acc);stroke-width:2;fill:none}
+.ln-dash{stroke:var(--acc);stroke-width:1.4;fill:none;stroke-dasharray:6 4}
+.ln-warn{stroke:var(--warn);stroke-width:1.4;fill:none}
+.tt{font:600 15px var(--f-body);fill:var(--ink)}
+.t{font:13px var(--f-body);fill:var(--ink)}
+.ts{font:12px var(--f-body);fill:var(--muted)}
+.tm{font:13px var(--f-mono);fill:var(--ink)}
+.tmb{font:600 13px var(--f-mono);fill:var(--ink)}
+.ta{font:600 12px var(--f-mono);fill:var(--acc)}
+.tw{font:600 12px var(--f-body);fill:var(--warn)}
+.tamb{font:600 12px var(--f-body);fill:var(--amb)}
+.th2{font:600 12px var(--f-body);fill:var(--h2)}
+.fa{fill:var(--acc)} .fw{fill:var(--warn)} .fm{fill:var(--muted)} .fh{fill:var(--h2)}
+.pool{fill:none;stroke:var(--pool);stroke-width:2}
+.pool-d{fill:none;stroke:var(--pool);stroke-width:2;stroke-dasharray:7 4}
+.pot{fill:var(--potfill);stroke:var(--pot);stroke-width:1.2}
+.hatch{fill:url(#hatch)}
+/* Tabellen und Kacheln */
+table{border-collapse:collapse;width:100%;font-size:14px;min-width:620px}
+th,td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}
+th{font:600 13px var(--f-body);background:var(--bg)}
+td.ab{background:var(--warnsoft);color:var(--warn);font-weight:600}
+td.ve{background:var(--ambsoft);color:var(--amb);font-weight:600}
+td.of{background:var(--accsoft);color:var(--acc)}
+td.c{text-align:center;font-size:18px;color:var(--acc)}
+td.cw{text-align:center;font-size:18px;color:var(--muted)}
+td.ph{color:var(--muted);font-family:var(--f-mono);font-size:12px}
+.chip{display:inline-block;font:600 11px var(--f-body);padding:1px 6px;border-radius:3px;margin-left:6px;vertical-align:middle}
+.chip.ind{background:var(--ambsoft);color:var(--amb)}
+.chip.op{background:var(--warnsoft);color:var(--warn)}
+.src{font-family:var(--f-mono);font-size:12px;color:var(--muted)}
+.tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px}
+.tile{border:1px solid var(--line);border-left:4px solid var(--acc);border-radius:0;padding:10px 12px;background:var(--bg)}
+.tile b{overflow-wrap:anywhere;display:block;font:600 15px var(--f-disp);letter-spacing:.01em}
+.tile span{font-size:13px;color:var(--muted)}
+.issues{display:grid;gap:10px;margin-top:14px}
+.issue{border:1px solid var(--line);border-left:4px solid var(--amb);border-radius:0;background:var(--surface);padding:12px 14px}
+.issue b{font:600 16px var(--f-disp)}
+.issue p{margin:4px 0 0;font-size:15px}
+.legend{display:flex;flex-wrap:wrap;gap:14px;font-size:13px;color:var(--muted);margin-top:10px}
+.legend i{display:inline-block;width:14px;height:10px;margin-right:6px;vertical-align:middle;border-radius:2px}
+footer{margin-top:60px;font-size:13px;color:var(--muted);border-top:1px solid var(--line);padding-top:12px}
+</style>
+</head>
+<body>
+<main>
+
+<header>
+  <div class="kicker">ENEO Wasserstoff-Standortkonzept · Fassung 2026-11-11-Z</div>
+  <h1>Schritt 6: GeoPackage und Projekt</h1>
+  <p class="lead">Die Ergebnisse aus Schritt 1 bis 4 werden in eine GeoPackage geschrieben, das QGIS-Projekt wird darum gebaut und in die GeoPackage eingebettet. Fast jede Regel in diesem Schritt stammt aus einem Fehler im Referenzlauf: Einstellungen, die still verloren gehen.</p>
+  <div class="meta"><span class="tag">Anhang D</span><span class="tag">Anhang E</span><span class="tag">Anhang F</span><span class="tag">Anhang G1</span><span class="tag">Anhang H3</span><span class="tag">Anhang H4</span></div>
+</header>
+
+<!-- 01 Überblick -->
+<h2><span class="no">01</span>Die zehn Teilschritte in drei Gruppen</h2>
+<figure>
+<svg viewBox="0 0 900 300" role="img" aria-label="Teilschritte 6.1 bis 6.10, gruppiert nach Datenstruktur, Projektzustand und Haltbarkeit">
+<rect class="bx-h2" x="20" y="20" width="270" height="260" rx="8"/><text class="tt" x="34" y="46">Datenstruktur</text><text class="ts" x="34" y="66">was in der GeoPackage steht</text>
+<rect class="bx" x="34" y="84" width="242" height="54" rx="5"/><text class="ta" x="46" y="106">6.3</text><text class="t" x="80" y="106">GeoPackage schreiben</text><text class="ts" x="80" y="124">Schema Anhang D</text>
+<rect class="bx" x="34" y="146" width="242" height="54" rx="5"/><text class="ta" x="46" y="168">6.4</text><text class="t" x="80" y="168">Layernamen</text><text class="ts" x="80" y="186">Präfix nur in der GPKG</text>
+<rect class="bx" x="34" y="208" width="242" height="54" rx="5"/><text class="ta" x="46" y="230">6.7</text><text class="t" x="80" y="230">Metadaten, Quellen</text><text class="ts" x="80" y="248">Layer 00 und 97</text>
+<rect class="bx-amb" x="310" y="20" width="290" height="260" rx="8"/><text class="tt" x="324" y="46">Projektzustand</text><text class="ts" x="324" y="66">was nur im Projekt steht</text>
+<rect class="bx" x="324" y="84" width="128" height="54" rx="5"/><text class="ta" x="336" y="106">6.1</text><text class="t" x="366" y="106">drei CRS</text>
+<rect class="bx" x="460" y="84" width="128" height="54" rx="5"/><text class="ta" x="472" y="106">6.2</text><text class="t" x="502" y="106">Neuaufbau</text><text class="ts" x="472" y="124">neu setzen</text>
+<rect class="bx" x="324" y="146" width="128" height="54" rx="5"/><text class="ta" x="336" y="168">6.5</text><text class="t" x="366" y="168">gebrauchs-</text><text class="t" x="366" y="186">fertig</text>
+<rect class="bx" x="460" y="146" width="128" height="54" rx="5"/><text class="ta" x="472" y="168">6.9</text><text class="t" x="502" y="168">Baum und</text><text class="t" x="502" y="186">Legende</text>
+<rect class="bx" x="324" y="208" width="264" height="54" rx="5"/><text class="ta" x="336" y="230">6.10</text><text class="t" x="374" y="230">keinen Layer doppelt anlegen</text><text class="ts" x="374" y="248">Layerkennung bleibt</text>
+<rect class="bx-acc" x="620" y="20" width="260" height="260" rx="8"/><text class="tt" x="634" y="46">Haltbarkeit</text><text class="ts" x="634" y="66">was ein Neuladen übersteht</text>
+<rect class="bx" x="634" y="84" width="232" height="70" rx="5"/><text class="ta" x="646" y="106">6.6</text><text class="t" x="680" y="106">Projekt einbetten</text><text class="ts" x="680" y="124">qgis_projects,</text><text class="ts" x="680" y="140">nach Anhang H3</text>
+<rect class="bx" x="634" y="162" width="232" height="70" rx="5"/><text class="ta" x="646" y="184">6.8</text><text class="t" x="680" y="184">Symbollayer</text><text class="ts" x="680" y="202">als GeoPackage,</text><text class="ts" x="680" y="218">nie im Speicher</text>
+</svg>
+<figcaption>Gruppierung nach dem, was die Regeln schützen. Die Ausgabe von Schritt 6 sind Kontrolllisten: Layer mit Objektzahl, alle CRS, Anzeigefilter, Layerlisten je Layout und der Inhalt von <code>00_Metadaten</code>.</figcaption>
+</figure>
+
+<!-- 02 Schema -->
+<h2><span class="no">02</span>6.3 · Die Layer der GeoPackage</h2>
+<figure>
+<svg viewBox="0 0 900 430" role="img" aria-label="Layerliste der GeoPackage nach Anhang D, gruppiert nach Nummernbereich und Thema">
+<text class="tmb" x="20" y="20">Zelle_&lt;Projektname&gt;.gpkg · EPSG:25832 · keine Offline-Raster</text>
+<g>
+<rect class="bx-acc" x="20" y="34" width="210" height="190" rx="6"/><text class="ta" x="32" y="56">00–05 Eigenes Vorhaben</text>
+<text class="ts" x="32" y="80">00 Windparks</text><text class="ts" x="32" y="98">01 WEA-Standorte</text><text class="ts" x="32" y="116">02 Potenzialflaechen</text><text class="ts" x="32" y="134">03 Analysegebiet 15 km</text><text class="ts" x="32" y="152">04 Weicher Rand</text><text class="ts" x="32" y="170">05 Poolflaeche</text>
+<rect class="bx-warn" x="240" y="34" width="200" height="90" rx="6"/><text class="tw" x="252" y="56">10–11 Stromnetz</text><text class="ts" x="252" y="80">10 Umspannwerke</text><text class="ts" x="252" y="98">11 Stromleitungen</text>
+<rect class="bx-warn" x="240" y="134" width="200" height="90" rx="6"/><text class="tw" x="252" y="156">30 Gas</text><text class="ts" x="252" y="180">30 Gasnetz</text>
+<rect class="bx-amb" x="450" y="34" width="210" height="190" rx="6"/><text class="tamb" x="462" y="56">20–27 Erzeugung, Flächen</text><text class="ts" x="462" y="80">20 Biogas CO2</text><text class="ts" x="462" y="98">22 PV Freiflaeche</text><text class="ts" x="462" y="116">23 Gewerbeflaechen</text><text class="ts" x="462" y="134">24 Projektregister EE</text><text class="ts" x="462" y="152">25 Vorhaben Dritter</text><text class="ts" x="462" y="170">27 BESS-Eignung</text>
+<rect class="bx-h2" x="670" y="34" width="210" height="190" rx="6"/><text class="th2" x="682" y="56">40–42 Wasserstoff, Wärme</text><text class="ts" x="682" y="80">40 H2-Kernnetz (Punkte)</text><text class="ts" x="682" y="98">41 Waermesenken</text><text class="ts" x="682" y="116">42 H2 ueberregional</text>
+<rect class="bx" x="20" y="236" width="210" height="80" rx="6"/><text class="ta" x="32" y="258">50–51 Akteure</text><text class="ts" x="32" y="282">50 Akteure</text><text class="ts" x="32" y="300">51 Ankerabnehmer</text>
+<rect class="bx-h2" x="240" y="236" width="420" height="80" rx="6"/><text class="th2" x="252" y="258">60–64 Konzept</text><text class="ts" x="252" y="282">60 Elektrolyse · 61 Direktleitungen · 62 Wasserstoffwege</text><text class="ts" x="252" y="300">63 Einspeisepunkt · 64 Parkverbund</text>
+<rect class="bx" x="670" y="236" width="210" height="80" rx="6"/><text class="ta" x="682" y="258">70–71 Planung</text><text class="ts" x="682" y="282">70 Restriktionen</text><text class="ts" x="682" y="300">71 RROP-Windvorranggebiete</text>
+<rect class="bx-dash" x="20" y="328" width="210" height="80" rx="6"/><text class="ta" x="32" y="350">90 Darstellung</text><text class="ts" x="32" y="374">abgeleitet, wird verworfen</text><text class="ts" x="32" y="390">und neu erzeugt (F7)</text>
+<rect class="bx" x="240" y="328" width="420" height="80" rx="6"/><text class="ta" x="252" y="350">96–97 Modell und Belege</text><text class="ts" x="252" y="374">96 Mengenmodell · 97 Quellen</text><text class="ts" x="252" y="390">beide ohne Karte, für Dokumente und Prüfung</text>
+<rect class="bx" x="670" y="328" width="210" height="80" rx="6"/><text class="ta" x="682" y="350">00 Metadaten</text><text class="ts" x="682" y="374">Tabelle ohne Geometrie</text><text class="ts" x="682" y="390">zuletzt_geaendert, hinweis</text>
+</g>
+</svg>
+<figcaption>Liste aus Anhang D, Gruppierung und Farben nach den Themenfarben in Anhang F. Pool- und Potenzialflächen der Verbundparks liegen nicht in dieser Datei, sondern als eigene GeoPackages im Unterordner des Parks. Layer 70 erscheint nicht in der Karte, nur im Text, wo er etwas entscheidet.</figcaption>
+</figure>
+
+<!-- 03 Pflichtfelder -->
+<h2><span class="no">03</span>6.3 · Pflichtfelder</h2>
+<figure>
+<table>
+<thead><tr><th>Layer</th><th>Felder</th><th>Regel</th></tr></thead>
+<tbody>
+<tr><td>jeder Sachlayer</td><td class="src">lage_status, lage_quelle</td><td>belegt, konstruiert oder geschaetzt</td></tr>
+<tr><td>00, 01</td><td class="src">name, park</td><td>derselbe Wert in beiden Layern</td></tr>
+<tr><td>00</td><td class="src">wea, Leistungsspalte</td><td>Anlagenzahl, Parkleistung</td></tr>
+<tr><td>20</td><td class="src">aufbereitung</td><td>Status der Biomethanaufbereitung</td></tr>
+<tr><td>22</td><td class="src">typ, status, quelle_datensatz</td><td>Bestand oder Planung, Herkunftsregister</td></tr>
+<tr><td>27</td><td class="src">ha, kapazitaet_mwh, pfad, km_elektrolyse, km_netzpunkt, bodenklasse, hochwasser, gesichert</td><td>BESS-Eignungsflächen</td></tr>
+<tr><td>50</td><td class="src">kategorie, status, rolle, funktion</td><td>Hausschema, Funktionszeile</td></tr>
+<tr><td>50</td><td class="src">nr</td><td>lückenlos, sortiert nach Entfernung zu Variante A</td></tr>
+<tr><td>50</td><td class="src">km, km_zu_a, km_zu_b, quelle, quelle_geprueft</td><td>km bezieht sich auf A, Herkunft und Prüfquelle verschieden</td></tr>
+<tr><td>60</td><td class="src">Leistungsspalte</td><td>Elektrolyseleistung je Variante</td></tr>
+<tr><td>61</td><td class="src">park, variante, laenge_km</td><td>zwei Dezimalen</td></tr>
+<tr><td>62</td><td class="src">transportweg, farbe</td><td>Leitung oder Lkw, Themenfarbe</td></tr>
+<tr><td>64</td><td class="src">von, nach, abstand_km</td><td>eine Dezimale</td></tr>
+<tr><td>70</td><td class="src">wirkung, trifft_wea, trifft_elektrolyse, status</td><td>Restriktion, Planungsgrundlage oder Hinweis</td></tr>
+<tr><td>96</td><td class="src">groesse, bezeichnung, fall, wert, einheit, vorbehalt</td><td>wert numerisch, feste Schlüssel</td></tr>
+<tr><td>97</td><td class="src">Aussage, Quelle, Abrufdatum, Konfidenz</td><td>belegt, indikativ, zu erheben</td></tr>
+<tr><td>00_Metadaten</td><td class="src">zuletzt_geaendert, hinweis</td><td>hinweis wird je Fortschreibung mit Datum ergänzt</td></tr>
+</tbody>
+</table>
+<figcaption>Aus Anhang D und 6.7. Für Layer 40 nennt Anhang D zusätzlich Ort, antrags_id, Art, vorhabentraeger, Inbetriebnahme, Entfernung und Quelle, für Layer 25 bei Speichern <code>art = BESS</code>.</figcaption>
+</figure>
+
+<div class="duo">
+<figure>
+<svg viewBox="0 0 420 300" role="img" aria-label="Layer 96: eine Bandbreite wird als zwei Zeilen mit min und max geführt, ein Text mit Spanne wird abgewiesen">
+<text class="tt" x="20" y="24">Layer 96, Bandbreite</text>
+<rect class="bx-warn" x="20" y="38" width="380" height="74" rx="6"/><text class="tw" x="32" y="60">abgewiesen</text>
+<text class="tm" x="32" y="86">abwaerme_gwh_a</text><text class="tm" x="388" y="86" text-anchor="end">"3,24 bis 5,59"</text>
+<rect class="bx-acc" x="20" y="126" width="380" height="110" rx="6"/><text class="ta" x="32" y="148">richtig</text>
+<text class="tm" x="32" y="176">abwaerme_gwh_a_min</text><text class="tm" x="388" y="176" text-anchor="end">3.24</text>
+<text class="tm" x="32" y="200">abwaerme_gwh_a_max</text><text class="tm" x="388" y="200" text-anchor="end">5.59</text>
+<text class="ts" x="32" y="224">Spalte groesse · wert numerisch</text>
+<text class="ts" x="20" y="268">Die Spanne erscheint erst im Dokument als Text.</text>
+</svg>
+<figcaption>Feste Schlüssel: netto_p50_mwh, vollaststunden_park, elektrolyse_mw, aufnahmequote_proz, strom_elektrolyse_mwh, vollaststunden_elektrolyse, spez_verbrauch_kwh_kg, h2_t_a, o2_t_a, wasser_m3_a, abwaerme min/max, co2_bedarf_t_a, co2_potenzial_t_a.</figcaption>
+</figure>
+<figure>
+<svg viewBox="0 0 420 300" role="img" aria-label="Layernamen: in der GeoPackage mit Nummernpräfix, im Projekt lesbar ohne Präfix und Unterstriche">
+<defs><marker id="a3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M1 1L9 5L1 9z" class="fm"/></marker></defs>
+<text class="tt" x="20" y="24">GeoPackage</text><text class="tt" x="250" y="24">Projekt</text>
+<g>
+<rect class="bx" x="20" y="40" width="170" height="30" rx="4"/><text class="tm" x="30" y="60">50_Akteure</text>
+<rect class="bx" x="20" y="80" width="170" height="30" rx="4"/><text class="tm" x="30" y="100">61_Direktleitungen</text>
+<rect class="bx" x="20" y="120" width="170" height="30" rx="4"/><text class="tm" x="30" y="140">23_Gewerbeflaechen</text>
+<rect class="bx" x="20" y="160" width="170" height="30" rx="4"/><text class="tm" x="30" y="180">71_RROP_Vorrang</text>
+<rect class="bx-acc" x="250" y="40" width="150" height="30" rx="4"/><text class="t" x="260" y="60">Akteure</text>
+<rect class="bx-acc" x="250" y="80" width="150" height="30" rx="4"/><text class="t" x="260" y="100">Direktleitungen</text>
+<rect class="bx-acc" x="250" y="120" width="150" height="30" rx="4"/><text class="t" x="260" y="140">Gewerbeflächen</text>
+<rect class="bx-acc" x="250" y="160" width="150" height="30" rx="4"/><text class="t" x="260" y="180">RROP-Vorrang</text>
+<path class="ln" d="M190 55 H246" marker-end="url(#a3)"/><path class="ln" d="M190 95 H246" marker-end="url(#a3)"/><path class="ln" d="M190 135 H246" marker-end="url(#a3)"/><path class="ln" d="M190 175 H246" marker-end="url(#a3)"/>
+</g>
+<text class="ts" x="20" y="232">Das Präfix sortiert die Tabellen und bleibt</text><text class="ts" x="20" y="248">für Skripte und Prüfung in der Datei.</text>
+</svg>
+<figcaption>Beispielnamen. Die genaue Schreibweise der Tabellen in der GeoPackage legt der Prompt nicht fest, nur das Präfix.</figcaption>
+</figure>
+</div>
+
+<!-- 04 CRS -->
+<h2><span class="no">04</span>6.1 · Drei Stellen führen ein CRS</h2>
+<figure>
+<svg viewBox="0 0 900 260" role="img" aria-label="CRS muss an drei Stellen gesetzt werden: Projekt vor dem ersten Layer, Kartenfenster und jedes Kartenelement. extent gibt gesetzte Werte zurück, auch wenn falsch gezeichnet wird">
+<rect class="bx-acc" x="20" y="30" width="260" height="110" rx="6"/><text class="ta" x="34" y="54">1 Projekt</text><text class="ts" x="34" y="78">vor dem ersten Layer</text><text class="tm" x="34" y="104">setCrs(25832)</text>
+<rect class="bx-acc" x="320" y="30" width="260" height="110" rx="6"/><text class="ta" x="334" y="54">2 Kartenfenster</text><text class="ts" x="334" y="78">eigener Aufruf</text><text class="tm" x="334" y="104">setDestinationCrs</text>
+<rect class="bx-acc" x="620" y="30" width="260" height="110" rx="6"/><text class="ta" x="634" y="54">3 jedes Kartenelement</text><text class="ts" x="634" y="78">Hauptkarte und Übersicht,</text><text class="ts" x="634" y="94">in jedem Layout</text><text class="tm" x="634" y="118">ausdrücklich</text>
+<rect class="bx-warn" x="20" y="166" width="860" height="70" rx="6"/><text class="tw" x="34" y="192">Falle</text><text class="ts" x="34" y="214">extent() gibt danach die gesetzten Werte zurück, auch wenn falsch gezeichnet wird. Die Abfrage prüft also nicht, was passiert ist.</text>
+</svg>
+<figcaption>Daher die Regel aus den Grundsätzen „Prüfen heißt ansehen“: Kontrolle erfolgt am exportierten Bild (Anhang G2), nicht an Rückgabewerten. Vor jedem Export werden alle CRS in einer Zeile ausgegeben (F12).</figcaption>
+</figure>
+
+<!-- 05 Neuaufbau -->
+<h2><span class="no">05</span>6.2 · Was einen Neuaufbau nicht überlebt</h2>
+<figure>
+<svg viewBox="0 0 900 390" role="img" aria-label="Bei clear, Neuladen oder Neuaufbau bleiben die Daten der GeoPackage erhalten, acht Arten von Projekteinstellungen gehen verloren und müssen neu gesetzt und ausgegeben werden">
+<defs><marker id="a5" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M1 1L9 5L1 9z" class="fm"/></marker></defs>
+<rect class="bx-acc" x="20" y="30" width="250" height="130" rx="8"/><text class="tt" x="34" y="56">steht in der GeoPackage</text><text class="ts" x="34" y="82">Geometrien und Attribute</text><text class="ts" x="34" y="100">Feldnamen, Präfixe</text><text class="ts" x="34" y="118">eingebettetes Projekt</text><text class="ta" x="34" y="146">überlebt</text>
+<rect class="bx-warn" x="20" y="180" width="250" height="190" rx="8"/><text class="tt" x="34" y="206">steht nur im Projekt</text><text class="ts" x="34" y="230">die drei CRS</text><text class="ts" x="34" y="248">Layerlisten, keepLayerSet</text><text class="ts" x="34" y="266">Anzeigefilter</text><text class="ts" x="34" y="284">Legendensymbole</text><text class="ts" x="34" y="302">Renderer, Symbolik</text><text class="ts" x="34" y="320">Maßstabsstufen</text><text class="ts" x="34" y="338">Beschriftungen, Layernamen</text><text class="ts" x="34" y="356">Sichtbarkeit, Ausschnitt</text>
+<rect class="bx-amb" x="320" y="150" width="170" height="70" rx="6"/><text class="tt" x="405" y="178" text-anchor="middle">clear(), Neuladen,</text><text class="tt" x="405" y="198" text-anchor="middle">Neuaufbau</text>
+<path class="ln" d="M270 95 H500" marker-end="url(#a5)"/><path class="ln-warn" d="M270 270 C300 270 300 240 318 220"/>
+<path class="ln" d="M490 185 H536" marker-end="url(#a5)"/>
+<rect class="bx" x="540" y="30" width="340" height="320" rx="8"/><text class="tt" x="554" y="56">Nach jedem Neuaufbau</text>
+<text class="t" x="554" y="86">1 neu setzen</text><text class="t" x="554" y="110">2 ausgeben</text><text class="t" x="554" y="134">3 gegen Soll halten, beide Richtungen</text>
+<rect class="bx-warn" x="554" y="156" width="150" height="70" rx="5"/><text class="tw" x="629" y="182" text-anchor="middle">fehlt etwas?</text><text class="ts" x="629" y="202" text-anchor="middle">z. B. Layer im Layout</text>
+<rect class="bx-amb" x="716" y="156" width="150" height="70" rx="5"/><text class="tamb" x="791" y="182" text-anchor="middle">zu viel da?</text><text class="ts" x="791" y="202" text-anchor="middle">z. B. alter Filter</text>
+<text class="ts" x="554" y="262">Kontrolle am Ende über Anhang G1:</text><text class="ts" x="554" y="280">sieben Einstellungen mit Sollwert,</text><text class="ts" x="554" y="298">siehe Abschnitt 11</text>
+</svg>
+<figcaption>Die Liste in 6.2 ist zugleich die Liste der Ausgaben von Schritt 6. Wer im Prompt „ausgeben“ liest, soll die tatsächlich gesetzten Werte zeigen, nicht die beabsichtigten.</figcaption>
+</figure>
+
+<!-- 06 Gebrauchsfertig -->
+<h2><span class="no">06</span>6.5 · Das Projekt öffnet sich gebrauchsfertig</h2>
+<figure>
+<svg viewBox="0 0 900 400" role="img" aria-label="Layerbaum beim Öffnen: Layer der Hauptkarte und OSM sichtbar, Dokumentationslayer, ungenutzte Grundkarten und leere Kategorielayer ausgeblendet, Ausschnitt auf der Zelle">
+<rect class="bx" x="20" y="20" width="400" height="360" rx="8"/>
+<text class="tt" x="34" y="44">Layerbaum beim Öffnen</text>
+<g>
+<rect x="34" y="62" width="14" height="14" class="fa"/><text class="t" x="58" y="74">Elektrolysestandort</text>
+<rect x="34" y="86" width="14" height="14" class="fa"/><text class="t" x="58" y="98">WEA-Standorte</text>
+<rect x="34" y="110" width="14" height="14" class="fa"/><text class="t" x="58" y="122">Poolfläche, Potenzialflächen</text>
+<rect x="34" y="134" width="14" height="14" class="fa"/><text class="t" x="58" y="146">Akteure, nach Kategorie</text>
+<rect x="34" y="158" width="14" height="14" class="fa"/><text class="t" x="58" y="170">Netz, Gas, Kernnetz …</text>
+<rect x="34" y="182" width="14" height="14" class="fa"/><text class="t" x="58" y="194">OSM Standard</text>
+<rect x="34" y="214" width="14" height="14" fill="none" stroke="var(--muted)"/><text class="ts" x="58" y="226">Akteure: Forschung (leer)</text>
+<rect x="34" y="238" width="14" height="14" fill="none" stroke="var(--muted)"/><text class="ts" x="58" y="250">Metadaten, Mengenmodell, Quellen</text>
+<rect x="34" y="262" width="14" height="14" fill="none" stroke="var(--muted)"/><text class="ts" x="58" y="274">Restriktionen (Layer 70)</text>
+<rect x="34" y="286" width="14" height="14" fill="none" stroke="var(--muted)"/><text class="ts" x="58" y="298">ATKIS Graustufen</text>
+<rect x="34" y="310" width="14" height="14" fill="none" stroke="var(--muted)"/><text class="ts" x="58" y="322">Satellit</text>
+</g>
+<text class="ta" x="300" y="128">sichtbar wie</text><text class="ta" x="300" y="144">Hauptkarte</text>
+<text class="ts" x="300" y="266">ausgeblendet,</text><text class="ts" x="300" y="282">bleibt geladen</text>
+<line x1="34" y1="204" x2="406" y2="204" stroke="var(--line)"/>
+<rect class="bx" x="460" y="20" width="420" height="360" rx="8"/>
+<text class="tt" x="474" y="44">Kartenfenster beim Öffnen</text>
+<rect x="490" y="70" width="360" height="250" fill="var(--bg)" stroke="var(--line)"/>
+<circle cx="670" cy="195" r="110" fill="none" stroke="currentColor" stroke-dasharray="5 4"/>
+<polygon class="pot" points="630,160 700,152 710,210 640,220"/><polygon class="pool" points="640,168 694,162 702,206 648,212"/>
+<rect x="731" y="181" width="14" height="14" class="fh" transform="rotate(45 738 188)"/>
+<text class="ts" x="490" y="344">gespeicherter Ausschnitt auf der Zelle</text>
+</svg>
+<figcaption>Beispielhafter Layerbaum. „Leere Kategorielayer“ sind Akteurskategorien ohne Eintrag. Sie bleiben im Projekt, weil unbesetzte Kategorien genannt werden sollen (Anhang D), sind aber ausgeblendet.</figcaption>
+</figure>
+
+<!-- 07 Symbollayer -->
+<h2><span class="no">07</span>6.8 · Symbollayer: GeoPackage statt Speicher</h2>
+<div class="duo">
+<figure>
+<svg viewBox="0 0 420 330" role="img" aria-label="Ein Speicherlayer ist nach dem Neuladen leer, ein Symbollayer aus einer GeoPackage bleibt erhalten">
+<defs><marker id="a7" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M1 1L9 5L1 9z" class="fm"/></marker></defs>
+<rect class="bx-warn" x="20" y="20" width="380" height="120" rx="6"/><text class="tw" x="34" y="44">Speicherlayer (memory)</text>
+<g style="fill:var(--warn)"><circle cx="60" cy="90" r="6"/><circle cx="90" cy="76" r="6"/><circle cx="110" cy="104" r="6"/></g>
+<path class="ln" d="M150 90 H226" marker-end="url(#a7)"/><text class="ts" x="160" y="80">Neuladen</text>
+<rect x="240" y="60" width="140" height="60" fill="none" stroke="var(--warn)" stroke-dasharray="4 3"/><text class="tw" x="310" y="95" text-anchor="middle">leer</text>
+<rect class="bx-acc" x="20" y="160" width="380" height="150" rx="6"/><text class="ta" x="34" y="184">Kartendarstellung Arbeitsdateien/</text>
+<text class="tm" x="34" y="210">verbund_symbole.gpkg</text><text class="tm" x="34" y="232">nah_symbole.gpkg</text>
+<text class="ts" x="34" y="258">je Datei die Layer Symbole, Standort, Versatz</text><text class="ts" x="34" y="278">dazu kernnetz_trasse_linie.gpkg, nordpfeil.svg</text>
+<text class="ta" x="388" y="296" text-anchor="end">überlebt</text>
+</svg>
+<figcaption>Gilt für versetzte Icons, Standortpunkte, Versatzlinien und die Kernnetz-Mittellinie. Die Dateien werden in Schritt 7 nach Anhang F7 gebaut und später mit aufs Drive kopiert.</figcaption>
+</figure>
+<figure>
+<svg viewBox="0 0 420 330" role="img" aria-label="Teilen zwei Layouts einen Symbollayer gleichen Namens, löscht der Neuaufbau des einen den Layer im anderen. Daher je Blatt eigene Layernamen">
+<rect class="bx-warn" x="20" y="20" width="380" height="140" rx="6"/><text class="tw" x="34" y="44">gemeinsamer Name</text>
+<rect class="bx" x="34" y="60" width="150" height="50" rx="4"/><text class="t" x="109" y="82" text-anchor="middle">Layout Verbund</text><text class="ts" x="109" y="100" text-anchor="middle">„Symbole“</text>
+<rect class="bx" x="236" y="60" width="150" height="50" rx="4"/><text class="t" x="311" y="82" text-anchor="middle">Layout Nahbereich</text><text class="ts" x="311" y="100" text-anchor="middle">„Symbole“ neu gebaut</text>
+<text class="tw" x="34" y="142">Blatt 7 ist danach leer</text>
+<rect class="bx-acc" x="20" y="176" width="380" height="134" rx="6"/><text class="ta" x="34" y="200">je Blatt eigener Name</text>
+<rect class="bx" x="34" y="216" width="150" height="50" rx="4"/><text class="t" x="109" y="238" text-anchor="middle">Layout Verbund</text><text class="ts" x="109" y="256" text-anchor="middle">„Verbund Symbole“</text>
+<rect class="bx" x="236" y="216" width="150" height="50" rx="4"/><text class="t" x="311" y="238" text-anchor="middle">Layout Nahbereich</text><text class="ts" x="311" y="256" text-anchor="middle">„Nah Symbole“</text>
+<text class="ta" x="34" y="294">jedes Blatt behält seine Symbole</text>
+</svg>
+<figcaption>Eine der bekannten Fallen aus dem Lauf Narthauen-Süd (Anhang H4).</figcaption>
+</figure>
+</div>
+
+<!-- 08 Legende und Kennung -->
+<h2><span class="no">08</span>6.9 und 6.10 · Zwei stille Fehler</h2>
+<div class="duo">
+<figure>
+<svg viewBox="0 0 420 340" role="img" aria-label="Ein im Layerbaum unsichtbarer Layer wird im Layout gezeichnet, fehlt aber in der gebauten Legende">
+<rect class="bx" x="20" y="20" width="160" height="150" rx="6"/><text class="tt" x="34" y="44">Layerbaum</text>
+<rect x="34" y="62" width="12" height="12" class="fa"/><text class="ts" x="54" y="73">Umspannwerke</text>
+<rect x="34" y="86" width="12" height="12" fill="none" stroke="var(--warn)"/><text class="tw" x="54" y="97">Parkverbund</text>
+<rect x="34" y="110" width="12" height="12" class="fa"/><text class="ts" x="54" y="121">Direktleitungen</text>
+<rect class="bx" x="200" y="20" width="200" height="150" rx="6"/><text class="tt" x="214" y="44">Layout, feste Liste</text>
+<line x1="220" y1="80" x2="380" y2="120" class="ln-acc"/><text class="ta" x="214" y="150">Parkverbund gezeichnet</text>
+<rect class="bx-warn" x="20" y="190" width="380" height="80" rx="6"/><text class="tt" x="34" y="214">gebaute Legende</text><text class="ts" x="34" y="238">Umspannwerk · Direktleitung</text><text class="tw" x="34" y="258">Parkverbund fehlt</text>
+<text class="ta" x="20" y="300">Regel: vor dem Legendenbau alle Layer der</text><text class="ta" x="20" y="318">Hauptkarte sichtbar schalten, Objektzahl ausgeben</text>
+</svg>
+<figcaption>Die Objektzahl je Layer im Blattausschnitt zeigt zugleich, welche Legendeneinträge entfallen dürfen (Anhang F11).</figcaption>
+</figure>
+<figure>
+<svg viewBox="0 0 420 340" role="img" aria-label="Legt ein Skript einen vorhandenen Layer neu an, bekommt er eine neue Kennung und jedes Layout, das die alte Kennung führt, verliert ihn still">
+<defs><marker id="a8" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M1 1L9 5L1 9z" class="fm"/></marker></defs>
+<rect class="bx" x="20" y="20" width="180" height="56" rx="5"/><text class="t" x="34" y="42">Parkverbund</text><text class="tm" x="34" y="62">id …_a1b2</text>
+<rect class="bx" x="240" y="20" width="160" height="56" rx="5"/><text class="t" x="254" y="42">Layout H2Konzept</text><text class="tm" x="254" y="62">führt a1b2</text>
+<path class="ln" d="M240 48 H204" marker-end="url(#a8)"/>
+<rect class="bx-warn" x="20" y="100" width="380" height="96" rx="6"/><text class="tw" x="34" y="124">Skript ruft addMapLayer erneut auf</text>
+<rect class="bx" x="34" y="138" width="166" height="44" rx="4"/><text class="t" x="44" y="158">Parkverbund</text><text class="tm" x="44" y="174">id …_c3d4</text>
+<text class="tw" x="220" y="158">Layout sucht a1b2:</text><text class="tw" x="220" y="174">Layer weg, kein Fehler</text>
+<rect class="bx-acc" x="20" y="214" width="380" height="110" rx="6"/><text class="ta" x="34" y="238">Regel</text><text class="ts" x="34" y="260">vor addMapLayer nach dem Namen suchen,</text><text class="ts" x="34" y="276">vorhandenen Layer weiterverwenden,</text><text class="ts" x="34" y="292">je Layout die Layerliste der Hauptkarte</text><text class="ts" x="34" y="308">ausgeben und gegen die Sollliste halten</text>
+</svg>
+<figcaption>Kennungen gekürzt. Im Referenzlauf verloren so beide Layouts den Parkverbund, die Legende war ohne ihn (Anhang H4).</figcaption>
+</figure>
+</div>
+
+<!-- 09 Abschluss H3 -->
+<h2><span class="no">09</span>6.6 und 6.7 · Einbetten und Metadaten</h2>
+<figure>
+<svg viewBox="0 0 900 380" role="img" aria-label="Abschluss nach Anhang H3: Projekt speichern, relative Pfade, GeoPackage abschließen mit Vacuum und Einbetten, Projektdatei kopieren, erst dann Übertragung">
+<defs><marker id="a9" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M1 1L9 5L1 9z" class="fm"/></marker></defs>
+<rect class="bx" x="20" y="20" width="160" height="110" rx="6"/><text class="ta" x="34" y="42">1</text><text class="tt" x="54" y="42">speichern</text><text class="ts" x="34" y="66">eigener Aufruf,</text><text class="ts" x="34" y="82">mit nichts anderem</text><text class="ts" x="34" y="98">gemischt</text>
+<rect class="bx-h2" x="200" y="20" width="200" height="110" rx="6"/><text class="ta" x="214" y="42">2</text><text class="tt" x="234" y="42">relative Pfade</text><text class="tm" x="214" y="66">drive.fertig()</text><text class="ts" x="214" y="88">meldet absolute Reste</text><text class="ts" x="214" y="104">und fehlende Dateien</text>
+<rect class="bx-acc" x="420" y="20" width="260" height="110" rx="6"/><text class="ta" x="434" y="42">3</text><text class="tt" x="454" y="42">GeoPackage abschließen</text><text class="ts" x="434" y="66">SQLite-Backup nach drive_set/,</text><text class="ts" x="434" y="82">journal_mode DELETE, VACUUM,</text><text class="ts" x="434" y="98">einbetten, VACUUM,</text><text class="ts" x="434" y="114">integrity_check, Zählungen</text>
+<rect class="bx" x="700" y="20" width="180" height="110" rx="6"/><text class="ta" x="714" y="42">4</text><text class="tt" x="734" y="42">qgz kopieren</text><text class="ts" x="714" y="66">nach drive_set/</text><text class="ts" x="714" y="82">&lt;Projekt&gt; H2</text><text class="ts" x="714" y="98">Konzept.qgz</text>
+<path class="ln" d="M180 75 H196" marker-end="url(#a9)"/><path class="ln" d="M400 75 H416" marker-end="url(#a9)"/><path class="ln" d="M680 75 H696" marker-end="url(#a9)"/>
+<text class="ta" x="880" y="152" text-anchor="end">5 erst dann Übertragung nach Anhang H1</text>
+<text class="tt" x="20" y="194">Pfade beim Umschreiben</text>
+<rect class="bx" x="20" y="206" width="400" height="34" rx="4"/><text class="tm" x="30" y="228">Drive-Pfad im H2-Ordner</text><text class="tm" x="410" y="228" text-anchor="end">./</text>
+<rect class="bx" x="20" y="246" width="400" height="34" rx="4"/><text class="tm" x="30" y="268">Symbole, Logo</text><text class="tm" x="410" y="268" text-anchor="end">../../../../../../02 Dokumente/</text>
+<rect class="bx" x="20" y="286" width="400" height="34" rx="4"/><text class="tm" x="30" y="308">Arbeitsordner out/</text><text class="tm" x="410" y="308" text-anchor="end">./</text>
+<text class="tw" x="20" y="348">Neue Arbeitsdateien müssen in drive_set/ liegen,</text><text class="tw" x="20" y="366">sonst zeigt die Projektdatei ins Leere.</text>
+<rect class="bx" x="460" y="186" width="420" height="180" rx="6"/><text class="tt" x="474" y="210">Layer 00_Metadaten</text>
+<text class="tm" x="474" y="236">zuletzt_geaendert</text><text class="tm" x="680" y="236">2026-11-06</text>
+<text class="tm" x="474" y="262">hinweis</text><text class="ts" x="680" y="262">06.10.: Erstlauf.</text><text class="ts" x="680" y="278">22.10.: Blatt 8 ergänzt.</text><text class="ts" x="680" y="294">06.11.: A3-Format.</text>
+<text class="ts" x="474" y="326">Jede Fortschreibung hängt einen Satz mit Datum an.</text><text class="ts" x="474" y="344">Layer 97: je neuer Quelle eine Zeile mit Abrufdatum</text><text class="ts" x="474" y="360">und Konfidenz.</text>
+</svg>
+<figcaption>Ablauf aus Anhang H3. Die Einträge in <code>hinweis</code> sind erfunden. Nach dem Ersetzen auf dem Drive dürfen keine <code>-shm</code>- oder <code>-wal</code>-Dateien neben der GeoPackage liegen.</figcaption>
+</figure>
+
+<!-- 10 Betriebsregeln -->
+<h2><span class="no">10</span>Anhang E · Betriebsregeln für QGIS</h2>
+<figure>
+<table>
+<thead><tr><th>Regel</th><th>Grund</th></tr></thead>
+<tbody>
+<tr><td>in /tmp bauen, am Ende einmal mit copy2 kopieren</td><td>Arbeitsordner und Drive sind Ablage, nicht Werkbank</td></tr>
+<tr><td>Module aus dem Werkzeugordner erst nach /tmp kopieren</td><td>ein import aus einem Drive-Pfad blockiert</td></tr>
+<tr><td>keine Netzzugriffe in QGIS, Umrechnungen außerhalb</td><td>execute_code hat 55 s Zeitlimit, ein Datumsübergang kann einen Gitterdownload auslösen</td></tr>
+<tr><td>Bestandsprojekte über die XML lesen, nicht öffnen</td><td>die .qgz ist ein ZIP, die .qgs ist Text</td></tr>
+<tr><td>Objektzahlen über SQLite, nicht featureCount()</td><td>keine Schleifen über Layer, die auf Drive-Dateien zeigen</td></tr>
+<tr><td>keine Fremdbibliotheken für Geodaten</td><td>QgsVectorLayer, QgsVectorFileWriter, QgsGeometry genügen</td></tr>
+<tr><td>embeddedRenderer() nie rekursiv lesen</td><td>blockiert bei Cluster- und Versatzrenderern schon beim Lesen</td></tr>
+<tr><td>Renderer und Beschriftung neu bauen, mit Kategorien</td><td>ein Einzelsymbol verliert die Kategorien</td></tr>
+<tr><td>Vorlagen mit loadFromTemplate(doc, ctx, False)</td><td>ohne Undo-Historie in ein leeres Layout</td></tr>
+<tr><td>speichern als eigener Aufruf, nach jedem Schreiben</td><td>ein Aufruf macht eine Sache</td></tr>
+<tr><td>keine Antwort: erst print(1), dann wiederholen</td><td>bei Stille anhalten und melden</td></tr>
+<tr><td>Bilder mit QImage skalieren und schneiden</td><td>PIL fehlt im QGIS-Python</td></tr>
+</tbody>
+</table>
+<figcaption>Auswahl aus Anhang E. Die Regeln gelten für Schritt 6 bis 8, sie sind hier aufgeführt, weil Schritt 6 der erste Schritt in QGIS ist.</figcaption>
+</figure>
+
+<!-- 11 G1 -->
+<h2><span class="no">11</span>Kontrolle nach Anhang G1</h2>
+<figure>
+<table>
+<thead><tr><th>Nr</th><th>Prüfung</th><th>Sollwert</th><th>aus</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>CRS</td><td>Projekt, Fenster, alle Kartenelemente auf EPSG:25832</td><td class="src">6.1</td></tr>
+<tr><td>2</td><td>Layerlisten je Kartenelement</td><td>einzeln gesetzt, Abgleich in beide Richtungen leer</td><td class="src">6.2, 6.10</td></tr>
+<tr><td>3</td><td>Anzeigefilter</td><td>mit Layername und Ausdruck ausgegeben</td><td class="src">6.2</td></tr>
+<tr><td>4</td><td>Legendensymbole ohne Versatz</td><td>Zahl der gesetzten Knoten</td><td class="src">6.2</td></tr>
+<tr><td>5</td><td>Maßstabsabhängige Sichtbarkeit</td><td>Zahl der Flächenlayer</td><td class="src">6.2</td></tr>
+<tr><td>6</td><td>Sichtbarkeit beim Öffnen</td><td>gleich der Layerliste der Hauptkarte</td><td class="src">6.5</td></tr>
+<tr><td>7</td><td>Gespeicherter Ausschnitt</td><td>auf der Zelle, Maßstab der Hauptkarte</td><td class="src">6.5</td></tr>
+</tbody>
+</table>
+<figcaption>G1 wird am Ende des Laufs als Tabelle ausgegeben. Die Spalte „aus“ ordnet jede Prüfung dem Teilschritt zu, aus dem die Regel stammt.</figcaption>
+</figure>
+
+<!-- 12 Unstimmigkeiten -->
+<h2><span class="no">12</span>Unstimmigkeiten im Prompt</h2>
+<div class="issues">
+<div class="issue"><b>OSM sichtbar oder nicht</b><p>6.5 verlangt beim Öffnen dieselben Layer wie die Hauptkarte plus OSM Standard. Anhang F4 sagt, OSM bleibt im Layerbaum für das Kartenfenster ausgeschaltet und steht nur in den Layerlisten der Layouts. Auch G1 Nr. 6 setzt die Sichtbarkeit gleich der Layerliste der Hauptkarte, die OSM enthält.</p></div>
+<div class="issue"><b>Einbetten vor den Karten</b><p>6.6 bettet das Projekt schon in Schritt 6 ein. Die Layouts aus H3 (H2Konzept, Eigentuemer, Verbund, Nahbereich, A3-Exportlayouts) und die Symbol-GeoPackages entstehen aber erst in Schritt 7. Sinnvoll ist das Einbetten erst nach dem letzten Kartenexport, oder es muss nach Schritt 7 wiederholt werden.</p></div>
+<div class="issue"><b>Zwei Orte für Darstellungsdaten</b><p>Layer 90 Darstellung liegt in der GeoPackage und wird nach F7 abgeleitet. Die Symbollayer aus 6.8 liegen dagegen als eigene GeoPackages unter <code>Kartendarstellung Arbeitsdateien/</code>. Wie beide zueinander stehen, sagt der Prompt nicht.</p></div>
+<div class="issue"><b>Layer 97: je Quelle oder je Aussage</b><p>6.7 verlangt je neuer Quelle eine Zeile. Das Schema in Anhang D führt aber Aussage, Quelle, Abrufdatum und Konfidenz, also eine Zeile je Aussage. Eine Quelle, die mehrere Aussagen belegt, fällt je nach Lesart unterschiedlich aus.</p></div>
+</div>
+
+<footer>Quelle: ENEO_Konzept_Prompt, Fassung 2026-11-11-Z, Schritt 6 sowie Anhang D, E, F, G1, H3 und H4. Layernamen in 03, Kennungen in 08 und die Einträge in 09 sind Beispiele.</footer>
+</main>
+</body>
+</html>

@@ -1,0 +1,96 @@
+# Pipeline-Definition (Entwurf). Reihenfolge, Teilschritte, Laufzeit, Haltepunkte.
+# Der Runner (src/h2konzept/orchestration) liest diese Datei. Eine Regel lebt nur hier.
+# Datenanforderungen je Teilschritt stehen in config/inputs.yaml.
+
+version: 0.2
+crs: "EPSG:25832"
+
+execution:
+  agent_mode: interactive      # interactive (Claude Desktop, Claude Code) | api (Claude API, Server)
+  notify: [console, file]      # später: email, slack
+  transient_retry: {max: 2, backoff_s: [5, 30]}   # nur Netzfehler, im Skript selbst
+
+stages:
+  - id: project
+    runtime: [venv, qgis]
+    substeps: [projektordner, projektdatei_xml, projektstand, eingangsvertrag, gpkg_schema, qgis_projekt]
+    halt_after: H1
+
+  - id: internal_data
+    runtime: venv
+    depends_on: [project]
+    substeps: [planung_wea, poolflaeche, potenzialflaeche, flurstuecke, nefino_export, postgis, parkverbund, nachrichtliche_flaechen]
+
+  - id: facts
+    runtime: venv
+    agent: sachdaten_leser        # nur unstrukturierte Quellen
+    depends_on: [project]
+    substeps: [dcf, angebot, vertrieb, ertragsprognose, eigentuemer, projektentwicklung, kennwerte_stand]
+    halt_after: H2
+
+  - id: external_data
+    runtime: venv
+    depends_on: [internal_data]
+    substeps_from: config/sources/geodatenkatalog.yaml   # ein Teilschritt je Quelle
+    plus_substeps: [bauleitplanung]                      # Agentenrecherche
+
+  - id: analysis
+    runtime: venv
+    agent: orchestrator           # Vorschlag Standortvariante, Auslegungsfall
+    depends_on: [internal_data, external_data, facts]
+    substeps: [radien, distanzen, schwellen, standortvarianten, akteure, mengenmodell, methanol, direktleitungen, zwischenbericht]
+    halt_after: H3
+
+  - id: maps
+    runtime: qgis
+    agent: pruefer
+    depends_on: [analysis]
+    substeps: [blatt_1, blatt_2, blatt_3, blatt_4, blatt_5, blatt_7, blatt_7_extern, blatt_8, blatt_8_extern, kontaktbogen, sichtpruefung]
+    halt_after: H4
+
+  - id: report
+    runtime: venv
+    agent: berichtsautor
+    depends_on: [maps, facts, analysis]
+    substeps: [kapitel_01, kapitel_02, kapitel_03, kapitel_04, kapitel_05, kapitel_06, kapitel_07, kapitel_08, kapitel_09, kapitel_10, setzen]
+
+  - id: handouts
+    runtime: venv
+    agent: handout_autor
+    depends_on: [report]
+    matrix:
+      zielgruppe: [Kommune, Abnehmer, Investor]
+      fassung: [intern, extern]
+    plus_substeps: [teilnehmerliste, beiblatt, teilnehmererklaerung, anfragen_entwuerfe]
+
+  - id: qa
+    runtime: [venv, qgis]
+    agent: pruefer
+    depends_on: [handouts]
+    substeps: [pruefskript, zahlenabgleich, namenssuche_extern, objektzahlen, ladetest_projekt, uebergabebericht, einordnung]
+
+  - id: publish
+    runtime: [venv, qgis]
+    depends_on: [qa]
+    halt_before: H5               # Änderungsliste nach Anhang H2, Go des Nutzers
+    substeps: [projekt_relativ, gpkg_abschluss, aenderungsliste, archiv, uebertragen, pruefen_md5_groesse, ladetest_ziel, wal_shm_pruefen]
+
+# Wer wen neu auslöst (Prompt 8.8). Der Runner vergleicht Hashes der Ausgänge.
+retrigger:
+  - when: "gpkg layer changed"
+    rerun: [maps, report, handouts, qa]
+  - when: "facts.json changed"
+    rerun: [analysis, maps, report, handouts, qa]
+  - when: "data_request decided"
+    rerun: [same_substep]
+
+halts:
+  H1: Eingangsvertrag und Projektstand
+  H2: Stammdaten, Widersprüche, Mehrdeutigkeiten
+  H3: Zwischenbericht, Standortvariante, Auslegungsfall
+  H4: Kontaktbogen der Karten
+  H5: Änderungsliste und Go für das Drive
+
+data_request_options:
+  intern: [nachgeliefert, anderer_ort, weglassen]
+  extern: [anbindung_geprueft, weglassen]

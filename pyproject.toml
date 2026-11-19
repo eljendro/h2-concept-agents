@@ -1,0 +1,38 @@
+[project]
+name = "h2konzept"
+version = "0.0.1"
+description = "Automatisierung des ENEO Wasserstoff-Standortkonzepts: Skripte für deterministische Schritte, Agenten für Text und Fehlerbehandlung"
+requires-python = ">=3.12"
+# Abhängigkeiten der normalen Umgebung (venv).
+# Module unter project/ und maps/ laufen im QGIS-Interpreter und dürfen nur stdlib und qgis nutzen.
+dependencies = [
+  "pyyaml",
+  "pydantic>=2",
+  "python-dotenv",
+  "requests",
+  "owslib",
+  "psycopg[binary]",
+  "geopandas",
+  "shapely>=2",
+  "pyogrio",
+  "jinja2",
+  "docxtpl",
+  "python-docx",
+]
+
+[project.optional-dependencies]
+dev = ["pytest", "ruff"]
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

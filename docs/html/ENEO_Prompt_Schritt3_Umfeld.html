@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ENEO-Prompt Schritt 3</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:wght@500;600&family=Source+Sans+3:wght@400;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  /* Layout: schmale Memo-Spalte, Abbildungen dürfen breiter laufen. Farben aus dem ENEO-Kartenstil abgeleitet. */
+  --bg:#f4f6f4; --surface:#ffffff; --ink:#1a2420; --muted:#5b6a63; --line:#c7d0cb;
+  --acc:#0F3A30; --accsoft:#e1ebe6; --h2:#1F4E79; --h2soft:#e2eaf3;
+  --warn:#8C2F27; --warnsoft:#f5e2df; --amb:#9a6a12; --ambsoft:#f6ecd6;
+  --pool:#FF1C24; --pot:#004BFF; --potfill:rgba(0,0,255,.16);
+  --f-disp:"Barlow Semi Condensed","Arial Narrow",sans-serif;
+  --f-body:"Source Sans 3","Segoe UI",Helvetica,Arial,sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#111714; --surface:#19211d; --ink:#e3eae6; --muted:#98a69f; --line:#34413b;
+  --acc:#7cc3a9; --accsoft:#1d3830; --h2:#8eb7e2; --h2soft:#1c2d40;
+  --warn:#ec8c80; --warnsoft:#3b221f; --amb:#e2b45c; --ambsoft:#382d1b;
+  --pool:#ff5a60; --pot:#6f9bff; --potfill:rgba(90,130,255,.22); color-scheme:dark;}}
+:root[data-theme="dark"]{
+  --bg:#111714; --surface:#19211d; --ink:#e3eae6; --muted:#98a69f; --line:#34413b;
+  --acc:#7cc3a9; --accsoft:#1d3830; --h2:#8eb7e2; --h2soft:#1c2d40;
+  --warn:#ec8c80; --warnsoft:#3b221f; --amb:#e2b45c; --ambsoft:#382d1b;
+  --pool:#ff5a60; --pot:#6f9bff; --potfill:rgba(90,130,255,.22); color-scheme:dark;}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 var(--f-body)}
+main{max-width:980px;margin:0 auto;padding:40px 20px 80px}
+header{border-bottom:2px solid var(--acc);padding-bottom:18px;margin-bottom:28px}
+.kicker{font:600 13px var(--f-mono);color:var(--acc);letter-spacing:.04em}
+h1{font:600 40px/1.1 var(--f-disp);margin:6px 0 10px;text-wrap:balance}
+h2{font:600 26px/1.2 var(--f-disp);margin:56px 0 6px;text-wrap:balance;display:flex;gap:12px;align-items:baseline}
+h2 .no{font:600 14px var(--f-mono);color:var(--acc);border:1px solid var(--acc);border-radius:4px;padding:1px 6px}
+p{max-width:68ch;margin:6px 0}
+.lead{color:var(--muted);max-width:70ch}
+.meta{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.tag{font:12px var(--f-mono);padding:3px 8px;border-radius:4px;background:var(--accsoft);color:var(--acc)}
+figure{margin:18px 0 0;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:18px;overflow-x:auto}
+figcaption{font-size:14px;color:var(--muted);margin-top:10px;max-width:80ch}
+svg{display:block;width:100%;height:auto;color:var(--ink);font-family:var(--f-body)}
+.duo{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+@media (max-width:760px){.duo{grid-template-columns:1fr}h1{font-size:32px}}
+code,.mono{font-family:var(--f-mono);font-size:.88em}
+/* SVG-Bausteine */
+.bx{fill:var(--surface);stroke:var(--line);stroke-width:1}
+.bx-acc{fill:var(--accsoft);stroke:var(--acc);stroke-width:1}
+.bx-h2{fill:var(--h2soft);stroke:var(--h2);stroke-width:1}
+.bx-warn{fill:var(--warnsoft);stroke:var(--warn);stroke-width:1}
+.bx-amb{fill:var(--ambsoft);stroke:var(--amb);stroke-width:1}
+.bx-dash{fill:none;stroke:var(--muted);stroke-width:1;stroke-dasharray:5 4}
+.ln{stroke:var(--muted);stroke-width:1.4;fill:none}
+.ln-acc{stroke:var(--acc);stroke-width:2;fill:none}
+.ln-dash{stroke:var(--acc);stroke-width:1.4;fill:none;stroke-dasharray:6 4}
+.ln-warn{stroke:var(--warn);stroke-width:1.4;fill:none}
+.tt{font:600 15px var(--f-body);fill:var(--ink)}
+.t{font:13px var(--f-body);fill:var(--ink)}
+.ts{font:12px var(--f-body);fill:var(--muted)}
+.tm{font:13px var(--f-mono);fill:var(--ink)}
+.tmb{font:600 13px var(--f-mono);fill:var(--ink)}
+.ta{font:600 12px var(--f-mono);fill:var(--acc)}
+.tw{font:600 12px var(--f-body);fill:var(--warn)}
+.tamb{font:600 12px var(--f-body);fill:var(--amb)}
+.th2{font:600 12px var(--f-body);fill:var(--h2)}
+.fa{fill:var(--acc)} .fw{fill:var(--warn)} .fm{fill:var(--muted)} .fh{fill:var(--h2)}
+.pool{fill:none;stroke:var(--pool);stroke-width:2}
+.pool-d{fill:none;stroke:var(--pool);stroke-width:2;stroke-dasharray:7 4}
+.pot{fill:var(--potfill);stroke:var(--pot);stroke-width:1.2}
+.hatch{fill:url(#hatch)}
+/* Tabellen und Kacheln */
+table{border-collapse:collapse;width:100%;font-size:14px;min-width:620px}
+th,td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}
+th{font:600 13px var(--f-body);background:var(--bg)}
+td.ab{background:var(--warnsoft);color:var(--warn);font-weight:600}
+td.ve{background:var(--ambsoft);color:var(--amb);font-weight:600}
+td.of{background:var(--accsoft);color:var(--acc)}
+td.c{text-align:center;font-size:18px;color:var(--acc)}
+td.cw{text-align:center;font-size:18px;color:var(--muted)}
+td.ph{color:var(--muted);font-family:var(--f-mono);font-size:12px}
+.chip{display:inline-block;font:600 11px var(--f-body);padding:1px 6px;border-radius:3px;margin-left:6px;vertical-align:middle}
+.chip.ind{background:var(--ambsoft);color:var(--amb)}
+.chip.op{background:var(--warnsoft);color:var(--warn)}
+.src{font-family:var(--f-mono);font-size:12px;color:var(--muted)}
+.tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px}
+.tile{border:1px solid var(--line);border-left:4px solid var(--acc);border-radius:0;padding:10px 12px;background:var(--bg)}
+.tile b{overflow-wrap:anywhere;display:block;font:600 15px var(--f-disp);letter-spacing:.01em}
+.tile span{font-size:13px;color:var(--muted)}
+.issues{display:grid;gap:10px;margin-top:14px}
+.issue{border:1px solid var(--line);border-left:4px solid var(--amb);border-radius:0;background:var(--surface);padding:12px 14px}
+.issue b{font:600 16px var(--f-disp)}
+.issue p{margin:4px 0 0;font-size:15px}
+.legend{display:flex;flex-wrap:wrap;gap:14px;font-size:13px;color:var(--muted);margin-top:10px}
+.legend i{display:inline-block;width:14px;height:10px;margin-right:6px;vertical-align:middle;border-radius:2px}
+footer{margin-top:60px;font-size:13px;color:var(--muted);border-top:1px solid var(--line);padding-top:12px}
+</style>
+</head>
+<body>
+<main>
+
+<header>
+  <div class="kicker">ENEO Wasserstoff-Standortkonzept · Fassung 2026-11-11-Z</div>
+  <h1>Schritt 3: Umfeld erheben</h1>
+  <p class="lead">Alles, was im Analysegebiet liegt, wird vollständig in den Datensatz aufgenommen. Zuerst kommt der Nefino-Export, danach füllen externe Quellen den Ring bis 15 km und die Themen, die der Export nicht führt. Jedes leere Ergebnis wird gegengeprüft.</p>
+  <div class="meta"><span class="tag">Anhang B</span><span class="tag">Anhang C</span><span class="tag">Anhang D</span><span class="tag">Anhang E</span><span class="tag">Anhang H4</span><span class="tag">Grundsätze</span></div>
+</header>
+
+<!-- 01 Überblick -->
+<h2><span class="no">01</span>Die vier Teilschritte</h2>
+<figure>
+<svg viewBox="0 0 900 230" role="img" aria-label="Teilschritte 3.1 bis 3.4: Nefino zuerst, Ring ergänzen, externe Quellen, Prüfregeln, dann Ausgabe je Thema">
+<defs><marker id="a1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M1 1L9 5L1 9z" class="fm"/></marker></defs>
+<g><rect class="bx-h2" x="20" y="20" width="160" height="110" rx="6"/><text class="ta" x="34" y="44">3.1</text><text class="tt" x="62" y="44">Nefino zuerst</text><text class="ts" x="34" y="66">je Thema Abdeckung</text><text class="ts" x="34" y="82">prüfen, sonst Export</text><text class="ts" x="34" y="98">des Nachbarprojekts</text><text class="ta" x="168" y="122" text-anchor="end">Anhang B</text></g>
+<g><rect class="bx-amb" x="200" y="20" width="160" height="110" rx="6"/><text class="ta" x="214" y="44">3.2</text><text class="tt" x="242" y="44">Ring ergänzen</text><text class="ts" x="214" y="66">10 bis 15 km aus</text><text class="ts" x="214" y="82">MaStR, OSM, LGLN …</text><text class="ta" x="348" y="122" text-anchor="end">Anhang B</text></g>
+<g><rect class="bx-amb" x="380" y="20" width="160" height="110" rx="6"/><text class="ta" x="394" y="44">3.3</text><text class="tt" x="422" y="44">Externe Quellen</text><text class="ts" x="394" y="66">Geodienste, Bau-</text><text class="ts" x="394" y="82">leitplanung, Rats-</text><text class="ts" x="394" y="98">informationssysteme</text><text class="ta" x="528" y="122" text-anchor="end">Anhang C</text></g>
+<g><rect class="bx-warn" x="560" y="20" width="160" height="110" rx="6"/><text class="ta" x="574" y="44">3.4</text><text class="tt" x="602" y="44">Prüfregeln</text><text class="ts" x="574" y="66">vier Regeln</text><text class="ts" x="574" y="82">je Quelle</text><text class="ta" x="708" y="122" text-anchor="end">Anhang C</text></g>
+<g><rect class="bx-acc" x="740" y="20" width="140" height="110" rx="6"/><text class="tt" x="754" y="44">Ausgabe</text><text class="ts" x="754" y="66">je Thema:</text><text class="ts" x="754" y="82">Objektzahl, Quelle,</text><text class="ts" x="754" y="98">Ausdehnung</text></g>
+<line class="ln" x1="180" y1="75" x2="196" y2="75" marker-end="url(#a1)"/>
+<line class="ln" x1="360" y1="75" x2="376" y2="75" marker-end="url(#a1)"/>
+<line class="ln" x1="540" y1="75" x2="556" y2="75" marker-end="url(#a1)"/>
+<line class="ln" x1="720" y1="75" x2="736" y2="75" marker-end="url(#a1)"/>
+<rect class="bx-dash" x="20" y="150" width="860" height="70" rx="5"/>
+<text class="tt" x="34" y="174">Grundsätze, die hier greifen</text>
+<text class="ts" x="34" y="194">Was im Radius liegt, kommt vollständig in den Datensatz · Auswahlregeln steuern nur Bewertung und Darstellung</text><text class="ts" x="34" y="208">Ein neuer Lauf enthält nicht weniger als ein alter · kein „nicht erhoben“, solange eine vorhandene Quelle die Antwort führt</text>
+</svg>
+<div class="legend"><span><i style="background:var(--h2soft);border:1px solid var(--h2)"></i>vorhandener Export</span><span><i style="background:var(--ambsoft);border:1px solid var(--amb)"></i>je Lauf recherchiert</span><span><i style="background:var(--warnsoft);border:1px solid var(--warn)"></i>Kontrolle</span></div>
+<figcaption>Schritt 3 ist der Teil des Laufs mit dem offensten Ergebnis. Was gefunden wird, hängt von der Datenlage in jeder Gemeinde ab.</figcaption>
+</figure>
+
+<!-- 02 Radien -->
+<h2><span class="no">02</span>Welcher Radius wofür gilt</h2>
+<figure>
+<svg viewBox="0 0 900 330" role="img" aria-label="Radien im Vergleich: Zelle bis 5 km, Nefino bis 10 km, Analysegebiet bis 15 km mit weichem Rand bis 17 km, Ring 10 bis 15 km, Nullprüfung bis 20 km, Wasserstoffvorhaben bis 60 km">
+<defs><pattern id="hatch" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="7" stroke="var(--amb)" stroke-width="1.6"/></pattern></defs>
+<g>
+<line x1="200" y1="290" x2="800" y2="290" class="ln"/>
+<line x1="200" y1="284" x2="200" y2="296" class="ln"/><text class="ts" x="200" y="312" text-anchor="middle">0</text>
+<line x1="350" y1="284" x2="350" y2="296" class="ln"/><text class="ts" x="350" y="312" text-anchor="middle">5</text>
+<line x1="500" y1="284" x2="500" y2="296" class="ln"/><text class="ts" x="500" y="312" text-anchor="middle">10</text>
+<line x1="650" y1="284" x2="650" y2="296" class="ln"/><text class="ts" x="650" y="312" text-anchor="middle">15</text>
+<line x1="800" y1="284" x2="800" y2="296" class="ln"/><text class="ts" x="800" y="312" text-anchor="middle">20</text>
+<text class="ts" x="840" y="312" text-anchor="middle">//</text><text class="ts" x="878" y="312" text-anchor="middle">60 km</text>
+<line x1="350" y1="20" x2="350" y2="280" stroke="var(--line)" stroke-dasharray="2 3"/><line x1="500" y1="20" x2="500" y2="280" stroke="var(--line)" stroke-dasharray="2 3"/><line x1="650" y1="20" x2="650" y2="280" stroke="var(--line)" stroke-dasharray="2 3"/>
+</g>
+<text class="t" x="20" y="38">Zelle, Parkverbund</text><rect x="200" y="24" width="150" height="22" class="bx-acc"/>
+<text class="t" x="20" y="80">Nefino-Export</text><rect x="200" y="66" width="300" height="22" class="bx-h2"/><text class="th2" x="510" y="82">Layer enden hier</text>
+<text class="t" x="20" y="122">Analysegebiet</text><rect x="200" y="108" width="450" height="22" class="bx"/><rect x="650" y="108" width="60" height="22" class="bx-dash"/><text class="ts" x="718" y="124">weicher Rand</text>
+<text class="t" x="20" y="164">Ring nach Anhang B</text><rect x="500" y="150" width="150" height="22" fill="url(#hatch)" stroke="var(--amb)"/>
+<text class="t" x="20" y="206">Nullprüfung Netz, Gewerbe</text><rect x="200" y="192" width="600" height="22" class="bx-warn"/>
+<text class="t" x="20" y="248">H2-Vorhaben, Reifegrad</text><rect x="200" y="234" width="630" height="22" class="bx-amb"/><rect x="826" y="230" width="20" height="30" fill="var(--surface)"/><rect x="846" y="234" width="34" height="22" class="bx-amb"/>
+</svg>
+<figcaption>Maßstab 1 km = 30 Einheiten bis 20 km, danach gestaucht. Alle Radien laufen um den Clusterzentroid. Projekte mit bis zu 5 km Abstand bilden eine Zelle. Wasserstoffvorhaben werden zusätzlich im Landkreis und den Nachbarlandkreisen gesucht.</figcaption>
+</figure>
+
+<!-- 03 Nefino-Gruppen -->
+<h2><span class="no">03</span>3.1 · Was der Nefino-Export liefert</h2>
+<figure>
+<div class="tiles">
+<div class="tile" style="border-left-color:var(--warn)"><b>power_network</b><span>Umspannwerke, 110-kV-Leitungen, Einspeisepunkte, Netzbetreiber, Netzausbau, Redispatch, Entlastungsregionen</span></div>
+<div class="tile" style="border-left-color:var(--warn)"><b>gas_network_infrastructure</b><span>Gasverteilnetz mit Durchmesser, Druck, Status</span></div>
+<div class="tile" style="border-left-color:var(--amb)"><b>other_generating_units</b><span>Biogasanlagen, gasbefeuerte Kraftwerke</span></div>
+<div class="tile" style="border-left-color:var(--ink)"><b>energy_intensive_industry</b><span>BAFA-Register, Wärmetauscher, Tankstellen, Seveso-Betriebe</span></div>
+<div class="tile"><b>wind, wind_areas</b><span>Wind je Nabenhöhe, Anlagen in Betrieb, Planung, stillgelegt, RROP-Entwurf, Landespotenzialflächen</span></div>
+<div class="tile" style="border-left-color:var(--h2)"><b>projektregister_*</b><span>Parallelvorhaben Wind, Solar, BESS, UW mit Entwickler und Stand<span class="chip op">Status prüfen</span></span></div>
+<div class="tile" style="border-left-color:var(--amb)"><b>solar, planstatus_solar</b><span>benachteiligte Gebiete, Flächenziele je Gemeindeverband</span></div>
+<div class="tile" style="border-left-color:var(--ink)"><b>settlement, buildings</b><span>Industrie- und Gewerbegebiete, Versorgung, Gebäude</span></div>
+<div class="tile" style="border-left-color:var(--muted)"><b>cadastral</b><span>Flurstücke, ohne Eigentümer</span></div>
+<div class="tile" style="border-left-color:var(--muted)"><b>administration</b><span>Gemeinden, Landkreise<span class="chip op">am Rand beschnitten</span></span></div>
+<div class="tile"><b>soil, water, nature, landscape, forest, (avi)fauna</b><span>Böden, Schutzzonen, Überschwemmung, Habitate</span></div>
+<div class="tile" style="border-left-color:var(--muted)"><b>aviation, planning, topography, transport</b><span>Radar, MVA-Höhen, Vorranggebiete, Straßen, Rohstoffe</span></div>
+</div>
+<figcaption>Für jedes Thema aus Anhang B wird geprüft, ob der Export es abdeckt. Die Vorhaben im Projektregister enthalten auch abgelehnte und zurückgezogene Einträge. Ihre Geometrie ist die des Gemeindeverbands, nicht die des Vorhabens.</figcaption>
+</figure>
+
+<!-- 04 Fallback -->
+<h2><span class="no">04</span>3.1 · Kein eigener Export vorhanden</h2>
+<div class="duo">
+<figure>
+<svg viewBox="0 0 420 380" role="img" aria-label="Fehlt der eigene Export, wird nach Freigabe der Export des nächsten ENEO-Projekts genutzt. Der nicht abgedeckte Teil wird mit Himmelsrichtung als nicht erhoben benannt">
+<defs><pattern id="hatch2" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="7" stroke="var(--warn)" stroke-width="1.4"/></pattern></defs>
+<circle cx="210" cy="190" r="150" fill="url(#hatch2)" stroke="currentColor" stroke-width="1.2" stroke-dasharray="6 4"/>
+<circle cx="160" cy="150" r="140" fill="var(--surface)" stroke="none"/>
+<circle cx="160" cy="150" r="140" class="bx-h2" fill-opacity=".6"/>
+<circle cx="210" cy="190" r="5" class="fa"/><text class="ta" x="218" y="186">eigene Zelle</text>
+<circle cx="160" cy="150" r="5" class="fh"/><text class="th2" x="100" y="128">Nachbarprojekt</text><text class="th2" x="100" y="144">Export 10 km</text>
+<rect x="290" y="300" width="120" height="40" rx="4" fill="var(--surface)"/><text class="tw" x="350" y="318" text-anchor="middle">nicht erhoben</text><text class="tw" x="350" y="334" text-anchor="middle">Ost und Süd</text>
+<text class="tmb" x="210" y="22" text-anchor="middle">N</text><line x1="210" y1="26" x2="210" y2="36" class="ln"/>
+<text class="ts" x="20" y="370">Analysegebiet 15 km gestrichelt</text>
+</svg>
+<figcaption>Im Referenzlauf Narthauen-Süd galt der Export von Otterstedt-Nord. Ost und Süd blieben offen (Anhang H4).</figcaption>
+</figure>
+<figure>
+<svg viewBox="0 0 420 380" role="img" aria-label="Wo die Lücke genannt wird: Vorbehalte jedes Dokuments und Impressum jeder Karte">
+<defs><marker id="a4" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M1 1L9 5L1 9z" class="fm"/></marker></defs>
+<rect class="bx-amb" x="110" y="20" width="200" height="56" rx="6"/><text class="tt" x="210" y="44" text-anchor="middle">Freigabe einholen</text><text class="ts" x="210" y="62" text-anchor="middle">Nachbar-Export verwenden?</text>
+<path class="ln" d="M210 76 V106" marker-end="url(#a4)"/>
+<rect class="bx-warn" x="60" y="110" width="300" height="56" rx="6"/><text class="tt" x="210" y="134" text-anchor="middle">Lücke mit Himmelsrichtung</text><text class="ts" x="210" y="152" text-anchor="middle">als „nicht erhoben“ benennen</text>
+<path class="ln" d="M160 166 V214" marker-end="url(#a4)"/><path class="ln" d="M260 166 V214" marker-end="url(#a4)"/>
+<rect class="bx" x="20" y="218" width="180" height="80" rx="6"/><text class="tt" x="110" y="244" text-anchor="middle">Dokumente</text><text class="ts" x="110" y="264" text-anchor="middle">Vorbehalte, Kapitel 1</text><text class="ts" x="110" y="280" text-anchor="middle">jeder Fassung</text>
+<rect class="bx" x="220" y="218" width="180" height="80" rx="6"/><text class="tt" x="310" y="244" text-anchor="middle">Karten</text><text class="ts" x="310" y="264" text-anchor="middle">Impressum, über das</text><text class="ts" x="310" y="280" text-anchor="middle">Datenstanddatum</text>
+<text class="ts" x="210" y="334" text-anchor="middle">Jeder Nefino-Layer trägt außerdem den Vermerk,</text><text class="ts" x="210" y="352" text-anchor="middle">dass seine Ausdehnung bei 10 km endet (3.2).</text>
+</svg>
+<figcaption>Die Lücke wird nicht geschlossen, sondern benannt.</figcaption>
+</figure>
+</div>
+
+<!-- 05 Ring -->
+<h2><span class="no">05</span>3.2 · Den Ring von 10 bis 15 km füllen</h2>
+<figure>
+<svg viewBox="0 0 900 340" role="img" aria-label="Zuordnung der Themen im Ring zu den Ergänzungsquellen nach Anhang B. Das Gasnetz lässt sich nicht schließen">
+<defs><marker id="a5" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M1 1L9 5L1 9z" class="fm"/></marker></defs>
+<g>
+<rect class="bx" x="20" y="20" width="280" height="36" rx="4"/><text class="t" x="32" y="43">Anlagen: Biogas, PV, Wind</text>
+<rect class="bx" x="20" y="64" width="280" height="36" rx="4"/><text class="t" x="32" y="87">Umspannwerke und Leitungen</text>
+<rect class="bx" x="20" y="108" width="280" height="36" rx="4"/><text class="t" x="32" y="131">Industrie- und Gewerbeflächen</text>
+<rect class="bx" x="20" y="152" width="280" height="36" rx="4"/><text class="t" x="32" y="175">Boden und Höhe</text>
+<rect class="bx" x="20" y="196" width="280" height="36" rx="4"/><text class="t" x="32" y="219">Hochwasser und Schutzgebiete</text>
+<rect class="bx" x="20" y="240" width="280" height="36" rx="4"/><text class="t" x="32" y="263">Wärme</text>
+<rect class="bx-warn" x="20" y="284" width="280" height="36" rx="4"/><text class="tw" x="32" y="307">Gasnetz</text>
+</g>
+<g>
+<line class="ln" x1="300" y1="38" x2="456" y2="38" marker-end="url(#a5)"/>
+<line class="ln" x1="300" y1="82" x2="456" y2="82" marker-end="url(#a5)"/>
+<line class="ln" x1="300" y1="126" x2="456" y2="126" marker-end="url(#a5)"/>
+<line class="ln" x1="300" y1="170" x2="456" y2="170" marker-end="url(#a5)"/>
+<line class="ln" x1="300" y1="214" x2="456" y2="214" marker-end="url(#a5)"/>
+<line class="ln" x1="300" y1="258" x2="456" y2="258" marker-end="url(#a5)"/>
+<line class="ln-warn" x1="300" y1="302" x2="456" y2="302" marker-end="url(#a5)"/>
+</g>
+<g>
+<rect class="bx-amb" x="460" y="20" width="420" height="36" rx="4"/><text class="t" x="472" y="43">Marktstammdatenregister, Filter auf Landkreis</text>
+<rect class="bx-amb" x="460" y="64" width="420" height="36" rx="4"/><text class="t" x="472" y="87">OpenStreetMap, Geometrie zusätzlich LGLN Basis-DLM sie03_l</text>
+<rect class="bx-amb" x="460" y="108" width="420" height="36" rx="4"/><text class="t" x="472" y="131">LGLN Basis-DLM sie02_f, lokaler Landesdownload</text>
+<rect class="bx-amb" x="460" y="152" width="420" height="36" rx="4"/><text class="t" x="472" y="175">NIBIS Kartenserver (LBEG)</text>
+<rect class="bx-amb" x="460" y="196" width="420" height="36" rx="4"/><text class="t" x="472" y="219">Umweltkarten Niedersachsen, BfN</text>
+<rect class="bx-amb" x="460" y="240" width="420" height="36" rx="4"/><text class="t" x="472" y="263">kommunale Wärmeplanung der Gemeinden</text>
+<rect class="bx-warn" x="460" y="284" width="420" height="36" rx="4"/><text class="tw" x="472" y="307">nicht schließbar, als Grenze benennen</text>
+</g>
+</svg>
+<figcaption>Zuordnung nach Anhang B. Die Abfragemuster der Dienste stehen in <code>ENEO_Geodatenkatalog.md</code>. Ein Lauf liest diese Datei und sucht nicht neu.</figcaption>
+</figure>
+
+<!-- 06 Zusätzlich -->
+<h2><span class="no">06</span>Was zusätzlich erhoben wird</h2>
+<div class="duo">
+<figure>
+<svg viewBox="0 0 420 400" role="img" aria-label="Verortung von Vorhaben mit Verfahrensstand in drei Stufen, danach Mittelpunkt der Verwaltungsgrenze als konstruiert">
+<defs><marker id="a6" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M1 1L9 5L1 9z" class="fm"/></marker></defs>
+<text class="tt" x="20" y="24">Vorhaben verorten</text>
+<rect class="bx-acc" x="20" y="40" width="380" height="50" rx="5"/><text class="ta" x="32" y="62">1</text><text class="t" x="52" y="62">MaStR über die Projektgesellschaft</text>
+<rect class="bx-acc" x="20" y="104" width="380" height="64" rx="5"/><text class="ta" x="32" y="126">2</text><text class="t" x="52" y="126">Ratsinformationssystem der Gemeinde</text><text class="ts" x="52" y="146">Aufstellungsbeschluss, Geltungsbereich</text><text class="ts" x="52" y="160">über news_links und meilensteine</text>
+<rect class="bx-acc" x="20" y="182" width="380" height="50" rx="5"/><text class="ta" x="32" y="204">3</text><text class="t" x="52" y="204">Gemarkung und Flur, über ALKIS</text><text class="ts" x="52" y="222">aus standortbeschreibung</text>
+<path class="ln" d="M210 232 V258" marker-end="url(#a6)"/><text class="ts" x="220" y="252">keiner gelingt</text>
+<rect class="bx-amb" x="20" y="262" width="380" height="64" rx="5"/><text class="t" x="32" y="284">Mittelpunkt der vollständigen Verwaltungsgrenze</text><text class="ts" x="32" y="304">aus BKG, nicht aus dem beschnittenen Export</text><text class="tamb" x="32" y="318">lage_status = konstruiert</text>
+<text class="ts" x="20" y="352">In der Karte: ab 10 MW bzw. 10 MWp, dazu alle einzeln</text><text class="ts" x="20" y="368">verorteten. Kleinere am Verbandsmittelpunkt bleiben</text><text class="ts" x="20" y="384">im Datensatz.</text>
+</svg>
+<figcaption>Gilt für jedes Vorhaben mit Verfahrensstand: genehmigt, im Bau, im B-Plan-Verfahren oder mit Aufstellungsbeschluss.</figcaption>
+</figure>
+<figure>
+<svg viewBox="0 0 420 400" role="img" aria-label="Wärme: Senken ab 300 kW oder 1 GWh werden aufgenommen, Abwärmequellen gehen zu den Nebenprodukten, Kläranlagen zu den Akteuren, Einträge ohne Sachdaten gelten als nicht bewertbar">
+<defs><marker id="a6b" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M1 1L9 5L1 9z" class="fm"/></marker></defs>
+<text class="tt" x="20" y="24">Wärmeobjekte sortieren</text>
+<rect class="bx" x="120" y="40" width="180" height="50" rx="5"/><text class="t" x="210" y="62" text-anchor="middle">Wärmeobjekt</text><text class="ts" x="210" y="80" text-anchor="middle">im Ring gefunden</text>
+<path class="ln" d="M150 90 L60 140" marker-end="url(#a6b)"/><path class="ln" d="M190 90 L160 140" marker-end="url(#a6b)"/><path class="ln" d="M230 90 L262 140" marker-end="url(#a6b)"/><path class="ln" d="M270 90 L360 140" marker-end="url(#a6b)"/>
+<rect class="bx-acc" x="10" y="144" width="96" height="96" rx="5"/><text class="t" x="58" y="166" text-anchor="middle">Senke</text><text class="ts" x="58" y="186" text-anchor="middle">ab 300 kW</text><text class="ts" x="58" y="202" text-anchor="middle">oder 1 GWh</text><text class="ta" x="58" y="226" text-anchor="middle">Layer 41</text>
+<rect class="bx" x="112" y="144" width="96" height="96" rx="5"/><text class="t" x="160" y="166" text-anchor="middle">Abwärme-</text><text class="t" x="160" y="182" text-anchor="middle">quelle</text><text class="ts" x="160" y="202" text-anchor="middle">Konkurrenz</text><text class="ta" x="160" y="226" text-anchor="middle">Kapitel 4</text>
+<rect class="bx" x="214" y="144" width="96" height="96" rx="5"/><text class="t" x="262" y="166" text-anchor="middle">Kläranlage</text><text class="ts" x="262" y="186" text-anchor="middle">O2-Abnehmer,</text><text class="ts" x="262" y="202" text-anchor="middle">Rohwasser</text><text class="ta" x="262" y="226" text-anchor="middle">Layer 50</text>
+<rect class="bx-warn" x="316" y="144" width="96" height="96" rx="5"/><text class="t" x="364" y="166" text-anchor="middle">ohne</text><text class="t" x="364" y="182" text-anchor="middle">Sachdaten</text><text class="tw" x="364" y="210" text-anchor="middle">nicht</text><text class="tw" x="364" y="226" text-anchor="middle">bewertbar</text>
+<text class="ts" x="20" y="274">Immer aufgenommen: Nah- und Fernwärmenetze, Eignungs-</text><text class="ts" x="20" y="290">gebiete, Bäder, Gewächshäuser, Trocknung, Prozesswärme.</text>
+<text class="ts" x="20" y="318">Je Netz: Betreiber, Erzeugung, Leistung, Abnehmer,</text><text class="ts" x="20" y="334">Vorlauftemperatur, Einspeisepunkt, Baujahr.</text>
+<text class="tamb" x="20" y="360">Unveröffentlichte Vorlauftemperatur aus der</text><text class="tamb" x="20" y="376">Erzeugungsart schätzen und kennzeichnen.</text>
+</svg>
+<figcaption>Reine Pumpwerke entfallen. Bestehende Netze werden über das MaStR-Feld für thermische Leistung bei Biomasse, Bioenergiedörfer, LBEG und Klimaschutzkonzepte gesucht.</figcaption>
+</figure>
+</div>
+
+<figure>
+<svg viewBox="0 0 900 230" role="img" aria-label="Weitere Themen: Photovoltaik getrennt nach Bestand und Planung, Bestandswindparks, Wasserstoffvorhaben in drei Reifestufen, Wasserversorgung nach Verband">
+<rect class="bx" x="20" y="20" width="200" height="190" rx="6"/><text class="tt" x="34" y="44">Photovoltaik</text><text class="ts" x="34" y="66">Bestand und Planung</text><text class="ts" x="34" y="82">getrennt, Feld status</text><text class="ts" x="34" y="104">MaStR: Freiflächen erst</text><text class="ts" x="34" y="120">kurz vor Inbetriebnahme</text><text class="ts" x="34" y="142">plus Projektregister Solar</text><text class="tamb" x="34" y="168">ab 1 MW</text><text class="ta" x="34" y="196">Layer 22</text>
+<rect class="bx" x="240" y="20" width="200" height="190" rx="6"/><text class="tt" x="254" y="44">Bestandswindparks</text><text class="ts" x="254" y="66">alle WEA in Betrieb</text><text class="ts" x="254" y="82">im Ring aus dem MaStR</text><text class="ts" x="254" y="104">Leistung, Nabenhöhe,</text><text class="ts" x="254" y="120">Betreiber, IBN-Jahr</text><text class="ts" x="254" y="142">zu Parks zusammengefasst</text><text class="ta" x="254" y="196">Layer 24, 25</text>
+<rect class="bx" x="460" y="20" width="220" height="190" rx="6"/><text class="tt" x="474" y="44">H2-Vorhaben</text>
+<rect x="474" y="58" width="190" height="26" class="bx-acc"/><text class="t" x="484" y="76">in Betrieb</text>
+<rect x="474" y="90" width="190" height="26" class="bx-h2"/><text class="t" x="484" y="108">im Bau, im Verfahren</text>
+<rect x="474" y="122" width="190" height="26" class="bx-amb"/><text class="t" x="484" y="140">in Planung</text>
+<text class="ts" x="474" y="170">je Vorhaben Status mit Datum,</text><text class="ts" x="474" y="186">Beteiligte mit Rolle, Quelle</text><text class="ta" x="474" y="202">Layer 42</text>
+<rect class="bx" x="700" y="20" width="180" height="190" rx="6"/><text class="tt" x="714" y="44">Wasser</text><text class="ts" x="714" y="66">Versorger über die</text><text class="ts" x="714" y="82">Verbandsordnung, nicht</text><text class="ts" x="714" y="98">über die Gemeindegrenze</text><text class="ts" x="714" y="124">Trinkwasser und Abwasser</text><text class="ts" x="714" y="140">getrennt erheben</text>
+</svg>
+<figcaption>Bei Wasserstoffvorhaben ausdrücklich mitsuchen: Untergrundspeicher, Leitungen im Planfeststellungsverfahren, geförderte Technologiezentren, Netzwerke und Cluster, HyPerformer- und HyLand-Bewerbungen, Betankungs- und Flottenprojekte. Ein Status ohne Datum gilt als unvollständig.</figcaption>
+</figure>
+
+<!-- 07 Externe Quellen -->
+<h2><span class="no">07</span>3.3 · Externe Quellen und ihre Fallen</h2>
+<figure>
+<table>
+<thead><tr><th>Quelle</th><th>beantwortet</th><th>Falle oder Regel</th></tr></thead>
+<tbody>
+<tr><td>Marktstammdatenregister</td><td>Anlagen Biomasse 2493, Solar 2495, Speicher 2496, Wind 2497, Erdgas 2410</td><td>Numerische Filter wirken nicht, lokal filtern. Ortsfilter immer mit Landkreis. Natürliche Personen anonymisiert.</td></tr>
+<tr><td>NIBIS Kartenserver</td><td>Höhe sDGM10 (Node 893, L731), Bodenklasse DIN 18300 (Node 461, L368)</td><td>GetFeatureInfo, WMS 1.1.1, EPSG:25832</td></tr>
+<tr><td>Umweltkarten Niedersachsen</td><td>Überschwemmung, Schutzgebiete</td><td>HQextrem ist kein festgesetztes Gebiet nach §76 WHG. Das Bauverbot nach §78 greift nur dort.</td></tr>
+<tr><td>OpenStreetMap</td><td>Umspannwerke, Leitungen, Betriebsflächen</td><td><code>substation=generation</code> ist kein Netzanschlusspunkt. Mehrere Spiegel mit Wiederholung.</td></tr>
+<tr><td>LGLN Basis-DLM</td><td>Leitungen sie03_l (51005), Gewerbe sie02_f (41002)</td><td>Online-Dienst antwortet mit HTTP 400, Landesdownload nutzen, außerhalb von QGIS lesen.</td></tr>
+<tr><td>BfN WFS</td><td>NSG, FFH, Vogelschutz, LSG, Naturparke</td><td>harmonisiert, für die finale Planung gelten Landesdaten</td></tr>
+<tr><td>BKG VG25 / VG250</td><td>vollständige Gemeinde- und Verbandsgrenzen</td><td>ersetzt die beschnittenen Grenzen des Exports</td></tr>
+<tr><td>Wasserstoff-Kernnetz</td><td>Trassen, Maßnahmen, Vorhabenträger</td><td>BNetzA-Beschluss vom 22.10.2024, Auszug als <code>H2_Kernnetz_Nordwest.csv</code> im Werkzeugordner</td></tr>
+<tr><td>LGLN Orthophotos DOP20</td><td>Lage einer Anlage prüfen</td><td>Kachelindex auf opengeodata</td></tr>
+</tbody>
+</table>
+<figcaption>Auszug aus Anhang C. Alle geprüften Endpunkte stehen in <code>ENEO_Geodatenkatalog.md</code>. Neue Dienste werden dort eingetragen.</figcaption>
+</figure>
+
+<!-- 08 Bauleitplanung -->
+<h2><span class="no">08</span>3.3 · Bauleitplanung und Ratsinformationssysteme</h2>
+<figure>
+<svg viewBox="0 0 900 300" role="img" aria-label="Suchweg in vier Stufen von Geoportal bis XPlanung und die Regel für einen belegten Nullbefund">
+<defs><marker id="a8" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M1 1L9 5L1 9z" class="fm"/></marker></defs>
+<rect class="bx-amb" x="20" y="20" width="200" height="90" rx="6"/><text class="ta" x="34" y="42">1</text><text class="tt" x="54" y="42">Geoportal Landkreis</text><text class="ts" x="34" y="66">RROP, Schutzgebiete,</text><text class="ts" x="34" y="82">teils FNP als Dienst</text>
+<rect class="bx-amb" x="240" y="20" width="200" height="90" rx="6"/><text class="ta" x="254" y="42">2</text><text class="tt" x="274" y="42">Bauleitplanung</text><text class="ts" x="254" y="66">Seite der (Samt-)Gemeinde,</text><text class="ts" x="254" y="82">B-Pläne als PDF</text>
+<rect class="bx-amb" x="460" y="20" width="200" height="90" rx="6"/><text class="ta" x="474" y="42">3</text><text class="tt" x="494" y="42">Ratsinfosystem</text><text class="ts" x="474" y="66">ALLRIS, SessionNet:</text><text class="ts" x="474" y="82">Beschlüsse mit Datum</text>
+<rect class="bx-amb" x="680" y="20" width="200" height="90" rx="6"/><text class="ta" x="694" y="42">4</text><text class="tt" x="714" y="42">XPlanung</text><text class="ts" x="694" y="66">Geltungsbereich direkt</text><text class="ts" x="694" y="82">als Geometrie</text>
+<line class="ln" x1="220" y1="65" x2="236" y2="65" marker-end="url(#a8)"/><line class="ln" x1="440" y1="65" x2="456" y2="65" marker-end="url(#a8)"/><line class="ln" x1="660" y1="65" x2="676" y2="65" marker-end="url(#a8)"/>
+<text class="tt" x="20" y="146">Nullbefund</text>
+<rect class="bx-acc" x="20" y="160" width="420" height="120" rx="6"/><text class="t" x="34" y="184">Gemeindeseite durchsucht</text><text class="ta" x="420" y="184" text-anchor="end">✓</text><text class="t" x="34" y="208">Ratsinformationssystem durchsucht</text><text class="ta" x="420" y="208" text-anchor="end">✓</text><line x1="34" y1="222" x2="426" y2="222" stroke="var(--line)"/><text class="tt" x="34" y="248" style="fill:var(--acc)">„Kein Bebauungsplan vorhanden“</text><text class="ts" x="34" y="268">beide Fundstellen genannt</text>
+<rect class="bx-warn" x="460" y="160" width="420" height="120" rx="6"/><text class="t" x="474" y="184">Gemeindeseite durchsucht</text><text class="ta" x="860" y="184" text-anchor="end">✓</text><text class="t" x="474" y="208">Ratsinformationssystem durchsucht</text><text class="tw" x="860" y="208" text-anchor="end">✗</text><line x1="474" y1="222" x2="866" y2="222" stroke="var(--line)"/><text class="tt" x="474" y="248" style="fill:var(--warn)">„nicht ermittelt“</text><text class="ts" x="474" y="268">kein Nullbefund</text>
+</svg>
+<figcaption>Je Fläche werden B-Plan, FNP, RROP-Stand, Beschlüsse der letzten 24 Monate und die zuständigen Stellen erhoben, jeweils mit Link und Abrufdatum. Einstiegspunkte wiederkehrender Gemeinden wandern nach <code>ENEO_Kennwerte.md</code>.</figcaption>
+</figure>
+
+<!-- 09 Prüfregeln -->
+<h2><span class="no">09</span>3.4 · Die vier Prüfregeln</h2>
+<figure>
+<svg viewBox="0 0 900 380" role="img" aria-label="Vier Prüfregeln: leeres Ergebnis heißt nicht kartiert, Filter mit Kontrollabfrage, Nullbefund bei Netz oder Gewerbe im 20-km-Umkreis wird wiederholt, kleinerer Datensatz liefert Teilergebnis">
+<rect class="bx" x="20" y="20" width="420" height="160" rx="6"/>
+<text class="ta" x="34" y="44">1</text><text class="tt" x="54" y="44">Leer heißt nicht kartiert</text>
+<rect class="bx-dash" x="34" y="62" width="120" height="70"/><text class="tmb" x="94" y="102" text-anchor="middle">0 Treffer</text>
+<text class="tmb" x="180" y="102">→</text>
+<text class="tw" x="210" y="88">nicht „nicht vorhanden“</text><text class="ta" x="210" y="112">sondern „nicht kartiert“</text>
+<text class="ts" x="34" y="160">je Thema eine benannte Zweitquelle</text>
+<rect class="bx" x="460" y="20" width="420" height="160" rx="6"/>
+<text class="ta" x="474" y="44">2</text><text class="tt" x="494" y="44">Filter mit Kontrollabfrage</text>
+<rect class="bx-acc" x="474" y="62" width="180" height="46" rx="4"/><text class="tm" x="486" y="82">BBOX x,y,x,y</text><text class="ta" x="486" y="100">Treffer bekannt</text>
+<rect class="bx-warn" x="680" y="62" width="186" height="46" rx="4"/><text class="tm" x="692" y="82">BBOX y,x,y,x</text><text class="tw" x="692" y="100">leere Tabelle, kein Fehler</text>
+<text class="ts" x="474" y="136">Ein Abfragefehler sieht aus wie ein Nullbefund.</text><text class="ts" x="474" y="152">Bei EPSG:25832 lautet die Reihenfolge x,y,x,y.</text>
+<rect class="bx" x="20" y="200" width="420" height="160" rx="6"/>
+<text class="ta" x="34" y="224">3</text><text class="tt" x="54" y="224">Null im 20-km-Umkreis</text>
+<circle cx="110" cy="290" r="50" class="bx-dash"/><text class="tw" x="110" y="294" text-anchor="middle">0</text>
+<text class="ts" x="180" y="262">Freileitungen, Umspannwerke</text><text class="ts" x="180" y="278">oder Gewerbeflächen</text><text class="ta" x="180" y="306">Wiederholung mit</text><text class="ta" x="180" y="322">anderem Endpunkt</text>
+<rect class="bx" x="460" y="200" width="420" height="160" rx="6"/>
+<text class="ta" x="474" y="224">4</text><text class="tt" x="494" y="224">Datensatz kleiner als Radius</text>
+<circle cx="560" cy="290" r="52" fill="none" stroke="currentColor" stroke-dasharray="5 4"/><rect x="528" y="258" width="64" height="64" class="bx-h2"/>
+<text class="ts" x="640" y="270">Abdeckung kleiner</text><text class="ts" x="640" y="286">als gefordert</text><text class="tamb" x="640" y="314">als Teilergebnis</text><text class="tamb" x="640" y="330">melden</text>
+</svg>
+<figcaption>Die Regeln gelten je Quelle. Sie setzen den Grundsatz „Prüfen heißt ansehen“ um: Ein Nullbefund ist erst dann einer, wenn die Abfrage nachweislich funktioniert.</figcaption>
+</figure>
+
+<!-- 10 Lage -->
+<h2><span class="no">10</span>Lage jedes Objekts bestimmen</h2>
+<div class="duo">
+<figure>
+<svg viewBox="0 0 420 330" role="img" aria-label="Rangfolge der Lagebestimmung nach Anhang D: OSM-Fläche, Orthophoto, Adresse, MaStR-Koordinate, mit 100-Meter-Regel">
+<rect class="bx-acc" x="20" y="20" width="380" height="44" rx="5"/><text class="ta" x="32" y="47">1</text><text class="t" x="52" y="47">OSM-Fläche, deren Zentroid</text>
+<rect class="bx" x="20" y="72" width="380" height="44" rx="5"/><text class="ta" x="32" y="99">2</text><text class="t" x="52" y="99">amtliches Orthophoto</text>
+<rect class="bx" x="20" y="124" width="380" height="44" rx="5"/><text class="ta" x="32" y="151">3</text><text class="t" x="52" y="151">Adresse geokodieren</text>
+<rect class="bx" x="20" y="176" width="380" height="44" rx="5"/><text class="ta" x="32" y="203">4</text><text class="t" x="52" y="203">MaStR-Koordinate, ohne Rundung</text>
+<circle cx="80" cy="276" r="5" class="fa"/><circle cx="170" cy="276" r="5" class="fh"/><line x1="80" y1="290" x2="170" y2="290" stroke="var(--warn)"/><text class="tw" x="125" y="306" text-anchor="middle">&gt; 100 m</text>
+<text class="ts" x="200" y="272">Anlagenfläche gilt,</text><text class="ts" x="200" y="288">Abweichung zur Register-</text><text class="ts" x="200" y="304">koordinate wird genannt</text>
+</svg>
+<figcaption>Registerkoordinaten bezeichnen oft Flurstück oder Betreiberadresse. Das Symbol soll auf der Anlage sitzen.</figcaption>
+</figure>
+<figure>
+<svg viewBox="0 0 420 330" role="img" aria-label="Drei Werte für lage_status: belegt und konstruiert erscheinen in der Karte, geschätzt nur in den offenen Punkten">
+<rect class="bx-acc" x="20" y="20" width="380" height="80" rx="5"/><text class="tmb" x="32" y="46">belegt</text><text class="ts" x="32" y="68">Quelle bezeichnet genau diesen Ort</text><text class="ta" x="388" y="46" text-anchor="end">Karte</text>
+<rect class="bx-h2" x="20" y="112" width="380" height="96" rx="5"/><text class="tmb" x="32" y="138">konstruiert</text><text class="ts" x="32" y="160">gezeichnet, nicht gemessen: Leitungen,</text><text class="ts" x="32" y="176">Wege, Ortslagen, Verwaltungsmittelpunkte</text><text class="ta" x="388" y="138" text-anchor="end">Karte</text>
+<rect class="bx-warn" x="20" y="220" width="380" height="90" rx="5"/><text class="tmb" x="32" y="246">geschaetzt</text><text class="ts" x="32" y="268">unbekannt und angenommen, nur für</text><text class="ts" x="32" y="284">Vorhaben ohne Verfahrensstand</text><text class="tw" x="388" y="246" text-anchor="end">offene Punkte</text>
+</svg>
+<figcaption>Jeder Sachlayer führt <code>lage_status</code> und <code>lage_quelle</code>. Ein Pflichtlayer mit nur geschätzten Lagen wird gemeldet.</figcaption>
+</figure>
+</div>
+
+<!-- 11 Ausgabe -->
+<h2><span class="no">11</span>Ausgabe: je Thema eine Zeile</h2>
+<figure>
+<table>
+<thead><tr><th>Thema</th><th>Ziel-Layer</th><th>Objektzahl</th><th>Quelle</th><th>Zweitquelle</th><th>Ausdehnung</th></tr></thead>
+<tbody>
+<tr><td>Umspannwerke</td><td class="src">10</td><td class="ph">n</td><td class="ph">Nefino + OSM</td><td class="ph">LGLN</td><td class="ph">15 km</td></tr>
+<tr><td>Stromleitungen</td><td class="src">11</td><td class="ph">n</td><td class="ph">Nefino + OSM</td><td class="ph">LGLN sie03_l</td><td class="ph">15 km</td></tr>
+<tr><td>Biogas, CO2-Quellen</td><td class="src">20</td><td class="ph">n</td><td class="ph">Nefino + MaStR</td><td class="ph">…</td><td class="ph">15 km</td></tr>
+<tr><td>PV-Freifläche</td><td class="src">22</td><td class="ph">n</td><td class="ph">MaStR + Register</td><td class="ph">…</td><td class="ph">15 km</td></tr>
+<tr><td>Gewerbeflächen</td><td class="src">23</td><td class="ph">n</td><td class="ph">Nefino + LGLN</td><td class="ph">…</td><td class="ph">15 km</td></tr>
+<tr><td>Vorhaben Dritter, BESS</td><td class="src">24, 25</td><td class="ph">n</td><td class="ph">Register + MaStR</td><td class="ph">RIS</td><td class="ph">15 km</td></tr>
+<tr><td>Gasnetz</td><td class="src">30</td><td class="ph">n</td><td class="ph">Nefino</td><td class="ph">–</td><td class="ph">10 km<span class="chip op">Teilergebnis</span></td></tr>
+<tr><td>H2-Kernnetz</td><td class="src">40</td><td class="ph">n</td><td class="ph">BNetzA-CSV</td><td class="ph">…</td><td class="ph">regional</td></tr>
+<tr><td>Wärmesenken</td><td class="src">41</td><td class="ph">n</td><td class="ph">Wärmeplanung</td><td class="ph">MaStR</td><td class="ph">15 km</td></tr>
+<tr><td>H2-Vorhaben</td><td class="src">42</td><td class="ph">n</td><td class="ph">Recherche</td><td class="ph">…</td><td class="ph">60 km</td></tr>
+<tr><td>Restriktionen, Vorranggebiete</td><td class="src">70, 71</td><td class="ph">n</td><td class="ph">Nefino + BfN</td><td class="ph">Umweltkarten</td><td class="ph">15 km</td></tr>
+</tbody>
+</table>
+<figcaption>Struktur der Ausgabe mit Platzhaltern. Die Spalten Ziel-Layer und Zweitquelle sind abgeleitet: Die Layer stammen aus Anhang D, die Pflicht zur Zweitquelle aus Regel 1. Das Gasnetz bleibt auf 10 km beschränkt, weil Anhang B keine Ergänzung kennt.</figcaption>
+</figure>
+
+<!-- 12 Unstimmigkeiten -->
+<h2><span class="no">12</span>Unstimmigkeiten im Prompt</h2>
+<div class="issues">
+<div class="issue"><b>Externe Recherche vor der Freigabe</b><p>Laut Grundsatz arbeiten Schritt 1 bis 5 nur mit Projektordner und Export, externe Einzelrecherche beginnt ab Schritt 6. Schritt 3 fragt aber MaStR, OSM, Geodienste, Ratsinformationssysteme und die Wasserstoffvorhaben ab. Unklar ist, wo Geodatenabfrage endet und Einzelrecherche beginnt.</p></div>
+<div class="issue"><b>Bauleitplanung ohne Flächen</b><p>3.3 verlangt Bauleitplanung je Gemeinde im Nahbereich. Anhang C bindet sie an Standortkandidaten der engeren Wahl und an BESS-Eignungsflächen, die erst in Schritt 4 entstehen. Der Nahbereich ist nirgends in Kilometern definiert.</p></div>
+<div class="issue"><b>20 km statt 15 km</b><p>Die Nullprüfung in 3.4 nennt einen 20-km-Umkreis. Das Analysegebiet endet bei 15 km plus 2 km weichem Rand, der Ring wird nur bis 15 km ergänzt.</p></div>
+<div class="issue"><b>Freigabe mitten im Lauf</b><p>Ohne eigenen Export braucht 3.1 eine Freigabe für den Nachbar-Export. Laut Startnachricht läuft Schritt 1 bis 5 aber ohne Unterbrechung, und in 1.4 gibt es für diesen Fall keine Regel. Die Exportschwelle könnte dort bereits zum Abbruch führen.</p></div>
+</div>
+
+<footer>Quelle: ENEO_Konzept_Prompt, Fassung 2026-11-11-Z, Schritt 3 sowie Grundsätze und Anhang B, C, D, E und H4. Zahlen in Tabelle 11 sind Platzhalter.</footer>
+</main>
+</body>
+</html>

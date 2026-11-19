@@ -1,0 +1,90 @@
+# Geodatenkatalog (Entwurf), aus Prompt Schritt 3.3 und ENEO_Datenquellen.md.
+# Endpunkte sind noch zu ergänzen und mit Kontrollabfrage zu prüfen (TASKS T-301).
+# Felder: typ (wfs|wms|api|download|csv|db|manual), url, layer, crs, axis_order, control_query, fallback, pitfalls
+
+sources:
+  mastr:
+    titel: Marktstammdatenregister
+    typ: api
+    url: null
+    filter: {biomasse: 2493, solar: 2495, speicher: 2496, wind: 2497, erdgas: 2410}
+    pitfalls:
+      - Numerische Filter wirken nicht, lokal filtern
+      - Ortsfilter immer mit Landkreis
+      - Natürliche Personen anonymisiert
+
+  nibis:
+    titel: NIBIS Kartenserver (Höhe sDGM10, Bodenklasse DIN 18300)
+    typ: wms
+    version: "1.1.1"
+    operation: GetFeatureInfo
+    crs: "EPSG:25832"
+    url: null
+    layer: {hoehe: "Node 893, L731", bodenklasse: "Node 461, L368"}
+
+  umweltkarten_nds:
+    titel: Umweltkarten Niedersachsen (Überschwemmung, Schutzgebiete, Wasserschutzgebiete)
+    typ: wms
+    url: null
+    pitfalls:
+      - HQextrem ist kein festgesetztes Gebiet nach §76 WHG, Bauverbot §78 greift nur dort
+
+  osm:
+    titel: OpenStreetMap (Umspannwerke, Leitungen, Betriebsflächen)
+    typ: api
+    url: null
+    fallback: [osm_mirror_2]
+    pitfalls:
+      - substation=generation ist kein Netzanschlusspunkt
+      - mehrere Spiegel mit Wiederholung
+
+  lgln_basis_dlm:
+    titel: LGLN Basis-DLM (Leitungen sie03_l 51005, Gewerbe sie02_f 41002)
+    typ: download
+    url: null
+    pitfalls:
+      - Online-Dienst antwortet mit HTTP 400, Landesdownload nutzen, außerhalb von QGIS lesen
+
+  bfn_schutzgebiete:
+    titel: BfN Schutzgebiete (NSG, FFH, Vogelschutz, LSG, Naturparke)
+    typ: wfs
+    url: null
+    pitfalls:
+      - harmonisiert, für finale Planung gelten Landesdaten
+
+  bkg_vg25:
+    titel: BKG VG25 / VG250 Verwaltungsgrenzen
+    typ: download
+    url: null
+    notes: ersetzt beschnittene Grenzen des Nefino-Exports
+
+  h2_kernnetz:
+    titel: Wasserstoff-Kernnetz (BNetzA-Beschluss 22.10.2024)
+    typ: csv
+    path: "${TOOLS_DIR}/H2_Kernnetz_Nordwest.csv"
+
+  lgln_dop20:
+    titel: LGLN Orthophotos DOP20
+    typ: download
+    url: null
+    notes: Lageprüfung, Kachelindex auf opengeodata
+
+  nefino:
+    titel: Nefino-Export (eigener Bestand)
+    typ: download
+    notes: Radius 10 km, Ring 10 bis 15 km aus anderen Quellen füllen
+
+  bauleitplanung:
+    titel: Geoportal Landkreis, Gemeindeseiten, Ratsinformationssysteme, XPlanung
+    typ: manual
+    notes: Agentenrecherche; Nullbefund nur, wenn Gemeindeseite und Ratsinfo durchsucht und beide genannt
+
+control_rules:            # Prompt 3.4
+  - id: leer_heisst_nicht_kartiert
+    text: "0 Treffer heißt 'nicht kartiert', nicht 'nicht vorhanden'; je Thema eine benannte Zweitquelle"
+  - id: bbox_kontrolle
+    text: "Kontrollabfrage mit bekanntem Treffer; bei EPSG:25832 Reihenfolge x,y,x,y"
+  - id: null_im_20km_umkreis
+    text: "0 Freileitungen, Umspannwerke oder Gewerbeflächen im 20-km-Umkreis: Wiederholung mit anderem Endpunkt"
+  - id: abdeckung
+    text: "Datensatz kleiner als Radius: als Teilergebnis melden"

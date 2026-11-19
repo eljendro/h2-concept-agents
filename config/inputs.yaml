@@ -1,0 +1,109 @@
+# Datenanforderungen aus eigenem Bestand (Entwurf), nach Prompt Anhang A (Ordnerbild, Eingangsvertrag).
+# Pfade logisch, aufgelöst durch die Speicherschicht. projekt:// = "01 Projekte/<Name> (P-XXXX)/"
+# required_by_stand: ab welchem Projektstand die Angabe Pflicht ist (Abbruch), sonst Vermerk.
+# blocking: true heißt, beim Weglassen können die genannten Stufen nicht laufen. Entscheiden darf trotzdem nur der Nutzer.
+
+inputs:
+  projektregister:
+    path: "werkzeug://Projektregister.csv"
+    used_by: [project.projektordner]
+    blocking: true
+
+  projektdatei:
+    path: "projekt://Projektanalyse*/24h Analyse/*.qgz"
+    note: maßgebliche Datei per XML bestimmen (Kartenelement 282,7 x 195,7 mm), nie öffnen
+    used_by: [project.projektdatei_xml]
+    blocking: false
+
+  wea_koordinaten:
+    path: ["projekt://Projektanalyse*/24h Analyse/Planung/*.gpkg", "projekt://Projektanalyse*/24h Analyse/Planung/*.csv"]
+    alt_source: Ertragsprognose Tabelle 1
+    required_by_stand: 1
+    used_by: [internal_data.planung_wea, analysis, maps]
+    blocking: true
+
+  ertragsprognose:
+    path: "projekt://Projektanalyse*/Ertragsprognose/*.pdf"
+    note: je Auslegungsvariante eine PDF, Agent liest mit Fundstelle
+    required_by_stand: 1
+    used_by: [facts.ertragsprognose]
+    blocking: true
+
+  dcf:
+    path: "projekt://DCF <Name>.gsheet"
+    access: google_sheets_api
+    cells: {netto_p50_mwh: "Input!G35", p75_mwh: "Input!G36", vollaststunden: "Input!G38"}   # aus Referenzlauf, je Projekt prüfen
+    required_by_stand: 1
+    used_by: [facts.dcf, analysis.mengenmodell]
+    blocking: true
+
+  angebot:
+    path: "projekt://Angebot <Name> (*).gslides"
+    access: google_slides_api
+    required_by_stand: 1
+    used_by: [facts.angebot]
+    blocking: true
+
+  hoehenbeschraenkung:
+    path: "projekt://Projektanalyse*/24h Analyse/MVA Anfrage */"
+    note: Ordnername wechselt, Präfix prüfen
+    required_by_stand: 1
+    used_by: [facts, maps]
+    blocking: true
+
+  pool_potenzialflaeche:
+    path: ["projekt://Projektanalyse*/24h Analyse/Planung/*Poolflaeche*.gpkg", "projekt://Projektanalyse*/Geodaten/"]
+    required_by_stand: 3          # Stand 1 bis 2: Vermerk
+    used_by: [internal_data.poolflaeche, internal_data.potenzialflaeche, maps]
+    blocking: false
+
+  nefino_export:
+    path: "projekt://Projektanalyse*/24h Analyse/H2 Konzept/"
+    note: Schwelle, dann größte Ausdehnung (Anhang B). Fehlt der Export, Ring aus Fremdquellen füllen
+    used_by: [internal_data.nefino_export, external_data]
+    blocking: false
+
+  vertrieb:
+    path: "projekt://Vertrieb: Projekt <Name>.gsheet"
+    access: google_sheets_api
+    used_by: [facts.vertrieb]
+    blocking: false
+
+  eigentuemer:
+    path: "projekt://Eigentuemer/"
+    note: Stand 2 und 3, personenbezogen (E7)
+    used_by: [facts.eigentuemer, projekt.projektstand]
+    blocking: false
+
+  projektentwicklung:
+    path: "projekt://Projektentwicklung/"
+    note: Netzanfragen ab Stand 4
+    used_by: [facts.projektentwicklung, project.projektstand]
+    blocking: false
+
+  kennwerte:
+    path: "werkzeug://ENEO_Kennwerte.md"
+    note: Standdatum prüfen, älter als zwölf Monate melden
+    used_by: [facts.kennwerte_stand, analysis]
+    blocking: true
+
+  geodatenkatalog:
+    path: "werkzeug://ENEO_Geodatenkatalog.md"
+    used_by: [external_data]
+    blocking: false
+
+  kernnetz:
+    path: "werkzeug://H2_Kernnetz_Nordwest.csv"
+    used_by: [external_data, analysis]
+    blocking: false
+
+  basis_dlm:
+    path: "ablage://Planungsunterlagen und Wissen/Geobasisdaten LGLN/"
+    used_by: [external_data]
+    blocking: false
+
+  postgis:
+    path: "postgis://"
+    note: Inhalte und Tabellen noch zu klären (TASKS T-110)
+    used_by: [internal_data.postgis]
+    blocking: false

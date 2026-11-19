@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ENEO-Prompt Schritt 2</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:wght@500;600&family=Source+Sans+3:wght@400;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  /* Layout: schmale Memo-Spalte, Abbildungen dürfen breiter laufen. Farben aus dem ENEO-Kartenstil abgeleitet. */
+  --bg:#f4f6f4; --surface:#ffffff; --ink:#1a2420; --muted:#5b6a63; --line:#c7d0cb;
+  --acc:#0F3A30; --accsoft:#e1ebe6; --h2:#1F4E79; --h2soft:#e2eaf3;
+  --warn:#8C2F27; --warnsoft:#f5e2df; --amb:#9a6a12; --ambsoft:#f6ecd6;
+  --pool:#FF1C24; --pot:#004BFF; --potfill:rgba(0,0,255,.16);
+  --f-disp:"Barlow Semi Condensed","Arial Narrow",sans-serif;
+  --f-body:"Source Sans 3","Segoe UI",Helvetica,Arial,sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#111714; --surface:#19211d; --ink:#e3eae6; --muted:#98a69f; --line:#34413b;
+  --acc:#7cc3a9; --accsoft:#1d3830; --h2:#8eb7e2; --h2soft:#1c2d40;
+  --warn:#ec8c80; --warnsoft:#3b221f; --amb:#e2b45c; --ambsoft:#382d1b;
+  --pool:#ff5a60; --pot:#6f9bff; --potfill:rgba(90,130,255,.22); color-scheme:dark;}}
+:root[data-theme="dark"]{
+  --bg:#111714; --surface:#19211d; --ink:#e3eae6; --muted:#98a69f; --line:#34413b;
+  --acc:#7cc3a9; --accsoft:#1d3830; --h2:#8eb7e2; --h2soft:#1c2d40;
+  --warn:#ec8c80; --warnsoft:#3b221f; --amb:#e2b45c; --ambsoft:#382d1b;
+  --pool:#ff5a60; --pot:#6f9bff; --potfill:rgba(90,130,255,.22); color-scheme:dark;}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 var(--f-body)}
+main{max-width:980px;margin:0 auto;padding:40px 20px 80px}
+header{border-bottom:2px solid var(--acc);padding-bottom:18px;margin-bottom:28px}
+.kicker{font:600 13px var(--f-mono);color:var(--acc);letter-spacing:.04em}
+h1{font:600 40px/1.1 var(--f-disp);margin:6px 0 10px;text-wrap:balance}
+h2{font:600 26px/1.2 var(--f-disp);margin:56px 0 6px;text-wrap:balance;display:flex;gap:12px;align-items:baseline}
+h2 .no{font:600 14px var(--f-mono);color:var(--acc);border:1px solid var(--acc);border-radius:4px;padding:1px 6px}
+p{max-width:68ch;margin:6px 0}
+.lead{color:var(--muted);max-width:70ch}
+.meta{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.tag{font:12px var(--f-mono);padding:3px 8px;border-radius:4px;background:var(--accsoft);color:var(--acc)}
+figure{margin:18px 0 0;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:18px;overflow-x:auto}
+figcaption{font-size:14px;color:var(--muted);margin-top:10px;max-width:80ch}
+svg{display:block;width:100%;height:auto;color:var(--ink);font-family:var(--f-body)}
+.duo{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+@media (max-width:760px){.duo{grid-template-columns:1fr}h1{font-size:32px}}
+code,.mono{font-family:var(--f-mono);font-size:.88em}
+/* SVG-Bausteine */
+.bx{fill:var(--surface);stroke:var(--line);stroke-width:1}
+.bx-acc{fill:var(--accsoft);stroke:var(--acc);stroke-width:1}
+.bx-h2{fill:var(--h2soft);stroke:var(--h2);stroke-width:1}
+.bx-warn{fill:var(--warnsoft);stroke:var(--warn);stroke-width:1}
+.bx-amb{fill:var(--ambsoft);stroke:var(--amb);stroke-width:1}
+.bx-dash{fill:none;stroke:var(--muted);stroke-width:1;stroke-dasharray:5 4}
+.ln{stroke:var(--muted);stroke-width:1.4;fill:none}
+.ln-acc{stroke:var(--acc);stroke-width:2;fill:none}
+.ln-dash{stroke:var(--acc);stroke-width:1.4;fill:none;stroke-dasharray:6 4}
+.ln-warn{stroke:var(--warn);stroke-width:1.4;fill:none}
+.tt{font:600 15px var(--f-body);fill:var(--ink)}
+.t{font:13px var(--f-body);fill:var(--ink)}
+.ts{font:12px var(--f-body);fill:var(--muted)}
+.tm{font:13px var(--f-mono);fill:var(--ink)}
+.tmb{font:600 13px var(--f-mono);fill:var(--ink)}
+.ta{font:600 12px var(--f-mono);fill:var(--acc)}
+.tw{font:600 12px var(--f-body);fill:var(--warn)}
+.tamb{font:600 12px var(--f-body);fill:var(--amb)}
+.th2{font:600 12px var(--f-body);fill:var(--h2)}
+.fa{fill:var(--acc)} .fw{fill:var(--warn)} .fm{fill:var(--muted)} .fh{fill:var(--h2)}
+.pool{fill:none;stroke:var(--pool);stroke-width:2}
+.pool-d{fill:none;stroke:var(--pool);stroke-width:2;stroke-dasharray:7 4}
+.pot{fill:var(--potfill);stroke:var(--pot);stroke-width:1.2}
+.hatch{fill:url(#hatch)}
+/* Tabellen und Kacheln */
+table{border-collapse:collapse;width:100%;font-size:14px;min-width:620px}
+th,td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}
+th{font:600 13px var(--f-body);background:var(--bg)}
+td.ab{background:var(--warnsoft);color:var(--warn);font-weight:600}
+td.ve{background:var(--ambsoft);color:var(--amb);font-weight:600}
+td.of{background:var(--accsoft);color:var(--acc)}
+td.c{text-align:center;font-size:18px;color:var(--acc)}
+td.cw{text-align:center;font-size:18px;color:var(--muted)}
+td.ph{color:var(--muted);font-family:var(--f-mono);font-size:12px}
+.chip{display:inline-block;font:600 11px var(--f-body);padding:1px 6px;border-radius:3px;margin-left:6px;vertical-align:middle}
+.chip.ind{background:var(--ambsoft);color:var(--amb)}
+.chip.op{background:var(--warnsoft);color:var(--warn)}
+.src{font-family:var(--f-mono);font-size:12px;color:var(--muted)}
+.tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px}
+.tile{border:1px solid var(--line);border-left:4px solid var(--acc);border-radius:0;padding:10px 12px;background:var(--bg)}
+.tile b{display:block;font:600 15px var(--f-disp);letter-spacing:.01em}
+.tile span{font-size:13px;color:var(--muted)}
+.issues{display:grid;gap:10px;margin-top:14px}
+.issue{border:1px solid var(--line);border-left:4px solid var(--amb);border-radius:0;background:var(--surface);padding:12px 14px}
+.issue b{font:600 16px var(--f-disp)}
+.issue p{margin:4px 0 0;font-size:15px}
+.legend{display:flex;flex-wrap:wrap;gap:14px;font-size:13px;color:var(--muted);margin-top:10px}
+.legend i{display:inline-block;width:14px;height:10px;margin-right:6px;vertical-align:middle;border-radius:2px}
+footer{margin-top:60px;font-size:13px;color:var(--muted);border-top:1px solid var(--line);padding-top:12px}
+</style>
+</head>
+<body>
+<main>
+
+<header>
+  <div class="kicker">ENEO Wasserstoff-Standortkonzept · Fassung 2026-11-11-Z</div>
+  <h1>Schritt 2: Stammdaten</h1>
+  <p class="lead">Die technischen Kennwerte jedes Parks werden aus den Projektdateien gezogen, gegeneinander geprüft und mit Fundstelle festgehalten. Jede spätere Wasserstoffmenge hängt am P50 aus diesem Schritt.</p>
+  <div class="meta"><span class="tag">Anhang A</span><span class="tag">Anhang D</span><span class="tag">Anhang E</span><span class="tag">Grundsätze</span></div>
+</header>
+
+<!-- 01 Überblick -->
+<h2><span class="no">01</span>Die sieben Teilschritte</h2>
+<figure>
+<svg viewBox="0 0 900 300" role="img" aria-label="Teilschritte 2.1 bis 2.7 und die Ausgabe je Park und als Summe">
+<defs><marker id="a1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M1 1L9 5L1 9z" class="fm"/></marker></defs>
+<g><rect class="bx-amb" x="20" y="20" width="200" height="100" rx="6"/><text class="ta" x="34" y="44">2.1</text><text class="tt" x="64" y="44">Versionen auflösen</text><text class="ts" x="34" y="66">gegen Zwangsdokument,</text><text class="ts" x="34" y="82">nicht gegen Datum</text><text class="ta" x="206" y="110" text-anchor="end">Grundsätze</text></g>
+<g><rect class="bx" x="240" y="20" width="200" height="100" rx="6"/><text class="ta" x="254" y="44">2.2</text><text class="tt" x="284" y="44">Google-Dateien</text><text class="ts" x="254" y="66">205-Byte-Verweise,</text><text class="ts" x="254" y="82">über doc_id öffnen</text><text class="ta" x="426" y="110" text-anchor="end">Anhang A</text></g>
+<g><rect class="bx" x="460" y="20" width="200" height="100" rx="6"/><text class="ta" x="474" y="44">2.3</text><text class="tt" x="504" y="44">Bezugsgröße P50</text><text class="ts" x="474" y="66">aus der DCF,</text><text class="ts" x="474" y="82">P75 nachrichtlich</text><text class="ta" x="646" y="110" text-anchor="end">Anhang D</text></g>
+<g><rect class="bx" x="680" y="20" width="200" height="100" rx="6"/><text class="ta" x="694" y="44">2.4</text><text class="tt" x="724" y="44">WEA-Koordinaten</text><text class="ts" x="694" y="66">aus Planung/,</text><text class="ts" x="694" y="82">UTM 32N</text><text class="ta" x="866" y="110" text-anchor="end">Anhang A, E</text></g>
+<line class="ln" x1="220" y1="70" x2="236" y2="70" marker-end="url(#a1)"/>
+<line class="ln" x1="440" y1="70" x2="456" y2="70" marker-end="url(#a1)"/>
+<line class="ln" x1="660" y1="70" x2="676" y2="70" marker-end="url(#a1)"/>
+<path class="ln" d="M780 120 V146 H120 V166" marker-end="url(#a1)"/>
+<g><rect class="bx" x="20" y="170" width="200" height="100" rx="6"/><text class="ta" x="34" y="194">2.5</text><text class="tt" x="64" y="194">Verlustansatz</text><text class="ts" x="34" y="216">DCF gegen Gutachten</text><text class="tw" x="34" y="236">Abweichung: offen</text><text class="ta" x="206" y="260" text-anchor="end">Anhang D</text></g>
+<g><rect class="bx" x="240" y="170" width="200" height="100" rx="6"/><text class="ta" x="254" y="194">2.6</text><text class="tt" x="284" y="194">Poolfläche</text><text class="ts" x="254" y="216">aus Geometrie</text><text class="tw" x="254" y="236">Abweichung: offen</text><text class="ta" x="426" y="260" text-anchor="end">Anhang A, D</text></g>
+<g><rect class="bx" x="460" y="170" width="200" height="100" rx="6"/><text class="ta" x="474" y="194">2.7</text><text class="tt" x="504" y="194">Verbundparks</text><text class="ts" x="474" y="216">wie 2.1 bis 2.6,</text><text class="tamb" x="474" y="236">ohne DCF: indikativ</text><text class="ta" x="646" y="260" text-anchor="end">Anhang D</text></g>
+<g><rect class="bx-acc" x="680" y="170" width="200" height="100" rx="6"/><text class="tt" x="694" y="194">Ausgabe</text><text class="ts" x="694" y="216">9 Kennwerte, je Park</text><text class="ts" x="694" y="232">und als Verbundsumme,</text><text class="ts" x="694" y="248">jeweils mit Fundstelle</text></g>
+<line class="ln" x1="220" y1="220" x2="236" y2="220" marker-end="url(#a1)"/>
+<line class="ln" x1="440" y1="220" x2="456" y2="220" marker-end="url(#a1)"/>
+<line class="ln" x1="660" y1="220" x2="676" y2="220" marker-end="url(#a1)"/>
+</svg>
+<div class="legend"><span><i style="background:var(--ambsoft);border:1px solid var(--amb)"></i>Rückfrage an den Nutzer möglich</span><span><i style="background:var(--warn)"></i>erzeugt offene Punkte</span><span><i style="background:var(--amb)"></i>erzeugt indikative Werte</span></div>
+<figcaption>Schritt 2 liest nur, was im Projektordner liegt. Es entstehen keine Dateien, nur eine geprüfte Wertetabelle.</figcaption>
+</figure>
+
+<!-- 02 Quellen -->
+<h2><span class="no">02</span>Welcher Wert aus welcher Datei kommt</h2>
+<figure>
+<table>
+<thead><tr><th>Kennwert</th><th>DCF<br><span class="src">.gsheet</span></th><th>Angebot<br><span class="src">.gslides</span></th><th>Ertrags&shy;prognose<br><span class="src">PDF</span></th><th>Planung/</th><th>Geodaten/</th><th>Luftfahrt&shy;bewertung</th></tr></thead>
+<tbody>
+<tr><td>WEA-Koordinaten</td><td></td><td></td><td class="cw">○</td><td class="c">●</td><td></td><td></td></tr>
+<tr><td>Anlagenzahl, Typ, Leistung, Nabenhöhe</td><td></td><td class="c">●</td><td class="c">●</td><td class="cw">○</td><td></td><td></td></tr>
+<tr><td>Netto-Stromertrag P50, P75</td><td class="c">●</td><td></td><td></td><td></td><td></td><td></td></tr>
+<tr><td>Verlustansatz</td><td class="c">●</td><td></td><td class="cw">○</td><td></td><td></td><td></td></tr>
+<tr><td>Höhenbeschränkung</td><td></td><td></td><td></td><td></td><td></td><td class="c">●</td></tr>
+<tr><td>Poolfläche</td><td class="cw">○</td><td></td><td></td><td class="c">●</td><td class="c">●</td><td></td></tr>
+<tr><td>Parkleistung, Volllaststunden</td><td colspan="6" class="ph">Quelle im Prompt nicht festgelegt, naheliegend aus Anzahl × Leistung und P50 ÷ Parkleistung</td></tr>
+</tbody>
+</table>
+<div class="legend"><span>● Hauptquelle</span><span>○ Abgleich: Abweichung wird gemeldet</span></div>
+<figcaption>Die Ordnerlage folgt dem Ordnerbild in Anhang A. Die Luftfahrtbewertung liegt im Ordner <code>MVA Anfrage &lt;Gutachter&gt;/</code>, dessen Name wechselt.</figcaption>
+</figure>
+
+<!-- 03 Versionsauflösung -->
+<h2><span class="no">03</span>2.1 · Welcher Dateistand gilt</h2>
+<figure>
+<svg viewBox="0 0 900 360" role="img" aria-label="Drei Stände der Ertragsprognose werden gegen Luftfahrtbewertung, BImSchG-Genehmigung und Netzzusage gehalten. Es gilt der Stand, der zu den Zwangsdokumenten passt, nicht der neueste">
+<defs><marker id="a3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M1 1L9 5L1 9z" class="fm"/></marker></defs>
+<text class="ts" x="20" y="22">Dateistände (Beispiel)</text>
+<rect class="bx-acc" x="20" y="34" width="290" height="70" rx="5"/><text class="tm" x="32" y="56">Ertragsprognose_v2_final.pdf</text><text class="ts" x="32" y="76">03/2026 · E-126 · NH 135 m</text><text class="ts" x="32" y="92">Gesamthöhe 198 m</text>
+<rect class="bx" x="20" y="116" width="290" height="70" rx="5"/><text class="tm" x="32" y="138">Ertragsprognose_alt.pdf</text><text class="ts" x="32" y="158">11/2025 · E-138 · NH 160 m</text><text class="ts" x="32" y="174">Gesamthöhe 229 m</text>
+<rect class="bx" x="20" y="198" width="290" height="70" rx="5"/><text class="tm" x="32" y="220">Ertragsprognose Neu.pdf</text><text class="ts" x="32" y="240">05/2026 · E-138 · NH 135 m</text><text class="ts" x="32" y="256">Gesamthöhe 204 m</text>
+<text class="ts" x="490" y="22">Zwangsdokumente</text>
+<rect class="bx-h2" x="490" y="34" width="230" height="70" rx="5"/><text class="t" x="502" y="58">Luftfahrtbewertung</text><text class="ts" x="502" y="78">Höhenbeschränkung</text><text class="th2" x="502" y="94">≤ 200 m</text>
+<rect class="bx-h2" x="490" y="116" width="230" height="70" rx="5"/><text class="t" x="502" y="140">BImSchG-Genehmigung</text><text class="ts" x="502" y="160">genehmigter Typ</text><text class="th2" x="502" y="176">E-126</text>
+<rect class="bx-h2" x="490" y="198" width="230" height="70" rx="5"/><text class="t" x="502" y="222">Netzzusage</text><text class="ts" x="502" y="242">zugesagte Leistung</text><text class="th2" x="502" y="258">passt zu E-126</text>
+<text class="tt" x="380" y="75" text-anchor="middle" style="fill:var(--acc)">✓ ✓ ✓</text>
+<text class="tt" x="380" y="157" text-anchor="middle" style="fill:var(--warn)">✗ ✗ ✗</text>
+<text class="tt" x="380" y="239" text-anchor="middle" style="fill:var(--warn)">✗ ✗ ✗</text>
+<line class="ln" x1="310" y1="69" x2="340" y2="69"/><line class="ln" x1="420" y1="69" x2="486" y2="69" marker-end="url(#a3)"/>
+<line class="ln" x1="310" y1="151" x2="340" y2="151"/><line class="ln" x1="420" y1="151" x2="486" y2="151" marker-end="url(#a3)"/>
+<line class="ln" x1="310" y1="233" x2="340" y2="233"/><line class="ln" x1="420" y1="233" x2="486" y2="233" marker-end="url(#a3)"/>
+<rect class="bx-acc" x="740" y="34" width="150" height="70" rx="5"/><text class="tt" x="815" y="62" text-anchor="middle">gilt</text><text class="ts" x="815" y="82" text-anchor="middle">obwohl nicht neuester</text>
+<line class="ln" x1="720" y1="69" x2="736" y2="69" marker-end="url(#a3)"/>
+<rect class="bx-dash" x="20" y="288" width="870" height="58" rx="5"/>
+<text class="tw" x="34" y="310">Datum und Zusätze wie v1, alt, neu, final zählen nicht.</text>
+<text class="ts" x="34" y="330">Die Schreibweise des Projektnamens schwankt, also über alle Varianten suchen: Narthauen-Süd · Narthauen Sued · Narthauen_Sued</text>
+</svg>
+<figcaption>Die Stände werden tabellarisch gelistet. Lässt sich keiner eindeutig zuordnen, wird nachgefragt, mit Auswahl. Werte im Bild sind Beispiele.</figcaption>
+</figure>
+
+<!-- 04 Google + P50 -->
+<h2><span class="no">04</span>2.2 und 2.3 · Google-Dateien und P50</h2>
+<div class="duo">
+<figure>
+<svg viewBox="0 0 420 300" role="img" aria-label="Eine gsheet-Datei auf dem Drive ist nur ein 205 Byte großer Verweis mit doc_id. Geöffnet wird über die doc_id">
+<defs><marker id="a4" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M1 1L9 5L1 9z" class="fm"/></marker></defs>
+<rect class="bx" x="20" y="30" width="170" height="110" rx="5"/>
+<text class="tm" x="34" y="54">DCF &lt;Name&gt;.gsheet</text><text class="tmb" x="34" y="84" style="fill:var(--warn)">205 Byte</text><text class="ts" x="34" y="104">nur ein Verweis,</text><text class="ts" x="34" y="120">keine Tabelle</text>
+<rect class="bx-h2" x="230" y="30" width="170" height="110" rx="5"/><text class="t" x="244" y="56">Inhalt der Datei</text><text class="tm" x="244" y="84">{"doc_id":</text><text class="tm" x="244" y="104"> "1Ab…xyz"}</text>
+<line class="ln" x1="190" y1="85" x2="226" y2="85" marker-end="url(#a4)"/>
+<rect class="bx-acc" x="20" y="190" width="380" height="80" rx="5"/><text class="tt" x="210" y="220" text-anchor="middle">Tabelle über die doc_id öffnen</text><text class="ts" x="210" y="242" text-anchor="middle">gilt für DCF, Angebote, Präsentationen, Vertriebstabelle</text>
+<path class="ln" d="M315 140 V186" marker-end="url(#a4)"/>
+</svg>
+<figcaption>Wer die Datei im Dateisystem liest, sieht nur den Verweis. Ohne diesen Schritt fehlen P50, Verlustansatz und Pachtmodell.</figcaption>
+</figure>
+<figure>
+<svg viewBox="0 0 420 300" role="img" aria-label="Ertragsverteilung: P50 ist der Median und Bezugsgröße, P75 liegt darunter und wird nur nachrichtlich genannt">
+<path d="M30 240 C110 240 130 60 210 60 C290 60 310 240 390 240" fill="var(--accsoft)" stroke="var(--acc)" stroke-width="1.6"/>
+<line x1="30" y1="240" x2="390" y2="240" class="ln"/>
+<line x1="210" y1="60" x2="210" y2="240" stroke="var(--acc)" stroke-width="2.4"/>
+<line x1="170" y1="92" x2="170" y2="240" stroke="var(--amb)" stroke-width="1.6" stroke-dasharray="5 4"/>
+<text class="ta" x="218" y="52">P50 · Bezugsgröße</text>
+<text class="tamb" x="164" y="84" text-anchor="end">P75 · nachrichtlich</text>
+<text class="ts" x="210" y="262" text-anchor="middle">Netto-Stromertrag [MWh/a] aus der DCF</text>
+<text class="ts" x="210" y="280" text-anchor="middle">P50 wird in 50 %, P75 in 75 % der Jahre</text><text class="ts" x="210" y="296" text-anchor="middle">mindestens erreicht</text>
+</svg>
+<figcaption>Gerechnet wird immer mit dem P50 der DCF, auch wenn das Gutachten andere Verluste nennt.</figcaption>
+</figure>
+</div>
+
+<!-- 05 Verlust + Pool -->
+<h2><span class="no">05</span>2.5 und 2.6 · Abgleich statt Korrektur</h2>
+<div class="duo">
+<figure>
+<svg viewBox="0 0 420 330" role="img" aria-label="Verlustansatz der DCF gegen Abschattungsverlust des Gutachtens. Bei Abweichung ohne dokumentierte Zusammensetzung entsteht ein offener Punkt, gerechnet wird mit dem P50 der DCF">
+<defs><marker id="a5" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M1 1L9 5L1 9z" class="fm"/></marker></defs>
+<text class="t" x="20" y="34">Verlustansatz DCF</text>
+<rect x="20" y="44" width="280" height="24" class="bx-h2"/><text class="tmb" x="310" y="61">14 %</text>
+<text class="t" x="20" y="98">Abschattungsverlust Gutachten</text>
+<rect x="20" y="108" width="180" height="24" class="bx"/><text class="tmb" x="210" y="125">9 %</text>
+<line x1="200" y1="78" x2="200" y2="140" stroke="var(--warn)" stroke-width="1" stroke-dasharray="3 3"/><line x1="300" y1="78" x2="300" y2="140" stroke="var(--warn)" stroke-width="1" stroke-dasharray="3 3"/>
+<text class="tw" x="250" y="156" text-anchor="middle">Δ 5 Prozentpunkte</text>
+<rect class="bx-amb" x="100" y="176" width="220" height="40" rx="5"/><text class="t" x="210" y="201" text-anchor="middle">Zusammensetzung belegt?</text>
+<path class="ln" d="M150 216 V246" marker-end="url(#a5)"/><path class="ln" d="M270 216 V246" marker-end="url(#a5)"/>
+<text class="ts" x="140" y="236" text-anchor="end">ja</text><text class="ts" x="280" y="236">nein</text>
+<rect class="bx" x="20" y="250" width="180" height="40" rx="5"/><text class="t" x="110" y="275" text-anchor="middle">erklärt, nennen</text>
+<rect class="bx-warn" x="220" y="250" width="180" height="40" rx="5"/><text class="tw" x="310" y="268" text-anchor="middle">offener Punkt</text><text class="ts" x="310" y="283" text-anchor="middle">für die DCF-Seite</text>
+<text class="ta" x="210" y="318" text-anchor="middle">in beiden Fällen: weiter mit P50 der DCF</text>
+</svg>
+<figcaption>Beide Werte werden genannt und gegenübergestellt. Zahlen im Bild sind Beispiele.</figcaption>
+</figure>
+<figure>
+<svg viewBox="0 0 420 330" role="img" aria-label="Poolfläche: Wert aus der Geometrie ist maßgeblich, alle Fundstellen werden gelistet, die Abweichung zur DCF wird in Hektar und Prozent beziffert">
+<polygon points="40,40 180,30 200,140 60,160" class="pool"/>
+<text class="tmb" x="120" y="92" text-anchor="middle">52,4 ha</text><text class="ts" x="120" y="110" text-anchor="middle">aus Geometrie</text>
+<text class="ts" x="230" y="44">Fundstellen</text>
+<circle cx="236" cy="66" r="4" class="fa"/><text class="t" x="248" y="70">Planung/ · 52,4 ha</text>
+<circle cx="236" cy="90" r="4" class="fa"/><text class="t" x="248" y="94">Geodaten/ · 51,9 ha</text>
+<circle cx="236" cy="114" r="4" class="fh"/><text class="t" x="248" y="118">DCF · 48,0 ha</text>
+<line x1="30" y1="230" x2="390" y2="230" class="ln"/>
+<g class="ts"><text class="ts" x="30" y="250">45</text><text class="ts" x="150" y="250">50</text><text class="ts" x="270" y="250">55</text><text class="ts" x="372" y="250">ha</text></g>
+<line x1="30" y1="225" x2="30" y2="235" class="ln"/><line x1="150" y1="225" x2="150" y2="235" class="ln"/><line x1="270" y1="225" x2="270" y2="235" class="ln"/>
+<circle cx="102" cy="230" r="6" class="fh"/>
+<circle cx="235.6" cy="230" r="6" class="fa" opacity=".6"/>
+<circle cx="247.6" cy="230" r="6" class="fa"/>
+<line x1="102" y1="206" x2="247.6" y2="206" stroke="var(--warn)" stroke-width="1.6"/>
+<line x1="102" y1="200" x2="102" y2="212" stroke="var(--warn)" stroke-width="1.6"/><line x1="247.6" y1="200" x2="247.6" y2="212" stroke="var(--warn)" stroke-width="1.6"/>
+<text class="tw" x="175" y="194" text-anchor="middle">4,4 ha · 9,2 %</text>
+<rect class="bx-warn" x="110" y="272" width="200" height="40" rx="5"/><text class="tw" x="210" y="297" text-anchor="middle">offener Punkt</text>
+</svg>
+<figcaption>Maßgeblich ist die Geometrie unter <code>Planung/</code> oder <code>Geodaten/</code>. Die Abweichung wird beziffert, nicht korrigiert. Zahlen im Bild sind Beispiele.</figcaption>
+</figure>
+</div>
+
+<!-- 06 Verbundparks -->
+<h2><span class="no">06</span>2.7 · Stammdaten der Verbundparks</h2>
+<figure>
+<svg viewBox="0 0 900 300" role="img" aria-label="Entscheidungen für Verbundparks: mit DCF wie Hauptpark, ohne DCF Windatlas-Vorabschätzung als indikativ, dazu zwei Vorbehalte">
+<defs><marker id="a6" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M1 1L9 5L1 9z" class="fm"/></marker></defs>
+<rect class="bx" x="20" y="110" width="160" height="60" rx="6"/><text class="tt" x="100" y="136" text-anchor="middle">Verbundpark</text><text class="ts" x="100" y="156" text-anchor="middle">aus Schritt 1.7</text>
+<rect class="bx-amb" x="220" y="110" width="140" height="60" rx="6"/><text class="tt" x="290" y="136" text-anchor="middle">DCF da?</text><text class="ts" x="290" y="156" text-anchor="middle">im Parkordner</text>
+<line class="ln" x1="180" y1="140" x2="216" y2="140" marker-end="url(#a6)"/>
+<path class="ln" d="M290 110 V60 H396" marker-end="url(#a6)"/><text class="ts" x="300" y="80">ja</text>
+<path class="ln" d="M290 170 V220 H396" marker-end="url(#a6)"/><text class="ts" x="300" y="200">nein</text>
+<rect class="bx-acc" x="400" y="30" width="230" height="60" rx="6"/><text class="tt" x="515" y="56" text-anchor="middle">wie 2.1 bis 2.6</text><text class="ts" x="515" y="76" text-anchor="middle">Konfidenz belegt</text>
+<rect class="bx-amb" x="400" y="190" width="230" height="80" rx="6"/><text class="tt" x="515" y="214" text-anchor="middle">Windatlas-Vorabschätzung</text><text class="ts" x="515" y="234" text-anchor="middle">mit Verlustkette der Haupt-DCF</text><text class="tamb" x="515" y="254" text-anchor="middle">indikativ, mit Gutachten neu rechnen</text>
+<text class="ts" x="670" y="30">Zusätzlich je Verbundpark prüfen</text>
+<rect class="bx-warn" x="670" y="44" width="210" height="96" rx="6"/><text class="tw" x="682" y="66">Vorbehalt</text><text class="ts" x="682" y="86">Layout-Dateiname nennt</text><text class="ts" x="682" y="102">einen anderen Anlagentyp</text><text class="ts" x="682" y="118">als die Berechnung</text>
+<rect class="bx-warn" x="670" y="156" width="210" height="96" rx="6"/><text class="tw" x="682" y="178">offener Punkt</text><text class="ts" x="682" y="198">Ordner Eigentümer/ fehlt:</text><text class="ts" x="682" y="214">Flächensicherungsstand</text><text class="ts" x="682" y="230">unbekannt</text>
+</svg>
+<figcaption>Im Referenzlauf Narthauen-Süd betraf das Otterstedt-Nord und Otterstedt-Süd. Die Verbundparks gehen mit ihrem Anteil in das Mengenmodell ein.</figcaption>
+</figure>
+
+<!-- 07 Ausgabe -->
+<h2><span class="no">07</span>Ausgabe: die Stammdatentabelle</h2>
+<figure>
+<table>
+<thead><tr><th>Kennwert</th><th>Hauptpark</th><th>Verbundpark A</th><th>Verbundpark B</th><th>Summe Verbund</th></tr></thead>
+<tbody>
+<tr><td>Anlagenzahl</td><td class="ph">Wert · Fundstelle</td><td class="ph">Wert · Fundstelle</td><td class="ph">Wert · Fundstelle</td><td class="ph">Σ</td></tr>
+<tr><td>Typ</td><td class="ph">Wert · Fundstelle</td><td class="ph">Wert · Fundstelle<span class="chip op">Vorbehalt</span></td><td class="ph">Wert · Fundstelle</td><td class="ph">je Park</td></tr>
+<tr><td>Leistung je Anlage</td><td class="ph">Wert · Fundstelle</td><td class="ph">Wert · Fundstelle</td><td class="ph">Wert · Fundstelle</td><td class="ph">je Park</td></tr>
+<tr><td>Nabenhöhe</td><td class="ph">Wert · Fundstelle</td><td class="ph">Wert · Fundstelle</td><td class="ph">Wert · Fundstelle</td><td class="ph">je Park</td></tr>
+<tr><td>Parkleistung</td><td class="ph">MW · Fundstelle</td><td class="ph">MW · Fundstelle</td><td class="ph">MW · Fundstelle</td><td class="ph">Σ MW</td></tr>
+<tr><td>Netto P50</td><td class="ph">MWh/a · DCF</td><td class="ph">MWh/a · DCF</td><td class="ph">MWh/a · Windatlas<span class="chip ind">indikativ</span></td><td class="ph">Σ MWh/a</td></tr>
+<tr><td>Volllaststunden</td><td class="ph">h · Fundstelle</td><td class="ph">h · Fundstelle</td><td class="ph">h<span class="chip ind">indikativ</span></td><td class="ph">?</td></tr>
+<tr><td>Höhenbeschränkung</td><td class="ph">m · Luftfahrt</td><td class="ph">m · Luftfahrt</td><td class="ph">m · Luftfahrt</td><td class="ph">je Park</td></tr>
+<tr><td>Poolfläche</td><td class="ph">ha · Geometrie<span class="chip op">Δ zur DCF</span></td><td class="ph">ha · Geometrie</td><td class="ph">ha · Geometrie</td><td class="ph">Σ ha</td></tr>
+</tbody>
+</table>
+<figcaption>Struktur der Ausgabe mit Platzhaltern. Die Markierungen zeigen, wo typischerweise Vorbehalte, indikative Werte und offene Punkte entstehen. Wie Volllaststunden zu einer Verbundsumme werden, lässt der Prompt offen.</figcaption>
+</figure>
+
+<!-- 08 Wohin -->
+<h2><span class="no">08</span>Wohin die Stammdaten fließen</h2>
+<figure>
+<svg viewBox="0 0 900 450" role="img" aria-label="Die Stammdaten speisen Layer im GeoPackage, das Mengenmodell, die Quellenliste, die Direktleitungen, die Konzeptbegründung, den Zellenvergleich und die Kostenseite">
+<defs><marker id="a8" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M1 1L9 5L1 9z" class="fm"/></marker></defs>
+<rect class="bx-acc" x="20" y="185" width="200" height="80" rx="6"/><text class="tt" x="120" y="218" text-anchor="middle">Stammdaten</text><text class="ts" x="120" y="238" text-anchor="middle">Schritt 2</text>
+<g>
+<path class="ln" d="M220 225 C300 225 300 40 396 40" marker-end="url(#a8)"/>
+<path class="ln" d="M220 225 C300 225 300 94 396 94" marker-end="url(#a8)"/>
+<path class="ln-acc" d="M220 225 C300 225 300 148 396 148" marker-end="url(#a8)"/>
+<path class="ln" d="M220 225 C300 225 300 202 396 202" marker-end="url(#a8)"/>
+<path class="ln" d="M220 225 C300 225 300 256 396 256" marker-end="url(#a8)"/>
+<path class="ln" d="M220 225 C300 225 300 310 396 310" marker-end="url(#a8)"/>
+<path class="ln" d="M220 225 C300 225 300 364 396 364" marker-end="url(#a8)"/>
+<path class="ln" d="M220 225 C300 225 300 418 396 418" marker-end="url(#a8)"/>
+</g>
+<rect class="bx" x="400" y="20" width="480" height="40" rx="5"/><text class="t" x="412" y="45">Layer 00 Windparks, 01 WEA-Standorte</text><text class="ts" x="868" y="45" text-anchor="end">Schritt 6</text>
+<rect class="bx" x="400" y="74" width="480" height="40" rx="5"/><text class="t" x="412" y="99">Layer 05 Poolfläche, 02 Potenzialflächen</text><text class="ts" x="868" y="99" text-anchor="end">Schritt 6</text>
+<rect class="bx-acc" x="400" y="128" width="480" height="40" rx="5"/><text class="t" x="412" y="153">Layer 96 Mengenmodell: netto_p50_mwh, vollaststunden_park</text><text class="ts" x="868" y="153" text-anchor="end">4.4</text>
+<rect class="bx" x="400" y="182" width="480" height="40" rx="5"/><text class="t" x="412" y="207">Layer 97 Quellen: belegt, indikativ, zu erheben</text><text class="ts" x="868" y="207" text-anchor="end">6.7</text>
+<rect class="bx" x="400" y="236" width="480" height="40" rx="5"/><text class="t" x="412" y="261">Parkschwerpunkt für Direktleitungen</text><text class="ts" x="868" y="261" text-anchor="end">4.6</text>
+<rect class="bx" x="400" y="290" width="480" height="40" rx="5"/><text class="t" x="412" y="315">Konzeptbegründung Kapitel 1 Vorbehalte, Kapitel 2 Windpark</text><text class="ts" x="868" y="315" text-anchor="end">8.2</text>
+<rect class="bx" x="400" y="344" width="480" height="40" rx="5"/><text class="t" x="412" y="369">Zellenvergleich: Parkleistung, P50, Volllaststunden</text><text class="ts" x="868" y="369" text-anchor="end">Schritt 9</text>
+<rect class="bx" x="400" y="398" width="480" height="40" rx="5"/><text class="t" x="412" y="423">Kostenseite: Opportunitätskosten und Pacht aus der DCF</text><text class="ts" x="868" y="423" text-anchor="end">Anhang D</text>
+</svg>
+<figcaption>Der stärkste Strang führt ins Mengenmodell. Ein falscher P50 verschiebt jede Wasserstoff-, Sauerstoff- und Wärmemenge des Konzepts.</figcaption>
+</figure>
+
+<!-- 09 Mengenmodell -->
+<h2><span class="no">09</span>Wie der P50 im Mengenmodell weiterwirkt</h2>
+<div class="duo">
+<figure>
+<svg viewBox="0 0 420 330" role="img" aria-label="Rechenkette des Mengenmodells mit Beispielwerten: 150.000 MWh mal 61,5 Prozent ergibt 92.250 MWh, geteilt durch 53 kWh je kg ergibt rund 1.741 Tonnen Wasserstoff">
+<defs><marker id="a9" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M1 1L9 5L1 9z" class="fm"/></marker></defs>
+<rect class="bx-acc" x="20" y="20" width="380" height="50" rx="5"/><text class="t" x="34" y="50">Netto P50</text><text class="tmb" x="386" y="50" text-anchor="end">150.000 MWh/a</text>
+<text class="ts" x="34" y="94">× aufgenommener Energieanteil (Fall A)</text><text class="tmb" x="386" y="94" text-anchor="end">61,5 %</text>
+<rect class="bx" x="20" y="108" width="380" height="50" rx="5"/><text class="t" x="34" y="138">Strom in die Elektrolyse</text><text class="tmb" x="386" y="138" text-anchor="end">92.250 MWh/a</text>
+<text class="ts" x="34" y="182">÷ spezifischer Verbrauch</text><text class="tmb" x="386" y="182" text-anchor="end">53 kWh/kg</text>
+<rect class="bx-h2" x="20" y="196" width="380" height="50" rx="5"/><text class="t" x="34" y="226">Wasserstoff</text><text class="tmb" x="386" y="226" text-anchor="end" style="fill:var(--h2)">≈ 1.741 t/a</text>
+<text class="ts" x="34" y="276">daraus Sauerstoff (8 kg je kg H2), Wasser,</text><text class="ts" x="34" y="294">Abwärme und CO2-Bedarf</text>
+</svg>
+<figcaption>Rechenweg nach Anhang D mit Beispielwerten. Der Parameter von 53 kWh/kg steht in <code>ENEO_Kennwerte.md</code>.</figcaption>
+</figure>
+<figure>
+<svg viewBox="0 0 420 330" role="img" aria-label="Leistungsanteil gegen Energieanteil bei etwa 3000 Volllaststunden: 40 Prozent Leistung nehmen 60 bis 63 Prozent der Energie auf, 50 Prozent nehmen 69 bis 72 Prozent auf">
+<line x1="60" y1="270" x2="400" y2="270" class="ln"/>
+<g><text class="ts" x="52" y="274" text-anchor="end">0</text><text class="ts" x="52" y="174" text-anchor="end">50 %</text><text class="ts" x="52" y="74" text-anchor="end">100 %</text></g>
+<line x1="60" y1="170" x2="400" y2="170" stroke="var(--line)" stroke-dasharray="2 3"/><line x1="60" y1="70" x2="400" y2="70" stroke="var(--line)" stroke-dasharray="2 3"/>
+<rect x="90" y="190" width="50" height="80" class="bx"/><text class="tmb" x="115" y="184" text-anchor="middle">40</text>
+<rect x="150" y="144" width="50" height="126" class="bx-acc"/><rect x="150" y="144" width="50" height="6" class="fa"/><text class="tmb" x="175" y="138" text-anchor="middle">60–63</text>
+<rect x="250" y="170" width="50" height="100" class="bx"/><text class="tmb" x="275" y="164" text-anchor="middle">50</text>
+<rect x="310" y="126" width="50" height="144" class="bx-acc"/><rect x="310" y="126" width="50" height="6" class="fa"/><text class="tmb" x="335" y="120" text-anchor="middle">69–72</text>
+<text class="t" x="145" y="292" text-anchor="middle">Fall A</text><text class="t" x="305" y="292" text-anchor="middle">Fall B</text>
+<rect x="90" y="306" width="12" height="10" class="bx"/><text class="ts" x="108" y="315">Leistungsanteil</text><rect x="220" y="306" width="12" height="10" class="bx-acc"/><text class="ts" x="238" y="315">Energieanteil</text>
+<text class="ts" x="60" y="40">Einzelpark, rund 3.000 Volllaststunden, indikativ</text>
+</svg>
+<figcaption>Der Energieanteil hängt fast nur an den Volllaststunden aus Schritt 2. Weichen diese deutlich ab, wird neu gerechnet.</figcaption>
+</figure>
+</div>
+
+<!-- 10 Unstimmigkeiten -->
+<h2><span class="no">10</span>Unstimmigkeiten im Prompt</h2>
+<div class="issues">
+<div class="issue"><b>Volllaststunden ohne Herleitung</b><p>Die Ausgabe verlangt Volllaststunden je Park und als Verbundsumme. Woher sie kommen und wie sie über mehrere Parks zusammengefasst werden, steht nirgends. Für das Mengenmodell sind sie aber der wichtigste Hebel.</p></div>
+<div class="issue"><b>Zwangsdokumente fehlen in frühen Projekten</b><p>2.1 löst Stände gegen Luftfahrtbewertung, BImSchG-Genehmigung und Netzzusage auf. In Stand 1 und 2 gibt es meist nur die Luftfahrtbewertung, und die entscheidet nicht zwischen zwei Ständen mit gleicher Höhe. Dann bleibt nur die Rückfrage.</p></div>
+<div class="issue"><b>Keine Rangfolge bei Widersprüchen zwischen Quellen</b><p>Koordinaten kommen aus <code>Planung/</code>, der Eingangsvertrag nennt auch die Ertragsprognose. Die Poolfläche kommt aus <code>Planung/</code> oder <code>Geodaten/</code>. Was gilt, wenn sich die beiden Quellen widersprechen, ist nicht geregelt.</p></div>
+<div class="issue"><b>Gesamtverlust gegen Einzelverlust</b><p>2.5 vergleicht den Verlustansatz der DCF mit dem Abschattungsverlust des Gutachtens. Enthält der DCF-Ansatz auch Verfügbarkeit, elektrische Verluste oder Abschaltungen, weichen die Werte fast immer ab. Dann wird der offene Punkt zur Regel statt zur Ausnahme.</p></div>
+</div>
+
+<footer>Quelle: ENEO_Konzept_Prompt, Fassung 2026-11-11-Z, Schritt 2 sowie Grundsätze und Anhang A, D und E. Alle Zahlen in den Abbildungen 03, 05 und 09 sind Beispielwerte.</footer>
+</main>
+</body>
+</html>

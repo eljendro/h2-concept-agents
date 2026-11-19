@@ -1,0 +1,61 @@
+# GeoPackage-Schema (Entwurf), abgeleitet aus Prompt Schritt 6.3 (Anhang D).
+# Vor Verwendung gegen Anhang D prüfen (TASKS T-106). Tabellennamen: Präfix plus Name.
+gpkg_name: "Zelle_<Projekt>.gpkg"
+crs: "EPSG:25832"
+offline_raster: false
+
+common_required_fields:      # jeder Sachlayer
+  - lage_status              # belegt | konstruiert | geschaetzt
+  - lage_quelle
+
+layers:
+  "00": {name: Windparks, required: [name, park, wea, leistung_mw]}
+  "01": {name: WEA_Standorte, required: [name, park]}
+  "02": {name: Potenzialflaechen}
+  "03": {name: Analysegebiet_15km}
+  "04": {name: Weicher_Rand}
+  "05": {name: Poolflaeche}
+  "10": {name: Umspannwerke}
+  "11": {name: Stromleitungen}
+  "20": {name: Biogas_CO2, required: [aufbereitung]}
+  "22": {name: PV_Freiflaeche, required: [typ, status, quelle_datensatz]}
+  "23": {name: Gewerbeflaechen}
+  "24": {name: Projektregister_EE}
+  "25": {name: Vorhaben_Dritter, notes: "bei Speichern art = BESS"}
+  "27": {name: BESS_Eignung, required: [ha, kapazitaet_mwh, pfad, km_elektrolyse, km_netzpunkt, bodenklasse, hochwasser, gesichert]}
+  "30": {name: Gasnetz}
+  "40": {name: H2_Kernnetz, required: [ort, antrags_id, art, vorhabentraeger, inbetriebnahme, entfernung, quelle]}
+  "41": {name: Waermesenken}
+  "42": {name: H2_ueberregional}
+  "50": {name: Akteure, required: [nr, kategorie, status, rolle, funktion, km, km_zu_a, km_zu_b, quelle, quelle_geprueft],
+         notes: "nr lückenlos, sortiert nach Entfernung zu Variante A; quelle und quelle_geprueft verschieden"}
+  "51": {name: Ankerabnehmer}
+  "60": {name: Elektrolyse, required: [variante, leistung_mw]}
+  "61": {name: Direktleitungen, required: [park, variante, laenge_km], precision: {laenge_km: 2}}
+  "62": {name: Wasserstoffwege, required: [transportweg, farbe]}
+  "63": {name: Einspeisepunkt}
+  "64": {name: Parkverbund, required: [von, nach, abstand_km], precision: {abstand_km: 1}}
+  "70": {name: Restriktionen, required: [wirkung, trifft_wea, trifft_elektrolyse, status], map: false}
+  "71": {name: RROP_Windvorrang}
+  "90": {name: Darstellung, derived: true, notes: "wird verworfen und neu erzeugt (F7)"}
+  "96": {name: Mengenmodell, geometry: false, required: [groesse, bezeichnung, fall, wert, einheit, vorbehalt],
+         notes: "wert numerisch; Bandbreiten als _min/_max"}
+  "97": {name: Quellen, geometry: false, required: [aussage, quelle, abrufdatum, konfidenz],
+         enums: {konfidenz: [belegt, indikativ, zu erheben]}}
+  "00_Metadaten": {geometry: false, required: [zuletzt_geaendert, hinweis]}
+
+mengenmodell_keys:
+  - netto_p50_mwh
+  - vollaststunden_park
+  - elektrolyse_mw
+  - aufnahmequote_proz
+  - strom_elektrolyse_mwh
+  - vollaststunden_elektrolyse
+  - spez_verbrauch_kwh_kg
+  - h2_t_a
+  - o2_t_a
+  - wasser_m3_a
+  - abwaerme_gwh_a_min
+  - abwaerme_gwh_a_max
+  - co2_bedarf_t_a
+  - co2_potenzial_t_a

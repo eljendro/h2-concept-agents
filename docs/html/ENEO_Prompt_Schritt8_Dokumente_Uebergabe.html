@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ENEO-Prompt Schritt 8</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:wght@500;600&family=Source+Sans+3:wght@400;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  /* Layout: schmale Memo-Spalte, Abbildungen dürfen breiter laufen. Farben aus dem ENEO-Kartenstil abgeleitet. */
+  --bg:#f4f6f4; --surface:#ffffff; --ink:#1a2420; --muted:#5b6a63; --line:#c7d0cb;
+  --acc:#0F3A30; --accsoft:#e1ebe6; --h2:#1F4E79; --h2soft:#e2eaf3;
+  --warn:#8C2F27; --warnsoft:#f5e2df; --amb:#9a6a12; --ambsoft:#f6ecd6;
+  --pool:#FF1C24; --pot:#004BFF; --potfill:rgba(0,0,255,.16);
+  --f-disp:"Barlow Semi Condensed","Arial Narrow",sans-serif;
+  --f-body:"Source Sans 3","Segoe UI",Helvetica,Arial,sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#111714; --surface:#19211d; --ink:#e3eae6; --muted:#98a69f; --line:#34413b;
+  --acc:#7cc3a9; --accsoft:#1d3830; --h2:#8eb7e2; --h2soft:#1c2d40;
+  --warn:#ec8c80; --warnsoft:#3b221f; --amb:#e2b45c; --ambsoft:#382d1b;
+  --pool:#ff5a60; --pot:#6f9bff; --potfill:rgba(90,130,255,.22); color-scheme:dark;}}
+:root[data-theme="dark"]{
+  --bg:#111714; --surface:#19211d; --ink:#e3eae6; --muted:#98a69f; --line:#34413b;
+  --acc:#7cc3a9; --accsoft:#1d3830; --h2:#8eb7e2; --h2soft:#1c2d40;
+  --warn:#ec8c80; --warnsoft:#3b221f; --amb:#e2b45c; --ambsoft:#382d1b;
+  --pool:#ff5a60; --pot:#6f9bff; --potfill:rgba(90,130,255,.22); color-scheme:dark;}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 var(--f-body)}
+main{max-width:980px;margin:0 auto;padding:40px 20px 80px}
+header{border-bottom:2px solid var(--acc);padding-bottom:18px;margin-bottom:28px}
+.kicker{font:600 13px var(--f-mono);color:var(--acc);letter-spacing:.04em}
+h1{font:600 40px/1.1 var(--f-disp);margin:6px 0 10px;text-wrap:balance}
+h2{font:600 26px/1.2 var(--f-disp);margin:56px 0 6px;text-wrap:balance;display:flex;gap:12px;align-items:baseline}
+h2 .no{font:600 14px var(--f-mono);color:var(--acc);border:1px solid var(--acc);border-radius:4px;padding:1px 6px}
+p{max-width:68ch;margin:6px 0}
+.lead{color:var(--muted);max-width:70ch}
+.meta{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.tag{font:12px var(--f-mono);padding:3px 8px;border-radius:4px;background:var(--accsoft);color:var(--acc)}
+figure{margin:18px 0 0;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:18px;overflow-x:auto}
+figcaption{font-size:14px;color:var(--muted);margin-top:10px;max-width:80ch}
+svg{display:block;width:100%;height:auto;color:var(--ink);font-family:var(--f-body)}
+.duo{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+@media (max-width:760px){.duo{grid-template-columns:1fr}h1{font-size:32px}}
+code,.mono{font-family:var(--f-mono);font-size:.88em}
+/* SVG-Bausteine */
+.bx{fill:var(--surface);stroke:var(--line);stroke-width:1}
+.bx-acc{fill:var(--accsoft);stroke:var(--acc);stroke-width:1}
+.bx-h2{fill:var(--h2soft);stroke:var(--h2);stroke-width:1}
+.bx-warn{fill:var(--warnsoft);stroke:var(--warn);stroke-width:1}
+.bx-amb{fill:var(--ambsoft);stroke:var(--amb);stroke-width:1}
+.bx-dash{fill:none;stroke:var(--muted);stroke-width:1;stroke-dasharray:5 4}
+.ln{stroke:var(--muted);stroke-width:1.4;fill:none}
+.ln-acc{stroke:var(--acc);stroke-width:2;fill:none}
+.ln-dash{stroke:var(--acc);stroke-width:1.4;fill:none;stroke-dasharray:6 4}
+.ln-warn{stroke:var(--warn);stroke-width:1.4;fill:none}
+.tt{font:600 15px var(--f-body);fill:var(--ink)}
+.t{font:13px var(--f-body);fill:var(--ink)}
+.ts{font:12px var(--f-body);fill:var(--muted)}
+.tm{font:13px var(--f-mono);fill:var(--ink)}
+.tmb{font:600 13px var(--f-mono);fill:var(--ink)}
+.ta{font:600 12px var(--f-mono);fill:var(--acc)}
+.tw{font:600 12px var(--f-body);fill:var(--warn)}
+.tamb{font:600 12px var(--f-body);fill:var(--amb)}
+.th2{font:600 12px var(--f-body);fill:var(--h2)}
+.fa{fill:var(--acc)} .fw{fill:var(--warn)} .fm{fill:var(--muted)} .fh{fill:var(--h2)}
+.pool{fill:none;stroke:var(--pool);stroke-width:2}
+.pool-d{fill:none;stroke:var(--pool);stroke-width:2;stroke-dasharray:7 4}
+.pot{fill:var(--potfill);stroke:var(--pot);stroke-width:1.2}
+.hatch{fill:url(#hatch)}
+/* Tabellen und Kacheln */
+table{border-collapse:collapse;width:100%;font-size:14px;min-width:620px}
+th,td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}
+th{font:600 13px var(--f-body);background:var(--bg)}
+td.ab{background:var(--warnsoft);color:var(--warn);font-weight:600}
+td.ve{background:var(--ambsoft);color:var(--amb);font-weight:600}
+td.of{background:var(--accsoft);color:var(--acc)}
+td.c{text-align:center;font-size:18px;color:var(--acc)}
+td.cw{text-align:center;font-size:18px;color:var(--muted)}
+td.ph{color:var(--muted);font-family:var(--f-mono);font-size:12px}
+.chip{display:inline-block;font:600 11px var(--f-body);padding:1px 6px;border-radius:3px;margin-left:6px;vertical-align:middle}
+.chip.ind{background:var(--ambsoft);color:var(--amb)}
+.chip.op{background:var(--warnsoft);color:var(--warn)}
+.src{font-family:var(--f-mono);font-size:12px;color:var(--muted)}
+.tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px}
+.tile{border:1px solid var(--line);border-left:4px solid var(--acc);border-radius:0;padding:10px 12px;background:var(--bg)}
+.tile b{overflow-wrap:anywhere;display:block;font:600 15px var(--f-disp);letter-spacing:.01em}
+.tile span{font-size:13px;color:var(--muted)}
+.issues{display:grid;gap:10px;margin-top:14px}
+.issue{border:1px solid var(--line);border-left:4px solid var(--amb);border-radius:0;background:var(--surface);padding:12px 14px}
+.issue b{font:600 16px var(--f-disp)}
+.issue p{margin:4px 0 0;font-size:15px}
+.legend{display:flex;flex-wrap:wrap;gap:14px;font-size:13px;color:var(--muted);margin-top:10px}
+.legend i{display:inline-block;width:14px;height:10px;margin-right:6px;vertical-align:middle;border-radius:2px}
+footer{margin-top:60px;font-size:13px;color:var(--muted);border-top:1px solid var(--line);padding-top:12px}
+</style>
+</head>
+<body>
+<main>
+
+<header>
+  <div class="kicker">ENEO Wasserstoff-Standortkonzept · Fassung 2026-11-11-Z</div>
+  <h1>Schritt 8: Dokumente, Prüfung, Übergabe</h1>
+  <p class="lead">Aus GeoPackage und geprüften Karten entstehen die Konzeptbegründung, sechs Handouts und fünf Begleitdokumente. Danach laufen Prüfskript und Abschlussprüfliste, der Übergabebericht wird geschrieben und alles geht über Staging und Änderungsliste auf das Drive.</p>
+  <div class="meta"><span class="tag">Grundsätze</span><span class="tag">Anhang C</span><span class="tag">Anhang G3, G4</span><span class="tag">Anhang H1, H2, H4, H5</span></div>
+</header>
+
+<!-- 01 Überblick -->
+<h2><span class="no">01</span>Die acht Teilschritte</h2>
+<figure>
+<svg viewBox="0 0 900 270" role="img" aria-label="Teilschritte 8.1 bis 8.8: Handout, Konzeptbegründung, Fassungen, Satz, Fließtext, Prüfskript, Übergabebericht, Reihenfolge">
+<defs><marker id="a1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M1 1L9 5L1 9z" class="fm"/></marker></defs>
+<rect class="bx-dash" x="20" y="20" width="860" height="44" rx="5"/><text class="ta" x="34" y="47">8.8</text><text class="t" x="70" y="47">Dokumente erst nach den Karten, Karten erst nach der Sichtprüfung. Jede Kartenänderung baut betroffene Dokumente neu.</text>
+<g>
+<rect class="bx-acc" x="20" y="84" width="200" height="74" rx="6"/><text class="ta" x="34" y="106">8.2</text><text class="tt" x="64" y="106">Konzeptbegründung</text><text class="ts" x="34" y="128">zehn Kapitel, intern,</text><text class="ts" x="34" y="144">Grundlage aller Fassungen</text>
+<rect class="bx-acc" x="240" y="84" width="200" height="74" rx="6"/><text class="ta" x="254" y="106">8.1</text><text class="tt" x="284" y="106">Handout</text><text class="ts" x="254" y="128">fünf Kartenblätter,</text><text class="ts" x="254" y="144">Legende, Teilnehmer, Zahlen</text>
+<rect class="bx-acc" x="460" y="84" width="200" height="74" rx="6"/><text class="ta" x="474" y="106">8.3</text><text class="tt" x="504" y="106">Sechs Fassungen</text><text class="ts" x="474" y="128">drei Zielgruppen,</text><text class="ts" x="474" y="144">je intern und extern</text>
+<rect class="bx" x="680" y="84" width="200" height="74" rx="6"/><text class="ta" x="694" y="106">8.4, 8.5</text><text class="tt" x="768" y="106">Satz, Text</text><text class="ts" x="694" y="128">Hausstil Anhang C,</text><text class="ts" x="694" y="144">nur belegte Werte</text>
+<path class="ln" d="M220 121 H236" marker-end="url(#a1)"/><path class="ln" d="M440 121 H456" marker-end="url(#a1)"/><path class="ln" d="M660 121 H676" marker-end="url(#a1)"/>
+<rect class="bx-warn" x="20" y="178" width="270" height="74" rx="6"/><text class="ta" x="34" y="200">8.6</text><text class="tt" x="64" y="200">Prüfskript</text><text class="ts" x="34" y="222">qs_zelle, vollständige Ausgabe,</text><text class="ts" x="34" y="238">zwei bekannte Grenzen</text>
+<rect class="bx" x="310" y="178" width="270" height="74" rx="6"/><text class="ta" x="324" y="200">8.7</text><text class="tt" x="354" y="200">Übergabebericht</text><text class="ts" x="324" y="222">Prüfliste G, Dateien, Entscheidungen,</text><text class="ts" x="324" y="238">Vorfälle, offene Punkte</text>
+<rect class="bx-h2" x="600" y="178" width="280" height="74" rx="6"/><text class="tt" x="614" y="200">Übertragung aufs Drive</text><text class="ts" x="614" y="222">Änderungsliste, Archiv, Staging,</text><text class="ts" x="614" y="238">Prüfung über API (Anhang H)</text>
+<path class="ln" d="M780 158 V168 H155 V174" marker-end="url(#a1)"/>
+<path class="ln" d="M290 215 H306" marker-end="url(#a1)"/><path class="ln" d="M580 215 H596" marker-end="url(#a1)"/>
+</g>
+</svg>
+<figcaption>Reihenfolge nach Inhalt, nicht nach Nummer: Die Konzeptbegründung ist die Grundlage, aus der die Handouts entstehen. Die Übertragung aufs Drive gehört zur „Übergabe“ im Titel, geregelt in Anhang H.</figcaption>
+</figure>
+
+<!-- 02 Dokumentfamilie -->
+<h2><span class="no">02</span>Ein Datenbestand, zwölf Dokumente</h2>
+<figure>
+<svg viewBox="0 0 900 400" role="img" aria-label="Aus GeoPackage und Karten entsteht die Konzeptbegründung, daraus sechs Handouts für Kommune, Abnehmer und Investor je intern und extern, dazu fünf interne Begleitdokumente">
+<defs><marker id="a2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M1 1L9 5L1 9z" class="fm"/></marker></defs>
+<rect class="bx-h2" x="20" y="160" width="160" height="80" rx="6"/><text class="tt" x="100" y="190" text-anchor="middle">GeoPackage</text><text class="tt" x="100" y="210" text-anchor="middle">und Karten</text><text class="ts" x="100" y="228" text-anchor="middle">Schritt 6, 7</text>
+<rect class="bx-acc" x="220" y="160" width="170" height="80" rx="6"/><text class="tt" x="305" y="190" text-anchor="middle">Konzept-</text><text class="tt" x="305" y="210" text-anchor="middle">begründung</text><text class="ts" x="305" y="228" text-anchor="middle">eine, intern</text>
+<path class="ln" d="M180 200 H216" marker-end="url(#a2)"/>
+<g>
+<rect class="bx" x="440" y="20" width="200" height="44" rx="5"/><text class="t" x="452" y="47">Handout Kommune</text><text class="tw" x="628" y="47" text-anchor="end">intern</text>
+<rect class="bx-acc" x="650" y="20" width="230" height="44" rx="5"/><text class="t" x="662" y="47">Handout Kommune</text><text class="ta" x="868" y="47" text-anchor="end">extern</text>
+<rect class="bx" x="440" y="74" width="200" height="44" rx="5"/><text class="t" x="452" y="101">Handout Abnehmer</text><text class="tw" x="628" y="101" text-anchor="end">intern</text>
+<rect class="bx-acc" x="650" y="74" width="230" height="44" rx="5"/><text class="t" x="662" y="101">Handout Abnehmer</text><text class="ta" x="868" y="101" text-anchor="end">extern</text>
+<rect class="bx" x="440" y="128" width="200" height="44" rx="5"/><text class="t" x="452" y="155">Handout Investor</text><text class="tw" x="628" y="155" text-anchor="end">intern</text>
+<rect class="bx-acc" x="650" y="128" width="230" height="44" rx="5"/><text class="t" x="662" y="155">Handout Investor</text><text class="ta" x="868" y="155" text-anchor="end">extern</text>
+</g>
+<path class="ln" d="M390 190 C410 190 410 42 436 42" marker-end="url(#a2)"/><path class="ln" d="M390 196 C415 196 415 96 436 96" marker-end="url(#a2)"/><path class="ln" d="M390 200 C420 200 420 150 436 150" marker-end="url(#a2)"/>
+<g>
+<rect class="bx" x="440" y="210" width="440" height="30" rx="4"/><text class="tm" x="452" y="230">Teilnehmerliste_&lt;Projekt&gt;_intern.docx</text>
+<rect class="bx" x="440" y="246" width="440" height="30" rx="4"/><text class="tm" x="452" y="266">Beiblatt_Blatt4_5_Eigentuemer_…_intern.docx</text>
+<rect class="bx" x="440" y="282" width="440" height="30" rx="4"/><text class="tm" x="452" y="302">Teilnehmererklaerung_&lt;Projekt&gt;_intern.docx</text>
+<rect class="bx" x="440" y="318" width="440" height="30" rx="4"/><text class="tm" x="452" y="338">Anfragen_Entwuerfe_&lt;Projekt&gt;_intern.md</text>
+<rect class="bx" x="440" y="354" width="440" height="30" rx="4"/><text class="tm" x="452" y="374">Uebergabe_&lt;Projekt&gt;.md</text>
+</g>
+<path class="ln" d="M305 240 V300 H436" marker-end="url(#a2)"/>
+<text class="ts" x="220" y="278">Begleitdokumente,</text><text class="ts" x="220" y="294">alle intern</text>
+</svg>
+<figcaption>Externe Fassungen tragen die Karten <code>_extern</code> von Blatt 7 und 8. Die Teilnehmererklärung beschreibt Bereitschaft, keine Verpflichtung. Die Anfragen an Teilnehmer und Behörden liegen auf Deutsch und Englisch vor.</figcaption>
+</figure>
+
+<!-- 03 Handout -->
+<h2><span class="no">03</span>8.1 · Aufbau eines Handouts</h2>
+<figure>
+<svg viewBox="0 0 900 300" role="img" aria-label="Handout mit vier bis sechs Seiten: Blatt 1, 2, 3, 7, 8 mit je einem Absatz, Legendenfeld, Teilnehmerliste oder Abnehmer nach Kategorie, Kennzahlen">
+<g>
+<rect class="bx" x="20" y="20" width="130" height="180" rx="3"/><rect x="30" y="30" width="110" height="78" class="bx-acc"/><text class="tmb" x="85" y="74" text-anchor="middle">Blatt 1</text><line x1="30" y1="124" x2="140" y2="124" stroke="var(--line)" stroke-width="4"/><line x1="30" y1="136" x2="120" y2="136" stroke="var(--line)" stroke-width="4"/><text class="ts" x="30" y="190">Elektrolyse</text>
+<rect class="bx" x="165" y="20" width="130" height="180" rx="3"/><rect x="175" y="30" width="110" height="78" class="bx-acc"/><text class="tmb" x="230" y="74" text-anchor="middle">Blatt 2</text><line x1="175" y1="124" x2="285" y2="124" stroke="var(--line)" stroke-width="4"/><line x1="175" y1="136" x2="265" y2="136" stroke="var(--line)" stroke-width="4"/><text class="ts" x="175" y="190">Übersicht</text>
+<rect class="bx" x="310" y="20" width="130" height="180" rx="3"/><rect x="320" y="30" width="110" height="78" class="bx-acc"/><text class="tmb" x="375" y="74" text-anchor="middle">Blatt 3</text><line x1="320" y1="124" x2="430" y2="124" stroke="var(--line)" stroke-width="4"/><line x1="320" y1="136" x2="410" y2="136" stroke="var(--line)" stroke-width="4"/><text class="ts" x="320" y="190">Parkverbund</text>
+<rect class="bx" x="455" y="20" width="130" height="180" rx="3"/><rect x="465" y="30" width="110" height="78" class="bx-amb"/><text class="tmb" x="520" y="74" text-anchor="middle">Blatt 7</text><line x1="465" y1="124" x2="575" y2="124" stroke="var(--line)" stroke-width="4"/><line x1="465" y1="136" x2="555" y2="136" stroke="var(--line)" stroke-width="4"/><text class="ts" x="465" y="190">Verbundkarte</text>
+<rect class="bx" x="600" y="20" width="130" height="180" rx="3"/><rect x="610" y="30" width="110" height="78" class="bx-amb"/><text class="tmb" x="665" y="74" text-anchor="middle">Blatt 8</text><line x1="610" y1="124" x2="720" y2="124" stroke="var(--line)" stroke-width="4"/><line x1="610" y1="136" x2="700" y2="136" stroke="var(--line)" stroke-width="4"/><text class="ts" x="610" y="190">Nahbereich</text>
+<rect class="bx" x="745" y="20" width="135" height="180" rx="3"/><rect x="755" y="30" width="60" height="50" class="bx"/><text class="ts" x="785" y="60" text-anchor="middle">Legende</text><line x1="755" y1="96" x2="870" y2="96" stroke="var(--line)" stroke-width="4"/><line x1="755" y1="112" x2="870" y2="112" stroke="var(--line)" stroke-width="4"/><line x1="755" y1="128" x2="850" y2="128" stroke="var(--line)" stroke-width="4"/><text class="ts" x="755" y="160">Teilnehmer</text><text class="ts" x="755" y="176">Kennzahlen</text>
+</g>
+<text class="ts" x="20" y="230">je Blatt ein Absatz: Maßstab und was zu sehen ist</text>
+<text class="ts" x="20" y="250">Kartenbilder JPG, 2.800 Pixel breit · Legendenfeld als PNG-Ausschnitt aus dem Export von Blatt 2, dazu der Satz zum Hausstil</text>
+<text class="tamb" x="455" y="276">Blatt 7 und 8 in externen Fassungen als _extern</text>
+</svg>
+<figcaption>Schema, eine Karte pro Seite dargestellt. Der Prompt legt vier bis sechs Seiten je Fassung fest. Intern folgt eine Teilnehmerliste, extern „Abnehmer und Partner nach Kategorie“.</figcaption>
+</figure>
+
+<!-- 04 Zielgruppen -->
+<h2><span class="no">04</span>8.3 · Drei Zielgruppen</h2>
+<figure>
+<svg viewBox="0 0 900 400" role="img" aria-label="Schwerpunkte der Fassungen für Kommune, Abnehmer und Investor, was in allen steht und was in keiner">
+<rect class="bx" x="20" y="20" width="275" height="200" rx="6"/><text class="tt" x="34" y="46">Kommune</text>
+<text class="ts" x="34" y="72">Wertschöpfung, Gewerbesteuer</text><text class="ts" x="34" y="90">Wärme für Liegenschaften</text><text class="ts" x="34" y="108">Verkehr und Schwerlast</text><text class="tamb" x="34" y="126">Lkw-Fahrten je Auslegungsfall</text><text class="ts" x="34" y="144">Einbindung in Wärmeplanung</text><text class="ts" x="34" y="162">Flächenverbrauch, Rückbau</text>
+<rect class="bx" x="312" y="20" width="275" height="200" rx="6"/><text class="tt" x="326" y="46">Abnehmer</text>
+<text class="ts" x="326" y="72">Menge und Verfügbarkeit</text><text class="ts" x="326" y="90">Deckungsgrad seines Bedarfs</text><text class="ts" x="326" y="108">Anlieferung, Transportweg</text><text class="ts" x="326" y="126">Zeitplan</text><text class="ts" x="326" y="144">Preis gegen heutigen Energieträger</text><text class="ts" x="326" y="162">CO2-Wirkung im Emissionshandel</text>
+<rect class="bx" x="605" y="20" width="275" height="200" rx="6"/><text class="tt" x="619" y="46">Investor oder Partner</text>
+<text class="ts" x="619" y="72">Projektstand, gesicherte Fläche</text><text class="ts" x="619" y="90">Netzanschlussstand</text><text class="ts" x="619" y="108">Auslegungsfälle</text><text class="tamb" x="619" y="126">Kostenseite mit Bandbreiten</text><text class="ts" x="619" y="144">offene Punkte, was sie</text><text class="ts" x="619" y="162">entscheidet</text>
+<rect class="bx-acc" x="20" y="240" width="560" height="140" rx="6"/><text class="ta" x="34" y="264">in allen Fassungen</text>
+<text class="ts" x="34" y="290">die fünf Kartenblätter</text><text class="ts" x="34" y="308">Kennzahlen des Windparks und des Verbunds</text><text class="ts" x="34" y="326">Mengenmodell im gewählten Fall</text><text class="ts" x="34" y="344">Vorbehalte zu den Eingangsdaten</text><text class="ts" x="34" y="362">Standzeile mit Datenstand und Datum des Laufs</text>
+<rect class="bx-warn" x="600" y="240" width="280" height="140" rx="6"/><text class="tw" x="614" y="264">in keiner Fassung</text>
+<text class="ts" x="614" y="290">Zahlen ohne Beleg</text><text class="ts" x="614" y="308">Wirtschaftlichkeitsrechnungen</text><text class="ts" x="614" y="326">Zusagen</text><text class="ta" x="614" y="358">Bereitschaft, keine Verpflichtung</text>
+</svg>
+<figcaption>Aus der Tabelle in 8.3. Die Kostenseite kommt aus Anhang D, ohne Kapitalwert und Rendite.</figcaption>
+</figure>
+
+<!-- 05 intern extern -->
+<h2><span class="no">05</span>8.3 · Intern und extern aus demselben Bestand</h2>
+<figure>
+<svg viewBox="0 0 900 330" role="img" aria-label="Die externe Fassung wird vor der Lieferung mit allen Teilnehmernamen aus Layer 50 durchsucht, ein Treffer ist ein Fehler">
+<defs><marker id="a5" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M1 1L9 5L1 9z" class="fm"/></marker></defs>
+<rect class="bx" x="20" y="20" width="410" height="140" rx="6"/><text class="tw" x="34" y="44">Intern</text>
+<text class="ts" x="34" y="68">Teilnehmer mit Namen, Karten Blatt 7, 8 intern</text>
+<rect x="34" y="84" width="382" height="56" fill="var(--warnsoft)"/><text class="ts" x="44" y="106">Titelzusatz: „Interne Fassung: Teilnehmerliste</text><text class="ts" x="44" y="124">mit Namen, vor Weitergabe entfernen“</text>
+<rect class="bx-acc" x="470" y="20" width="410" height="140" rx="6"/><text class="ta" x="484" y="44">Extern</text>
+<text class="ts" x="484" y="68">keine Abnehmer, Partner, Wettbewerber, Ansprech-</text><text class="ts" x="484" y="84">partner, Flächen- oder Pachtdaten</text>
+<rect x="484" y="96" width="382" height="56" fill="var(--bg)"/><text class="ts" x="494" y="116">Titelzusatz: „Externe Fassung: ohne Namen von</text><text class="ts" x="494" y="134">Abnehmern, Partnern und Wettbewerbern, …“</text>
+<rect class="bx-h2" x="20" y="190" width="200" height="60" rx="6"/><text class="t" x="34" y="214">Layer 50</text><text class="ts" x="34" y="234">alle Teilnehmernamen</text>
+<rect class="bx-h2" x="260" y="190" width="200" height="60" rx="6"/><text class="t" x="274" y="214">document.xml</text><text class="ts" x="274" y="234">jedes externen Handouts</text>
+<path class="ln" d="M220 220 H256" marker-end="url(#a5)"/>
+<path class="ln" d="M460 210 H560 V196" marker-end="url(#a5)"/><path class="ln" d="M460 230 H560 V266" marker-end="url(#a5)"/>
+<rect class="bx-acc" x="500" y="176" width="200" height="40" rx="5"/><text class="ta" x="600" y="201" text-anchor="middle">0 Treffer: Lieferung</text>
+<rect class="bx-warn" x="500" y="246" width="200" height="40" rx="5"/><text class="tw" x="600" y="271" text-anchor="middle">Treffer: Fehler</text>
+<text class="ts" x="20" y="310">Falle aus dem Referenzlauf: ein Abnehmername in der externen Fassung über die Vorlage „offene Punkte“ (H4).</text>
+</svg>
+<figcaption>Die Suche ist Prüfung G2 Nr. 18 für die Karten und G3 Nr. 9 für die Dokumente. Die Konzeptbegründung bleibt immer intern.</figcaption>
+</figure>
+
+<!-- 06 Kapitel -->
+<h2><span class="no">06</span>8.2 · Zehn Kapitel und woher ihr Inhalt kommt</h2>
+<figure>
+<table>
+<thead><tr><th>Kapitel</th><th>Inhalt</th><th>aus</th></tr></thead>
+<tbody>
+<tr><td>1 Ausgangslage, Zielsetzung</td><td>Projektstand, alle Vorbehalte zu den Eingangsdaten, Exportlücken, Risiko Windkulisse (§249)</td><td class="src">1.5, 1.6, 3.1, 4.1</td></tr>
+<tr><td>2 Windpark</td><td>technische Daten, Standort, Verbundabstände, Direktleitungen</td><td class="src">2, 4.6</td></tr>
+<tr><td>3 Wasserstofferzeugung</td><td>Leistung, Menge, Stromquelle, Speicherung, Nutzung</td><td class="src">4.4, 4.5</td></tr>
+<tr><td>4 Nebenprodukte</td><td>Abwärme mit Temperatur, Sauerstoff, Wasser, Wettbewerb um dieselbe Abnahme</td><td class="src">4.4, 3 (Abwärmequellen)</td></tr>
+<tr><td>5 Standortwahl</td><td>hergeleitet, Planungsrecht, Verfahren, bei offener Frage als Entscheidungsvorlage</td><td class="src">4.1</td></tr>
+<tr><td>6 Regionale Integration</td><td>Abnehmer und Partner nach Kategorie, Funktionszeilen, Passung</td><td class="src">4.3</td></tr>
+<tr><td>7 Kommunale Planung</td><td>Wärmeplanung mit Stand, Entsorgung, Verkehr, je mit Anknüpfungspunkt</td><td class="src">3.3</td></tr>
+<tr><td>8 Methanolstandort</td><td>Tabelle, Deckungsquote, Standortbegründung</td><td class="src">4.5</td></tr>
+<tr><td>9 H2-Vorhaben</td><td>nach Reifegrad, Ort, Status mit Datum, Beteiligte</td><td class="src">3 (60 km)</td></tr>
+<tr><td>10 Wasserstoffwege</td><td>alle fünf geprüft, dann alle offenen Punkte</td><td class="src">Anhang D, alle</td></tr>
+</tbody>
+</table>
+<figcaption>Kapitel und Inhalt aus 8.2, die Spalte „aus“ ist aus den Verweisen in Schritt 1 bis 4 und Anhang D zusammengestellt. In den Fließtext geht nur, was in Layer 97 die Konfidenz „belegt“ trägt, indikative Werte werden gekennzeichnet (8.5).</figcaption>
+</figure>
+
+<!-- 07 Hausstil -->
+<h2><span class="no">07</span>8.4 · Hausstil der Dokumente</h2>
+<div class="duo">
+<figure>
+<svg viewBox="0 0 420 520" role="img" aria-label="Seitenmuster im ENEO-Hausstil: Logo oben rechts, Cambria-Überschrift, Calibri-Blocksatz, Aufzählung mit fettem Schlagwort, dreispaltige Fußzeile mit grüner Linie">
+<rect x="40" y="20" width="340" height="480" fill="#ffffff" stroke="var(--line)"/>
+<rect x="290" y="34" width="74" height="24" fill="#0F3A30"/><text x="327" y="51" text-anchor="middle" style="font:600 11px var(--f-body);fill:#fff">ENEO</text>
+<text x="60" y="96" style="font:700 17px Cambria,Georgia,serif;fill:#111">5 Standortwahl</text>
+<g fill="#bbb"><rect x="60" y="110" width="300" height="5"/><rect x="60" y="121" width="300" height="5"/><rect x="60" y="132" width="300" height="5"/><rect x="60" y="143" width="220" height="5"/></g>
+<text x="60" y="176" style="font:700 11px Calibri,Arial,sans-serif;fill:#111">Fläche</text><rect x="104" y="170" width="220" height="5" fill="#bbb"/>
+<text x="60" y="196" style="font:700 11px Calibri,Arial,sans-serif;fill:#111">Planungsrecht</text><rect x="144" y="190" width="180" height="5" fill="#bbb"/>
+<text x="60" y="216" style="font:700 11px Calibri,Arial,sans-serif;fill:#111">Verfahren</text><rect x="120" y="210" width="200" height="5" fill="#bbb"/>
+<text x="60" y="256" style="font:700 14px Cambria,Georgia,serif;fill:#111">Teilnehmer</text>
+<text x="60" y="280" style="font:700 11px Calibri,Arial,sans-serif;fill:#111">Industrie und Produktion</text>
+<text x="70" y="300" style="font:700 11px Calibri,Arial,sans-serif;fill:#111">Muster Ziegelwerk GmbH</text>
+<text x="80" y="316" style="font:11px Calibri,Arial,sans-serif;fill:#444">Ankerabnehmer-Kandidat · Nr. 4 · 6,3 km</text>
+<rect x="80" y="326" width="250" height="5" fill="#bbb"/>
+<line x1="60" y1="460" x2="360" y2="460" stroke="#0F3A30" stroke-width="1.5"/>
+<text x="60" y="478" style="font:9px Calibri,Arial,sans-serif;fill:#0F3A30">ENEO Gruppe GmbH</text><text x="210" y="478" text-anchor="middle" style="font:9px Calibri,Arial,sans-serif;fill:#0F3A30">GF Philipp Rasche</text><text x="360" y="478" text-anchor="end" style="font:9px Calibri,Arial,sans-serif;fill:#0F3A30">Seite 7</text>
+</svg>
+<figcaption>Schema mit erfundenem Akteur. Die Seite ist bewusst weiß, wie das gedruckte Dokument.</figcaption>
+</figure>
+<figure>
+<table style="min-width:0;font-size:13px">
+<thead><tr><th>Element</th><th>Regel</th></tr></thead>
+<tbody>
+<tr><td>Text</td><td>Calibri 11, Blocksatz</td></tr>
+<tr><td>Überschriften</td><td>Cambria fett schwarz</td></tr>
+<tr><td>ENEO-Grün</td><td>nur Linien und Fußzeile</td></tr>
+<tr><td>Fußzeile</td><td>dreispaltig, mit Geschäftsführer</td></tr>
+<tr><td>Logo</td><td>jede Seite oben rechts, in der Kopfzeile verankert</td></tr>
+<tr><td>Umbruch</td><td>keepNext und keepLines auf Überschriften und Namen, keepLines auf jeden Absatz</td></tr>
+<tr><td>Aufzählung</td><td>Schlagwort fett, Erläuterung dahinter, eingerückt</td></tr>
+<tr><td>Fett</td><td>sparsam, nur Schlagwörter und Namen</td></tr>
+<tr><td>Teilnehmerliste</td><td>Kategorie als Zwischenüberschrift, Name fett, darunter Status, Kartennummer, Entfernung, Funktionszeile</td></tr>
+<tr><td>Legendenfeld</td><td>dieselben Einträge wie die Kartenlegende (F11)</td></tr>
+<tr><td style="color:var(--warn)">nicht</td><td>Vertraulichkeitshinweis, Semikolons, Gedankenstriche</td></tr>
+</tbody>
+</table>
+<figcaption>Gebaut wird mit <code>mkdocx.py</code> aus dem Werkzeugordner, weil auf dem Mac weder python-docx noch pip vorhanden sind. Der PDF-Export wird gemeldet, geliefert wird DOCX.</figcaption>
+</figure>
+</div>
+
+<!-- 08 Prüfskript -->
+<h2><span class="no">08</span>8.6 · Prüfskript und seine bekannten Grenzen</h2>
+<figure>
+<svg viewBox="0 0 900 330" role="img" aria-label="Aufruf des Prüfskripts aus execute_code über subprocess mit dem QGIS-eigenen Python und gesetzten Umgebungsvariablen, mit der Falle beim PROJ-Pfad">
+<defs><marker id="a8" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M1 1L9 5L1 9z" class="fm"/></marker></defs>
+<rect class="bx" x="20" y="20" width="170" height="70" rx="6"/><text class="t" x="34" y="46">execute_code</text><text class="ts" x="34" y="66">ruft subprocess</text>
+<path class="ln" d="M190 55 H226" marker-end="url(#a8)"/>
+<rect class="bx-h2" x="230" y="20" width="650" height="150" rx="6"/><text class="tt" x="244" y="44">eigener Prozess, QGIS-eigener Interpreter</text>
+<text class="tm" x="244" y="70">python3.12</text><text class="ts" x="420" y="70">/Applications/QGIS.app/Contents/MacOS/</text>
+<text class="tm" x="244" y="92">PYTHONHOME</text><text class="ts" x="420" y="92">…/Contents/Frameworks/</text>
+<text class="tm" x="244" y="114">PYTHONPATH</text><text class="ts" x="420" y="114">…/Contents/Resources/python</text>
+<text class="tm" x="244" y="136">PROJ_DATA, PROJ_LIB</text><text class="ta" x="420" y="136">…/Contents/Resources/qgis/proj</text>
+<text class="ts" x="244" y="158">kein pip im Interpreter</text>
+<rect class="bx-warn" x="230" y="186" width="650" height="56" rx="6"/><text class="tw" x="244" y="208">Falle: Resources/proj statt Resources/qgis/proj</text><text class="ts" x="244" y="228">pyproj bricht mit DataDirError ab, das Skript gibt nichts aus. Im Zweifel nach proj.db suchen.</text>
+<rect class="bx-acc" x="20" y="260" width="860" height="54" rx="6"/><text class="ta" x="34" y="282">qs_zelle_v10.py, vollständige Ausgabe zeigen</text><text class="ts" x="34" y="300">Ändert eine Fehlerbehebung einen Kartenlayer, wird die Karte neu exportiert, und nach 8.8 auch jedes Dokument mit diesem Kartenbild.</text>
+</svg>
+<figcaption>Aufruf nach Anhang C. Pfade gekürzt.</figcaption>
+</figure>
+<figure>
+<svg viewBox="0 0 900 240" role="img" aria-label="Zwei bekannte Grenzen: das Prüfskript misst zum Clusterzentroid und kennt keine Varianten, deshalb meldet es Fehler bei Zellen mit zwei Standortvarianten">
+<circle cx="200" cy="120" r="5" style="fill:currentColor"/><text class="ts" x="210" y="116">Clusterzentroid</text>
+<rect x="111" y="71" width="16" height="16" class="fh" transform="rotate(45 119 79)"/><text class="th2" x="70" y="62">Variante A</text>
+<rect x="281" y="161" width="16" height="16" class="fh" transform="rotate(45 289 169)"/><text class="th2" x="300" y="196">Variante B</text>
+<circle cx="119" cy="79" r="90" fill="none" stroke="var(--acc)" stroke-dasharray="5 4"/><text class="ta" x="40" y="200">3 km um A</text>
+<circle cx="70" cy="140" r="6" style="fill:#6B4A2E"/><text class="ts" x="20" y="226">CO2-Quelle: für A innerhalb, für B außerhalb</text>
+<rect class="bx-amb" x="440" y="20" width="440" height="200" rx="6"/><text class="tt" x="454" y="44">Meldung, kein Fehler</text>
+<text class="t" x="454" y="72">1 Methanolwegprüfung</text><text class="ts" x="454" y="90">misst zum Zentroid, meldet einen Widerspruch,</text><text class="ts" x="454" y="106">wenn eine Quelle nur für eine Variante innen liegt</text>
+<text class="t" x="454" y="136">2 Akteursentfernung</text><text class="ts" x="454" y="154">Layer 50 führt km zu Variante A, das Skript</text><text class="ts" x="454" y="170">prüft gegen den Zentroid</text>
+<text class="ta" x="454" y="202">im Übergabebericht als Grenze nennen, nicht beheben</text>
+</svg>
+<figcaption>Schema. „Die Daten sind richtig, die Prüfung ist zu eng.“ Beide Grenzen betreffen nur Zellen mit zwei Standortvarianten.</figcaption>
+</figure>
+
+<!-- 09 Abhängigkeit -->
+<h2><span class="no">09</span>8.8 · Wer wen neu auslöst</h2>
+<figure>
+<svg viewBox="0 0 900 230" role="img" aria-label="Kette Kartenlayer, Kartenexport, Sichtprüfung, Dokumente mit Kartenbild, Standzeile. Jede Änderung vorne löst alles dahinter neu aus">
+<defs><marker id="a9" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M1 1L9 5L1 9z" class="fm"/></marker></defs>
+<rect class="bx" x="20" y="40" width="150" height="56" rx="6"/><text class="t" x="95" y="73" text-anchor="middle">Kartenlayer</text>
+<rect class="bx" x="200" y="40" width="150" height="56" rx="6"/><text class="t" x="275" y="73" text-anchor="middle">Kartenexport</text>
+<rect class="bx-warn" x="380" y="40" width="150" height="56" rx="6"/><text class="t" x="455" y="73" text-anchor="middle">Sichtprüfung</text>
+<rect class="bx-acc" x="560" y="40" width="150" height="56" rx="6"/><text class="t" x="635" y="64" text-anchor="middle">Dokumente</text><text class="ts" x="635" y="82" text-anchor="middle">mit Kartenbild</text>
+<rect class="bx" x="740" y="40" width="140" height="56" rx="6"/><text class="t" x="810" y="73" text-anchor="middle">Standzeile</text>
+<path class="ln" d="M170 68 H196" marker-end="url(#a9)"/><path class="ln" d="M350 68 H376" marker-end="url(#a9)"/><path class="ln" d="M530 68 H556" marker-end="url(#a9)"/><path class="ln" d="M710 68 H736" marker-end="url(#a9)"/>
+<path class="ln-warn" d="M95 96 V140 H95" /><text class="tw" x="20" y="160">Prüfskript findet Fehler</text><path class="ln-warn" d="M95 146 V100" marker-end="url(#a9)"/>
+<rect class="bx-dash" x="380" y="130" width="500" height="80" rx="6"/><text class="tt" x="394" y="154">Standzeile in einem Satz</text><text class="ts" x="394" y="176">Datenstand, Datum des Laufs und die Fortschreibungen.</text><text class="ts" x="394" y="194">Wird je Fortschreibung ergänzt, wie hinweis in 00_Metadaten.</text>
+</svg>
+<figcaption>Dokumente erst nach den Karten, Karten erst nach der Sichtprüfung. Deshalb gehen die Vorschaubilder als Kontaktbogen an den Nutzer, bevor der Dokumentenbau beginnt.</figcaption>
+</figure>
+
+<!-- 10 Übergabebericht -->
+<h2><span class="no">10</span>8.7 und H5 · Der Übergabebericht</h2>
+<div class="duo">
+<figure>
+<svg viewBox="0 0 420 470" role="img" aria-label="Gliederung des Übergabeberichts: neun Abschnitte des Erstlaufs, dann je Fortschreibung ein nummerierter Abschnitt">
+<rect x="20" y="20" width="380" height="430" fill="var(--bg)" stroke="var(--line)" rx="6"/>
+<text class="tmb" x="34" y="44">Uebergabe_&lt;Projekt&gt;.md</text>
+<g>
+<text class="tm" x="34" y="74"># Dateien</text><text class="ts" x="230" y="74">Größe in Byte, Ort</text>
+<text class="tm" x="34" y="96"># Entscheidungen des Laufs</text>
+<text class="tm" x="34" y="118"># Prüfliste Anhang G</text><text class="ts" x="230" y="118">als Tabelle</text>
+<text class="tm" x="34" y="140"># Prüfskript</text><text class="ts" x="230" y="140">vollständige Ausgabe</text>
+<text class="tm" x="34" y="162"># Vorfälle und Technik</text>
+<text class="tm" x="34" y="184"># Offene Punkte</text><text class="ts" x="230" y="184">als Fragen</text>
+<text class="tm" x="34" y="206"># Einordnung andere Zellen</text><text class="ts" x="230" y="228">Schritt 9</text>
+<text class="tm" x="34" y="250"># Nächste Schritte</text>
+<text class="tm" x="34" y="272"># Abschlussprüfung</text>
+</g>
+<line x1="34" y1="290" x2="386" y2="290" stroke="var(--line)"/>
+<rect class="bx-acc" x="34" y="302" width="352" height="134" rx="5"/>
+<text class="tmb" x="46" y="324">## 16 Fortschreibung, Datum</text>
+<text class="ts" x="46" y="346">Anlass: wer hat was wann entschieden</text>
+<text class="ts" x="46" y="364">Umsetzung: Skript, Layer, Werte</text>
+<text class="ts" x="46" y="382">Dokumente · GeoPackage und Projekt</text>
+<text class="ts" x="46" y="400">Offen: A, B, C</text>
+<text class="ts" x="46" y="418">Tabelle aller übertragenen Dateien</text>
+</svg>
+<figcaption>Muster ist <code>Uebergabe_Narthauen-Sued.md</code>, Abschnitte 10 bis 15. Der Bericht wird mit jeder Übertragung ersetzt und vorher archiviert.</figcaption>
+</figure>
+<figure>
+<table style="min-width:0;font-size:13px">
+<thead><tr><th>G3</th><th>Prüfung</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>qs_zelle läuft mit Rückgabewert 0, Ausgabe vollständig</td></tr>
+<tr><td>2</td><td>Karte und GeoPackage mit denselben Objektzahlen</td></tr>
+<tr><td>3</td><td>Logo auf jeder Seite beider Dokumente</td></tr>
+<tr><td>4</td><td>keine Überschrift ohne Text am Seitenende</td></tr>
+<tr><td>5</td><td>Teilnehmerliste nach Kategorie, mit Funktionszeile</td></tr>
+<tr><td>6</td><td>alle zehn Kapitel vorhanden</td></tr>
+<tr><td>7</td><td>im Fließtext nur belegt und gekennzeichnet indikativ</td></tr>
+<tr><td>8</td><td>alle offenen Punkte im Schlusskapitel</td></tr>
+<tr><td>9</td><td>externe Handouts ohne Teilnehmernamen</td></tr>
+<tr><td>10</td><td>Standzeile, Titelzusatz, Blattzahl im Titel aktuell</td></tr>
+<tr><td>11</td><td>Drive-Projektdatei lädt in zweiter QgsProject()-Instanz, alle Layouts, Symbollayer</td></tr>
+<tr><td>12</td><td>Drive-API bestätigt Größe, keine -shm, -wal</td></tr>
+</tbody>
+</table>
+<figcaption>Anhang G3. Zusammen mit G1 und G2 wird die Prüfliste am Ende als Tabelle ausgegeben und steht im Übergabebericht.</figcaption>
+</figure>
+</div>
+
+<!-- 11 Drive -->
+<h2><span class="no">11</span>H1 und H2 · Der Weg auf das Drive</h2>
+<figure>
+<svg viewBox="0 0 900 420" role="img" aria-label="Acht Stufen von der Arbeit auf dem Mac bis zur bestätigten Datei auf dem Drive, mit Änderungsliste und Go als Haltepunkt">
+<defs><marker id="a11" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M1 1L9 5L1 9z" class="fm"/></marker></defs>
+<g>
+<rect class="bx-h2" x="20" y="20" width="200" height="80" rx="6"/><text class="ta" x="34" y="42">1</text><text class="t" x="54" y="42">bauen auf dem Mac</text><text class="ts" x="34" y="64">Ergebnisse nach</text><text class="tm" x="34" y="84">out/drive_set/</text>
+<rect class="bx-warn" x="240" y="20" width="200" height="80" rx="6"/><text class="ta" x="254" y="42">2</text><text class="t" x="274" y="42">Änderungsliste</text><text class="ts" x="254" y="64">im Chat, mit Vorschau,</text><text class="tw" x="254" y="84">auf Go warten</text>
+<rect class="bx" x="460" y="20" width="200" height="80" rx="6"/><text class="ta" x="474" y="42">3</text><text class="t" x="494" y="42">Archiv anlegen</text><text class="ts" x="474" y="64">Archiv &lt;JJJJ-MM-TT&gt;/,</text><text class="ts" x="474" y="80">_vor_&lt;Anlass&gt;_HHMM, copy2</text>
+<rect class="bx" x="680" y="20" width="200" height="80" rx="6"/><text class="ta" x="694" y="42">4</text><text class="t" x="714" y="42">Archiv prüfen</text><text class="ts" x="694" y="64">Sync abwarten, Drive-API:</text><text class="ts" x="694" y="80">Titel und Größe</text>
+<rect class="bx" x="680" y="130" width="200" height="80" rx="6"/><text class="ta" x="694" y="152">5</text><text class="t" x="714" y="152">ersetzen</text><text class="ts" x="694" y="174">copy2 aus drive_set/,</text><text class="ts" x="694" y="190">MD5 Staging gegen Drive</text>
+<rect class="bx" x="460" y="130" width="200" height="80" rx="6"/><text class="ta" x="474" y="152">6</text><text class="t" x="494" y="152">Sync bestätigen</text><text class="ts" x="474" y="174">2 bis 5 min je 100 MB,</text><text class="ts" x="474" y="190">API: Größe je Datei</text>
+<rect class="bx" x="240" y="130" width="200" height="80" rx="6"/><text class="ta" x="254" y="152">7</text><text class="t" x="274" y="152">Ladetest</text><text class="ts" x="254" y="174">zweite QgsProject()-</text><text class="ts" x="254" y="190">Instanz, danach clear()</text>
+<rect class="bx-acc" x="20" y="130" width="200" height="80" rx="6"/><text class="ta" x="34" y="152">8</text><text class="t" x="54" y="152">aufräumen geprüft</text><text class="ts" x="34" y="174">keine -shm, -wal</text><text class="ts" x="34" y="190">neben der GeoPackage</text>
+</g>
+<path class="ln" d="M220 60 H236" marker-end="url(#a11)"/><path class="ln" d="M440 60 H456" marker-end="url(#a11)"/><path class="ln" d="M660 60 H676" marker-end="url(#a11)"/><path class="ln" d="M780 100 V126" marker-end="url(#a11)"/>
+<path class="ln" d="M680 170 H664" marker-end="url(#a11)"/><path class="ln" d="M460 170 H444" marker-end="url(#a11)"/><path class="ln" d="M240 170 H224" marker-end="url(#a11)"/>
+<text class="tt" x="20" y="250">Änderungsliste, drei Spalten</text>
+<rect class="bx-acc" x="20" y="264" width="280" height="110" rx="6"/><text class="ta" x="34" y="286">A faktisch</text><text class="ts" x="34" y="308">was sich ändert, mit Quelle</text><text class="ts" x="34" y="324">oder Anlass: Entscheidung,</text><text class="ts" x="34" y="340">Slack-Kommentar, Prüfbefund,</text><text class="ts" x="34" y="356">je mit Datum</text>
+<rect class="bx-amb" x="310" y="264" width="280" height="110" rx="6"/><text class="tamb" x="324" y="286">B Stil</text><text class="ts" x="324" y="308">„Stilfrage, Nutzer entscheidet“</text><text class="ts" x="324" y="324">Dezimalen, Legendentexte,</text><text class="ts" x="324" y="340">Maßstabsleiste</text>
+<rect class="bx-warn" x="600" y="264" width="280" height="110" rx="6"/><text class="tw" x="614" y="286">C Rückfrage</text><text class="ts" x="614" y="308">ohne verifizierte Quelle, nur als</text><text class="ts" x="614" y="324">Frage: OSM-Hinweis, Projekt-</text><text class="ts" x="614" y="340">register-Träger, Flächen-</text><text class="ts" x="614" y="356">sicherung eines Verbundparks</text>
+<text class="ts" x="20" y="400">Dazu Umfang der Übertragung, Archivname und die Vorschaubilder, die der Nutzer vor der Entscheidung sehen soll.</text>
+</svg>
+<figcaption>Nie direkt auf das Drive schreiben, auch nicht aus QGIS. Drive for Desktop legt ersetzte Dateien unter neuer Kennung an, geprüft wird deshalb über Titel und Größe. Liegt der aktuelle Stand schon in einem Archiv (MD5 je Datei), genügt ein Vermerk. Bricht die Verbindung zum Mac ab: melden und warten.</figcaption>
+</figure>
+
+<!-- 12 Lieferung -->
+<h2><span class="no">12</span>G4 · Was geliefert wird</h2>
+<div class="tiles" style="margin-top:14px">
+<div class="tile"><b>Karten</b><span>je Blatt PNG, PDF, Vorschau-JPG</span></div>
+<div class="tile"><b>Daten</b><span>GeoPackage mit eingebettetem Projekt, qgz</span></div>
+<div class="tile"><b>Handouts</b><span>sechs Fassungen</span></div>
+<div class="tile"><b>Konzeptbegründung</b><span>eine, intern</span></div>
+<div class="tile"><b>Begleitdokumente</b><span>Teilnehmerliste, Beiblatt, Teilnehmererklärung, Anfragenentwürfe</span></div>
+<div class="tile"><b>Übergabebericht</b><span>mit Prüflisten und Dateitabelle</span></div>
+<div class="tile"><b>Arbeitsdateien</b><span>Kartendarstellung Arbeitsdateien/</span></div>
+<div class="tile" style="border-left-color:var(--amb)"><b>sonst nichts</b><span>im Drive-Ordner nur Lieferdateien und Archiv</span></div>
+</div>
+
+<!-- 13 Unstimmigkeiten -->
+<h2><span class="no">13</span>Unstimmigkeiten im Prompt</h2>
+<div class="issues">
+<div class="issue"><b>Version des Prüfskripts</b><p>8.6 verlangt <code>qs_zelle_v10.py</code> und nur ersatzweise v9. Prüfliste G3 Nr. 1 prüft dagegen ausdrücklich <code>qs_zelle_v9.py</code> mit Rückgabewert 0.</p></div>
+<div class="issue"><b>Kostenseite ohne Kapitel</b><p>Die Fassung für Investoren verlangt eine Kostenseite mit Bandbreiten. Die Konzeptbegründung ist die Grundlage aller Fassungen, hat aber kein Kapitel für Kosten. Damit fehlt der Kostenseite die belegte Quelle im Dokumentenbestand.</p></div>
+<div class="issue"><b>Übergabebericht vor Schritt 9</b><p>Der Übergabebericht entsteht in 8.7 und enthält laut H5 die „Einordnung gegen die anderen Zellen“. Diese Einordnung entsteht aber erst in Schritt 9. Der Bericht muss also nach Schritt 9 ergänzt oder neu geschrieben werden.</p></div>
+<div class="issue"><b>Vertraulichkeitshinweis</b><p>Der Hausstil schließt einen Vertraulichkeitshinweis aus. Der Titelzusatz der internen Fassung („Teilnehmerliste mit Namen, vor Weitergabe entfernen“) wirkt aber genau so. Gemeint ist vermutlich nur kein allgemeiner Standardvermerk.</p></div>
+</div>
+
+<footer>Quelle: ENEO_Konzept_Prompt, Fassung 2026-11-11-Z, Schritt 8 sowie Grundsätze und Anhang C, G3, G4, H1, H2, H4 und H5. Akteur und Seitenmuster in 07 sind erfundene Beispiele.</footer>
+</main>
+</body>
+</html>
